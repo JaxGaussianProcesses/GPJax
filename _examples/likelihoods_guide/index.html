@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
       
 
@@ -2665,7 +2665,7 @@ a likelihood object. To do this, we'll need a dataset.</p>
 </span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Latent function&quot;</span><span class="p">)</span>
 </span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f63101e7640&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fa4420027d0&gt;
 </code></pre></div>
 <p><img alt="png" src="../likelihoods_guide_files/likelihoods_guide_1_1.png" /></p>
 <p>In this example, our observations have support <span class="arithmatex">\([-3, 3]\)</span> and are generated from a
@@ -2678,13 +2678,13 @@ instantiating a likelihood object. We do this by specifying the <code>num_datapo
 argument.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Gaussian( # PositiveReal: 1 (8 B)
-  obs_stddev=PositiveReal( # 1 (8 B)
+<div class="language-text highlight"><pre><span></span><code>Gaussian( # NonNegativeReal: 1 (8 B)
+  obs_stddev=NonNegativeReal( # 1 (8 B)
     value=Array(1., dtype=float64, weak_type=True),
-    _tag=&quot;&#39;positive&#39;&quot;
+    _tag=&quot;&#39;non_negative&#39;&quot;
   ),
   num_datapoints=50,
-  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f6310be0fd0&gt;
+  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7fa442cf8760&gt;
 )
 </code></pre></div>
 <h3 id="likelihood-parameters">Likelihood parameters<a class="headerlink" href="#likelihood-parameters" title="Permanent link"></a></h3>
@@ -2698,13 +2698,13 @@ initialise the likelihood standard deviation with a value of <span class="arithm
 this as follows:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">gpx</span><span class="o">.</span><span class="n">likelihoods</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">num_datapoints</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">obs_stddev</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>Gaussian( # PositiveReal: 1 (8 B)
-  obs_stddev=PositiveReal( # 1 (8 B)
+<div class="language-text highlight"><pre><span></span><code>Gaussian( # NonNegativeReal: 1 (8 B)
+  obs_stddev=NonNegativeReal( # 1 (8 B)
     value=Array(0.5, dtype=float64, weak_type=True),
-    _tag=&quot;&#39;positive&#39;&quot;
+    _tag=&quot;&#39;non_negative&#39;&quot;
   ),
   num_datapoints=50,
-  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f6310be0fd0&gt;
+  integrator=&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7fa442cf8760&gt;
 )
 </code></pre></div>
 <h3 id="prediction">Prediction<a class="headerlink" href="#prediction" title="Permanent link"></a></h3>
@@ -2847,14 +2847,14 @@ expectation can be computed analytically.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Sun Apr 13 2025
+Last updated: Tue May 20 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
-IPython version      : 8.35.0
+IPython version      : 8.36.0
 
-jax       : 0.5.3
-matplotlib: 3.10.1
+matplotlib: 3.10.3
+jax       : 0.6.0
 gpjax     : 0.11.0
 
 Watermark: 2.5.0
@@ -2915,10 +2915,10 @@ Watermark: 2.5.0
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       

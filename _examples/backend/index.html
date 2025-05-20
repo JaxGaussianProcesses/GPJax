@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
       
 
@@ -2669,7 +2669,7 @@ Notebook</a> to
 see how you can define your own bijectors and parameter types.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">print</span><span class="p">(</span><span class="n">DEFAULT_BIJECTION</span><span class="p">[</span><span class="n">constant_param</span><span class="o">.</span><span class="n">_tag</span><span class="p">])</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;numpyro.distributions.transforms.SoftplusTransform object at 0x7f54dff20550&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;numpyro.distributions.transforms.SoftplusTransform object at 0x7f3740777970&gt;
 </code></pre></div>
 <p>We see here that the Softplus bijector is specified as the default for strictly
 positive parameters. To apply this, we must first realise the <em>state</em> of our model.
@@ -2710,19 +2710,19 @@ explanation of this model.).</p>
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">posterior</span> <span class="o">=</span> <span class="n">likelihood</span> <span class="o">*</span> <span class="n">prior</span>
 </span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">posterior</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mConjugatePosterior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 3 (24 B), Real: 1 (8 B), Total: 4 (32 B)[0m
-  [38;2;156;220;254mprior[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPrior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 2 (16 B), Real: 1 (8 B), Total: 3 (24 B)[0m
-    [38;2;156;220;254mkernel[0m[38;2;212;212;212m=[0m[38;2;79;201;177mMatern32[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 2 (16 B)[0m
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mConjugatePosterior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # NonNegativeReal: 2 (16 B), PositiveReal: 1 (8 B), Real: 1 (8 B), Total: 4 (32 B)[0m
+  [38;2;156;220;254mprior[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPrior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B), NonNegativeReal: 1 (8 B), Real: 1 (8 B), Total: 3 (24 B)[0m
+    [38;2;156;220;254mkernel[0m[38;2;212;212;212m=[0m[38;2;79;201;177mMatern32[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B), NonNegativeReal: 1 (8 B), Total: 2 (16 B)[0m
       [38;2;156;220;254mactive_dims[0m[38;2;212;212;212m=[0mslice(None, None, None),
       [38;2;156;220;254mn_dims[0m[38;2;212;212;212m=[0m[38;2;86;156;214mNone[0m,
-      [38;2;156;220;254mcompute_engine[0m[38;2;212;212;212m=[0m&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f54df548b20&gt;,
+      [38;2;156;220;254mcompute_engine[0m[38;2;212;212;212m=[0m&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f3740634520&gt;,
       [38;2;156;220;254mlengthscale[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
         [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
         [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
       [38;2;255;213;3m)[0m,
-      [38;2;156;220;254mvariance[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+      [38;2;156;220;254mvariance[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
         [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
-        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;non_negative&#39;&quot;[0m
       [38;2;255;213;3m)[0m
     [38;2;255;213;3m)[0m,
     [38;2;156;220;254mmean_function[0m[38;2;212;212;212m=[0m[38;2;79;201;177mConstant[0m[38;2;255;213;3m([0m[38;2;105;105;105m # Real: 1 (8 B)[0m
@@ -2733,13 +2733,13 @@ explanation of this model.).</p>
     [38;2;255;213;3m)[0m,
     [38;2;156;220;254mjitter[0m[38;2;212;212;212m=[0m[38;2;182;207;169m1e-06[0m
   [38;2;255;213;3m)[0m,
-  [38;2;156;220;254mlikelihood[0m[38;2;212;212;212m=[0m[38;2;79;201;177mGaussian[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B)[0m
-    [38;2;156;220;254mobs_stddev[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+  [38;2;156;220;254mlikelihood[0m[38;2;212;212;212m=[0m[38;2;79;201;177mGaussian[0m[38;2;255;213;3m([0m[38;2;105;105;105m # NonNegativeReal: 1 (8 B)[0m
+    [38;2;156;220;254mobs_stddev[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
       [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
-      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;non_negative&#39;&quot;[0m
     [38;2;255;213;3m)[0m,
     [38;2;156;220;254mnum_datapoints[0m[38;2;212;212;212m=[0m[38;2;182;207;169m100[0m,
-    [38;2;156;220;254mintegrator[0m[38;2;212;212;212m=[0m&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f54df5c4430&gt;
+    [38;2;156;220;254mintegrator[0m[38;2;212;212;212m=[0m&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f373bceb760&gt;
   [38;2;255;213;3m)[0m,
   [38;2;156;220;254mjitter[0m[38;2;212;212;212m=[0m[38;2;182;207;169m1e-06[0m
 [38;2;255;213;3m)[0m
@@ -2757,9 +2757,9 @@ from a give <code>State</code>.</p>
 <div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mState[0m[38;2;255;213;3m({[0m[38;2;105;105;105m[0m
   [38;2;156;220;254m&#39;likelihood&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
     [38;2;156;220;254m&#39;obs_stddev&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m,
       [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
-      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;non_negative&#39;[0m
     [38;2;255;213;3m)[0m
   [38;2;255;213;3m}[0m,
   [38;2;156;220;254m&#39;prior&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
@@ -2770,9 +2770,9 @@ from a give <code>State</code>.</p>
         [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
       [38;2;255;213;3m)[0m,
       [38;2;156;220;254m&#39;variance&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m,
         [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
-        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;non_negative&#39;[0m
       [38;2;255;213;3m)[0m
     [38;2;255;213;3m}[0m,
     [38;2;156;220;254m&#39;mean_function&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
@@ -2795,9 +2795,9 @@ parameter's value by 1.</p>
 <div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mState[0m[38;2;255;213;3m({[0m[38;2;105;105;105m[0m
   [38;2;156;220;254m&#39;likelihood&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
     [38;2;156;220;254m&#39;obs_stddev&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m,
       [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
-      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;non_negative&#39;[0m
     [38;2;255;213;3m)[0m
   [38;2;255;213;3m}[0m,
   [38;2;156;220;254m&#39;prior&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
@@ -2808,9 +2808,9 @@ parameter's value by 1.</p>
         [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
       [38;2;255;213;3m)[0m,
       [38;2;156;220;254m&#39;variance&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m,
         [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
-        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;non_negative&#39;[0m
       [38;2;255;213;3m)[0m
     [38;2;255;213;3m}[0m,
     [38;2;156;220;254m&#39;mean_function&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
@@ -2828,29 +2828,29 @@ the updated state.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">updated_posterior</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">graphdef</span><span class="p">,</span> <span class="n">updated_state</span><span class="p">)</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">updated_posterior</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mConjugatePosterior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 3 (24 B), Real: 1 (8 B), Total: 4 (32 B)[0m
+<div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mConjugatePosterior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # NonNegativeReal: 2 (16 B), PositiveReal: 1 (8 B), Real: 1 (8 B), Total: 4 (32 B)[0m
   [38;2;156;220;254mjitter[0m[38;2;212;212;212m=[0m[38;2;182;207;169m1e-06[0m,
-  [38;2;156;220;254mlikelihood[0m[38;2;212;212;212m=[0m[38;2;79;201;177mGaussian[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B)[0m
-    [38;2;156;220;254mintegrator[0m[38;2;212;212;212m=[0m&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f54df5c4430&gt;,
+  [38;2;156;220;254mlikelihood[0m[38;2;212;212;212m=[0m[38;2;79;201;177mGaussian[0m[38;2;255;213;3m([0m[38;2;105;105;105m # NonNegativeReal: 1 (8 B)[0m
+    [38;2;156;220;254mintegrator[0m[38;2;212;212;212m=[0m&lt;gpjax.integrators.AnalyticalGaussianIntegrator object at 0x7f373bceb760&gt;,
     [38;2;156;220;254mnum_datapoints[0m[38;2;212;212;212m=[0m[38;2;182;207;169m100[0m,
-    [38;2;156;220;254mobs_stddev[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+    [38;2;156;220;254mobs_stddev[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
       [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
-      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;non_negative&#39;&quot;[0m
     [38;2;255;213;3m)[0m
   [38;2;255;213;3m)[0m,
-  [38;2;156;220;254mprior[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPrior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 2 (16 B), Real: 1 (8 B), Total: 3 (24 B)[0m
+  [38;2;156;220;254mprior[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPrior[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B), NonNegativeReal: 1 (8 B), Real: 1 (8 B), Total: 3 (24 B)[0m
     [38;2;156;220;254mjitter[0m[38;2;212;212;212m=[0m[38;2;182;207;169m1e-06[0m,
-    [38;2;156;220;254mkernel[0m[38;2;212;212;212m=[0m[38;2;79;201;177mMatern32[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 2 (16 B)[0m
+    [38;2;156;220;254mkernel[0m[38;2;212;212;212m=[0m[38;2;79;201;177mMatern32[0m[38;2;255;213;3m([0m[38;2;105;105;105m # PositiveReal: 1 (8 B), NonNegativeReal: 1 (8 B), Total: 2 (16 B)[0m
       [38;2;156;220;254mactive_dims[0m[38;2;212;212;212m=[0mslice(None, None, None),
-      [38;2;156;220;254mcompute_engine[0m[38;2;212;212;212m=[0m&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f54df548b20&gt;,
+      [38;2;156;220;254mcompute_engine[0m[38;2;212;212;212m=[0m&lt;gpjax.kernels.computations.dense.DenseKernelComputation object at 0x7f3740634520&gt;,
       [38;2;156;220;254mlengthscale[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
         [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
         [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
       [38;2;255;213;3m)[0m,
       [38;2;156;220;254mn_dims[0m[38;2;212;212;212m=[0m[38;2;86;156;214mNone[0m,
-      [38;2;156;220;254mvariance[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+      [38;2;156;220;254mvariance[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
         [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(2., dtype=float64, weak_type=True),
-        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;non_negative&#39;&quot;[0m
       [38;2;255;213;3m)[0m
     [38;2;255;213;3m)[0m,
     [38;2;156;220;254mmean_function[0m[38;2;212;212;212m=[0m[38;2;79;201;177mConstant[0m[38;2;255;213;3m([0m[38;2;105;105;105m # Real: 1 (8 B)[0m
@@ -2871,9 +2871,9 @@ is very straightforward, and we may simply use the <code>transform</code> functi
 <div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mState[0m[38;2;255;213;3m({[0m[38;2;105;105;105m[0m
   [38;2;156;220;254m&#39;likelihood&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
     [38;2;156;220;254m&#39;obs_stddev&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m,
       [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.54132485, dtype=float64, weak_type=True),
-      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;non_negative&#39;[0m
     [38;2;255;213;3m)[0m
   [38;2;255;213;3m}[0m,
   [38;2;156;220;254m&#39;prior&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
@@ -2884,9 +2884,9 @@ is very straightforward, and we may simply use the <code>transform</code> functi
         [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
       [38;2;255;213;3m)[0m,
       [38;2;156;220;254m&#39;variance&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
+        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mNonNegativeReal[0m,
         [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.54132485, dtype=float64, weak_type=True),
-        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
+        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;non_negative&#39;[0m
       [38;2;255;213;3m)[0m
     [38;2;255;213;3m}[0m,
     [38;2;156;220;254m&#39;mean_function&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
@@ -2915,21 +2915,9 @@ altering the way in which we invoke <code>nnx.split</code>.</p>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">positive_reals</span><span class="p">)</span>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>[38;2;79;201;177mState[0m[38;2;255;213;3m({[0m[38;2;105;105;105m[0m
-  [38;2;156;220;254m&#39;likelihood&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
-    [38;2;156;220;254m&#39;obs_stddev&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-      [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
-      [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
-      [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
-    [38;2;255;213;3m)[0m
-  [38;2;255;213;3m}[0m,
   [38;2;156;220;254m&#39;prior&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
     [38;2;156;220;254m&#39;kernel&#39;[0m[38;2;212;212;212m: [0m[38;2;255;213;3m{[0m[38;2;105;105;105m[0m
       [38;2;156;220;254m&#39;lengthscale&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-        [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
-        [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
-        [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
-      [38;2;255;213;3m)[0m,
-      [38;2;156;220;254m&#39;variance&#39;[0m[38;2;212;212;212m: [0m[38;2;79;201;177mVariableState[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
         [38;2;156;220;254mtype[0m[38;2;212;212;212m=[0m[38;2;79;201;177mPositiveReal[0m,
         [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
         [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&#39;positive&#39;[0m
@@ -2990,7 +2978,7 @@ a linearly spaced set of inputs.</p>
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">meanf</span> <span class="o">=</span> <span class="n">LinearMeanFunction</span><span class="p">(</span><span class="n">intercept</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">slope</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 </span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">meanf</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>[&lt;matplotlib.lines.Line2D at 0x7f54de189330&gt;]
+<div class="language-text highlight"><pre><span></span><code>[&lt;matplotlib.lines.Line2D at 0x7f373ae20f10&gt;]
 </code></pre></div>
 <p><img alt="png" src="../backend_files/backend_36_1.png" /></p>
 <p>Looks good! To conclude this section, let's now parameterise a GP with our new mean
@@ -3052,17 +3040,17 @@ notebook.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Sun Apr 13 2025
+Last updated: Tue May 20 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
-IPython version      : 8.35.0
+IPython version      : 8.36.0
 
+jaxtyping : 0.3.2
+matplotlib: 3.10.3
+flax      : 0.10.6
+jax       : 0.6.0
 gpjax     : 0.11.0
-flax      : 0.10.5
-jax       : 0.5.3
-matplotlib: 3.10.1
-jaxtyping : 0.3.1
 
 Watermark: 2.5.0
 </code></pre></div>
@@ -3122,10 +3110,10 @@ Watermark: 2.5.0
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       

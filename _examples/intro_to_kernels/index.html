@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
       
 
@@ -2889,7 +2889,7 @@ posterior with the default hyperparameters:</p>
 </span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Posterior without Hyperparameter Optimisation&quot;</span><span class="p">)</span>
 </span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f0a41763580&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fd670e383d0&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_20_1.png" /></p>
 <p>We can see that optimising the hyperparameters by minimising the negative log marginal likelihood of the data results in a more faithful fit of the GP to the data. In particular, we can observe that the GP using optimised hyperparameters is more accurately able to reflect uncertainty in its predictions, as opposed to the GP using the default parameters, which is overconfident in its predictions.</p>
@@ -2907,16 +2907,16 @@ posterior with the default hyperparameters:</p>
 <div class="language-text highlight"><pre><span></span><code>Optimised Lengthscale: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
   [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.27113679, dtype=float64),
   [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
-[38;2;255;213;3m)[0m and Variance: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(24.79013316, dtype=float64),
-  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+[38;2;255;213;3m)[0m and Variance: [38;2;79;201;177mNonNegativeReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(24.79013317, dtype=float64),
+  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;non_negative&#39;&quot;[0m
 [38;2;255;213;3m)[0m
 Non-Optimised Lengthscale: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
   [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.1, dtype=float64, weak_type=True),
   [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
-[38;2;255;213;3m)[0m and Variance: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
+[38;2;255;213;3m)[0m and Variance: [38;2;79;201;177mNonNegativeReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
   [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(1., dtype=float64, weak_type=True),
-  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
+  [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;non_negative&#39;&quot;[0m
 [38;2;255;213;3m)[0m
 </code></pre></div>
 <h2 id="expressing-other-priors-with-different-kernels">Expressing Other Priors with Different Kernels<a class="headerlink" href="#expressing-other-priors-with-different-kernels" title="Permanent link"></a></h2>
@@ -3129,7 +3129,7 @@ training data, as well as 8 years before and after the training data:</p>
 </span><span id="__span-18-28"><a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
 </span><span id="__span-18-29"><a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f0a3b35b5e0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fd67020be50&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_47_1.png" /></p>
 <p>We can see that the model seems to have captured the periodic trend in the data, as well
@@ -3176,7 +3176,7 @@ period from 2010 onwards:</p>
 </span><span id="__span-19-38"><a id="__codelineno-19-38" name="__codelineno-19-38" href="#__codelineno-19-38"></a><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
 </span><span id="__span-19-39"><a id="__codelineno-19-39" name="__codelineno-19-39" href="#__codelineno-19-39"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f0a38d57430&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fd67002d960&gt;
 </code></pre></div>
 <p><img alt="png" src="../intro_to_kernels_files/intro_to_kernels_49_1.png" /></p>
 <p>This certainly looks like a reasonable fit to the data, with sensible extrapolation
@@ -3188,7 +3188,7 @@ parameters of the kernel are interpretable. Let's take a look at the learned per
 </span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">)</span>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Periodic Kernel Period: [38;2;79;201;177mPositiveReal[0m[38;2;255;213;3m([0m[38;2;105;105;105m # 1 (8 B)[0m
-  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.99962104, dtype=float64),
+  [38;2;156;220;254mvalue[0m[38;2;212;212;212m=[0mArray(0.99992299, dtype=float64),
   [38;2;156;220;254m_tag[0m[38;2;212;212;212m=[0m[38;2;207;144;120m&quot;&#39;positive&#39;&quot;[0m
 [38;2;255;213;3m)[0m
 </code></pre></div>
@@ -3210,19 +3210,19 @@ periodic trend tends to repeat itself roughly every year!</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Christie
 
-Last updated: Sun Apr 13 2025
+Last updated: Tue May 20 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
-IPython version      : 8.35.0
+IPython version      : 8.36.0
 
+matplotlib: 3.10.3
 optax     : 0.2.4
-gpjax     : 0.11.0
-jaxtyping : 0.3.1
 pandas    : 2.2.3
-jax       : 0.5.3
+jax       : 0.6.0
+gpjax     : 0.11.0
 sklearn   : 1.6.1
-matplotlib: 3.10.1
+jaxtyping : 0.3.2
 
 Watermark: 2.5.0
 </code></pre></div>
@@ -3282,10 +3282,10 @@ Watermark: 2.5.0
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       

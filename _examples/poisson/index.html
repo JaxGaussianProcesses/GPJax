@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../static/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
       
 
@@ -2598,14 +2598,14 @@ We store our data <span class="arithmatex">\(\mathcal{D}\)</span> as a GPJax <co
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">xtest</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Rate $\lambda$&quot;</span><span class="p">)</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>/home/runner/.local/share/hatch/env/virtual/gpjax/9bz-h8Il/docs/lib/python3.10/site-packages/jaxtyping/_decorator.py:463: UserWarning: y is not of type float64.Got y.dtype=int64. This may lead to numerical instability.
+<div class="language-text highlight"><pre><span></span><code>/home/runner/.local/share/hatch/env/virtual/gpjax/9bz-h8Il/docs/lib/python3.10/site-packages/jaxtyping/_decorator.py:473: UserWarning: y is not of type float64.Got y.dtype=int64. This may lead to numerical instability.
   out = fn(*args, **kwargs)
 
 
 
 
 
-&lt;matplotlib.legend.Legend at 0x7f629e335cc0&gt;
+&lt;matplotlib.legend.Legend at 0x7ff348fe12a0&gt;
 </code></pre></div>
 <p><img alt="png" src="../poisson_files/poisson_3_2.png" /></p>
 <h2 id="gaussian-process-definition">Gaussian Process definition<a class="headerlink" href="#gaussian-process-definition" title="Permanent link"></a></h2>
@@ -2747,7 +2747,7 @@ against the observed data.</p>
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;95% CI&quot;</span><span class="p">,</span>
 </span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.collections.FillBetweenPolyCollection at 0x7f62947f53c0&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.collections.FillBetweenPolyCollection at 0x7ff33ac8bb80&gt;
 </code></pre></div>
 <p><img alt="png" src="../poisson_files/poisson_17_1.png" /></p>
 <h2 id="system-configuration">System configuration<a class="headerlink" href="#system-configuration" title="Permanent link"></a></h2>
@@ -2756,18 +2756,18 @@ against the observed data.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Francesco Zanetta
 
-Last updated: Sun Apr 13 2025
+Last updated: Tue May 20 2025
 
 Python implementation: CPython
 Python version       : 3.10.16
-IPython version      : 8.35.0
+IPython version      : 8.36.0
 
-gpjax     : 0.11.0
-jaxtyping : 0.3.1
-flax      : 0.10.5
-jax       : 0.5.3
+flax      : 0.10.6
+matplotlib: 3.10.3
 blackjax  : 1.2.5
-matplotlib: 3.10.1
+jax       : 0.6.0
+jaxtyping : 0.3.2
+gpjax     : 0.11.0
 
 Watermark: 2.5.0
 </code></pre></div>
@@ -2829,10 +2829,10 @@ Watermark: 2.5.0
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
