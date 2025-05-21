@@ -1,11 +1,10 @@
-from flax import nnx
+import gpjax as gpx
 import jax
-from jax import config
 import jax.numpy as jnp
 import jax.random as jr
+import numpyro.distributions as npd
 import pytest
-
-import gpjax as gpx
+from flax import nnx
 from gpjax.dataset import Dataset
 from gpjax.gps import Prior
 from gpjax.likelihoods import Gaussian
@@ -17,6 +16,7 @@ from gpjax.objectives import (
     non_conjugate_mll,
 )
 from gpjax.parameters import Parameter
+from jax import config
 
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -83,6 +83,60 @@ def test_conjugate_mll(n_points: int, n_dims: int, key_val: int):
     grad = jax.grad(loss)
     grad_res = grad(state)
     assert isinstance(grad_res, nnx.State)
+
+
+def test_conjugate_mll_with_hyperpriors():
+    key_val = 123
+    n_points = 50
+    n_dims = 2
+
+    key = jr.PRNGKey(key_val)
+    D = build_data(n_points, n_dims, key, binary=False)
+
+    # MLL without hyperpriors
+    prior_without = gpx.gps.Prior(
+        kernel=gpx.kernels.RBF(
+            active_dims=list(range(n_dims)),
+            lengthscale=gpx.parameters.PositiveReal(
+                value=0.2,
+            ),
+        ),
+        mean_function=gpx.mean_functions.Constant(),
+    )
+    likelihood_without = gpx.likelihoods.Gaussian(
+        num_datapoints=n_points,
+        obs_stddev=gpx.parameters.PositiveReal(
+            value=0.05,
+        ),
+    )
+    posterior_without = prior_without * likelihood_without
+    mll_without = -conjugate_mll(posterior_without, D)
+
+    # MLL with hyperpriors
+    prior_with = gpx.gps.Prior(
+        kernel=gpx.kernels.RBF(
+            active_dims=list(range(n_dims)),
+            lengthscale=gpx.parameters.PositiveReal(
+                value=0.2,
+                prior=npd.LogNormal(
+                    loc=jnp.sqrt(2) + jnp.log(jnp.sqrt(n_dims)), scale=3
+                ),
+            ),
+        ),
+        mean_function=gpx.mean_functions.Constant(),
+    )
+    likelihood_with = gpx.likelihoods.Gaussian(
+        num_datapoints=n_points,
+        obs_stddev=gpx.parameters.PositiveReal(
+            value=0.05,
+            prior=npd.LogNormal(loc=-4, scale=1),
+        ),
+    )
+    posterior_with = prior_with * likelihood_with
+    mll_with = -conjugate_mll(posterior_with, D)
+
+    # Compare mll
+    assert mll_with < mll_without
 
 
 @pytest.mark.parametrize("n_points", [1, 2, 10])
