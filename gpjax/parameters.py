@@ -53,17 +53,19 @@ def transform(
         bijector = params_bijection.get(param._tag, npt.IdentityTransform())
         if inverse:
             transformed_value = bijector.inv(param.value)
-            # TODO: avoid transforming the prior if it is a Unit distribution
-            transformed_prior = npd.TransformedDistribution(
-                param.prior_dist, bijector.inv
-            )
+            transformed_prior = npd.TransformedDistribution(param._prior, bijector.inv)
         else:
             transformed_value = bijector(param.value)
-            # TODO: avoid transforming the prior if it is a Unit distribution
-            transformed_prior = npd.TransformedDistribution(param.prior_dist, bijector)
+            transformed_prior = npd.TransformedDistribution(param._prior, bijector)
 
-        # TODO: VariableState.replace, only allows replacing the value
-        param = param.replace(value=transformed_value, prior_dist=transformed_prior)
+        # VariableState.replace only allows replacing the value
+        # Here we copy the contents of that function exactly, but also modify the prior
+        modified_metadata = param.get_metadata() | {"_prior": transformed_prior}
+        param = nnx.VariableState(
+            param.type,
+            transformed_value,
+            **modified_metadata,
+        )
         return param
 
     gp_params, *other_params = params.split(Parameter, ...)
@@ -87,14 +89,19 @@ class Parameter(nnx.Variable[T]):
         self,
         value: T,
         tag: ParameterTag,
-        prior_dist: npd.Distribution = npd.Unit(0.0),
+        prior: npd.Distribution | None = None,
         **kwargs,
     ):
         _check_is_arraylike(value)
 
-        super().__init__(value=jnp.asarray(value), **kwargs)
+        super().__init__(
+            value=jnp.asarray(value), has_prior=prior is not None, **kwargs
+        )
         self._tag = tag
-        self.prior_dist = prior_dist
+        self._prior = prior if self.has_prior else npd.Unit(0.0)
+
+    def prior_log_prob(self):
+        return self._prior.log_prob(self.value) * self._has_prior
 
 
 class PositiveReal(Parameter[T]):
