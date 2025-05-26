@@ -53,10 +53,17 @@ def transform(
         bijector = params_bijection.get(param._tag, npt.IdentityTransform())
         if inverse:
             transformed_value = bijector.inv(param.value)
+            # TODO: avoid transforming the prior if it is a Unit distribution
+            transformed_prior = npd.TransformedDistribution(
+                param.prior_dist, bijector.inv
+            )
         else:
             transformed_value = bijector(param.value)
+            # TODO: avoid transforming the prior if it is a Unit distribution
+            transformed_prior = npd.TransformedDistribution(param.prior_dist, bijector)
 
-        param = param.replace(transformed_value)
+        # TODO: VariableState.replace, only allows replacing the value
+        param = param.replace(value=transformed_value, prior_dist=transformed_prior)
         return param
 
     gp_params, *other_params = params.split(Parameter, ...)
@@ -80,14 +87,14 @@ class Parameter(nnx.Variable[T]):
         self,
         value: T,
         tag: ParameterTag,
-        prior: npd.Distribution = npd.Unit(log_factor=0.0),
+        prior_dist: npd.Distribution = npd.Unit(0.0),
         **kwargs,
     ):
         _check_is_arraylike(value)
 
         super().__init__(value=jnp.asarray(value), **kwargs)
         self._tag = tag
-        self._prior = prior
+        self.prior_dist = prior_dist
 
 
 class PositiveReal(Parameter[T]):
@@ -169,6 +176,21 @@ def _check_is_arraylike(value: T) -> None:
     if not isinstance(value, (ArrayLike, list)):
         raise TypeError(
             f"Expected parameter value to be an array-like type. Got {value}."
+        )
+
+
+def _check_is_dist(value: tp.Any) -> None:
+    """Check if a value is a distribution.
+
+    Args:
+        value: The value to check.
+
+    Raises:
+        TypeError: If the value is not a distribution.
+    """
+    if not isinstance(value, npd.Distribution):
+        raise TypeError(
+            f"Expected parameter value to be a numpyro distribution. Got {value}."
         )
 
 
