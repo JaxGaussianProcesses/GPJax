@@ -1,11 +1,12 @@
 import typing as tp
 
-from flax import nnx
-from jax.experimental import checkify
 import jax.numpy as jnp
 import jax.tree_util as jtu
-from jax.typing import ArrayLike
+import numpyro.distributions as npd
 import numpyro.distributions.transforms as npt
+from flax import nnx
+from jax.experimental import checkify
+from jax.typing import ArrayLike
 
 from gpjax.numpyro_extras import FillTriangularTransform
 
@@ -52,10 +53,19 @@ def transform(
         bijector = params_bijection.get(param._tag, npt.IdentityTransform())
         if inverse:
             transformed_value = bijector.inv(param.value)
+            transformed_prior = npd.TransformedDistribution(param._prior, bijector.inv)
         else:
             transformed_value = bijector(param.value)
+            transformed_prior = npd.TransformedDistribution(param._prior, bijector)
 
-        param = param.replace(transformed_value)
+        # VariableState.replace only allows replacing the value
+        # Here we copy the contents of that function exactly, but also modify the prior
+        modified_metadata = param.get_metadata() | {"_prior": transformed_prior}
+        param = nnx.VariableState(
+            param.type,
+            transformed_value,
+            **modified_metadata,
+        )
         return param
 
     gp_params, *other_params = params.split(Parameter, ...)
@@ -75,11 +85,23 @@ class Parameter(nnx.Variable[T]):
 
     """
 
-    def __init__(self, value: T, tag: ParameterTag, **kwargs):
+    def __init__(
+        self,
+        value: T,
+        tag: ParameterTag,
+        prior: npd.Distribution | None = None,
+        **kwargs,
+    ):
         _check_is_arraylike(value)
 
-        super().__init__(value=jnp.asarray(value), **kwargs)
+        super().__init__(
+            value=jnp.asarray(value), has_prior=prior is not None, **kwargs
+        )
         self._tag = tag
+        self._prior = prior if self.has_prior else npd.Unit(0.0)
+
+    def prior_log_prob(self):
+        return self._prior.log_prob(self.value) * self._has_prior
 
 
 class NonNegativeReal(Parameter[T]):
@@ -170,6 +192,21 @@ def _check_is_arraylike(value: T) -> None:
     if not isinstance(value, (ArrayLike, list)):
         raise TypeError(
             f"Expected parameter value to be an array-like type. Got {value}."
+        )
+
+
+def _check_is_dist(value: tp.Any) -> None:
+    """Check if a value is a distribution.
+
+    Args:
+        value: The value to check.
+
+    Raises:
+        TypeError: If the value is not a distribution.
+    """
+    if not isinstance(value, npd.Distribution):
+        raise TypeError(
+            f"Expected parameter value to be a numpyro distribution. Got {value}."
         )
 
 
