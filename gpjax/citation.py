@@ -50,7 +50,7 @@ class AbstractCitation:
 
 
 class NullCitation(AbstractCitation):
-    def __str__(self) -> str:
+    def as_str(self) -> str:
         return (
             "No citation available. If you think this is an error, please open a pull"
             " request."
