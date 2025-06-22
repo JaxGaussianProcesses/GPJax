@@ -8,7 +8,12 @@ from beartype.typing import (
     Dict,
     Union,
 )
-from jaxlib.xla_extension import PjitFunction
+
+try:
+    # safely removable once jax>=0.6.0
+    from jaxlib.xla_extension import PjitFunction
+except ModuleNotFoundError:
+    from jaxlib._jax import PjitFunction
 
 from gpjax.kernels import (
     RFF,
