@@ -2770,14 +2770,11 @@ Optimization terminated successfully.
          Gradient evaluations: 23
 
 
+Optimization terminated successfully.
          Current function value: -271.634988
          Iterations: 11
-         Function evaluations: 72
-         Gradient evaluations: 60
-
-
-/home/runner/.local/share/hatch/env/virtual/gpjax/9bz-h8Il/docs/lib/python3.10/site-packages/scipy/optimize/_minimize.py:733: OptimizeWarning: Desired error not necessarily achieved due to precision loss.
-  res = _minimize_bfgs(fun, x0, args, jac, callback, **options)
+         Function evaluations: 17
+         Gradient evaluations: 17
 </code></pre></div>
 <h2 id="computing-the-barycentre">Computing the barycentre<a class="headerlink" href="#computing-the-barycentre" title="Permanent link"></a></h2>
 <p>In GPJax, the predictive distribution of a GP is given by a
@@ -2867,7 +2864,7 @@ uncertainty bands are sensible.</p>
 </span><span id="__span-5-33"><a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="p">)</span>
 </span><span id="__span-5-34"><a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f8420c27460&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f7e82f19420&gt;
 </code></pre></div>
 <p><img alt="png" src="../barycentres_files/barycentres_11_1.png" /></p>
 <h2 id="displacement-interpolation">Displacement interpolation<a class="headerlink" href="#displacement-interpolation" title="Permanent link"></a></h2>
@@ -2884,17 +2881,17 @@ distributions <span class="arithmatex">\(\mu_1\)</span> and <span class="arithma
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Tue May 20 2025
+Last updated: Mon Jun 23 2025
 
 Python implementation: CPython
-Python version       : 3.10.16
-IPython version      : 8.36.0
+Python version       : 3.10.18
+IPython version      : 8.37.0
 
-jaxtyping : 0.3.2
-numpyro   : 0.18.0
 matplotlib: 3.10.3
+jax       : 0.6.2
 gpjax     : 0.11.1
-jax       : 0.6.0
+numpyro   : 0.18.0
+jaxtyping : 0.3.2
 
 Watermark: 2.5.0
 </code></pre></div>
