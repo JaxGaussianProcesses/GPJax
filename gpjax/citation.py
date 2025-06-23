@@ -8,7 +8,12 @@ from beartype.typing import (
     Dict,
     Union,
 )
-from jaxlib.xla_extension import PjitFunction
+
+try:
+    # safely removable once jax>=0.6.0
+    from jaxlib.xla_extension import PjitFunction
+except ModuleNotFoundError:
+    from jaxlib._jax import PjitFunction
 
 from gpjax.kernels import (
     RFF,
@@ -45,7 +50,7 @@ class AbstractCitation:
 
 
 class NullCitation(AbstractCitation):
-    def __str__(self) -> str:
+    def as_str(self) -> str:
         return (
             "No citation available. If you think this is an error, please open a pull"
             " request."

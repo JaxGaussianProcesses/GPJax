@@ -15,13 +15,13 @@
 
 import typing as tp
 
+from flax import nnx
 import jax
+from jax.flatten_util import ravel_pytree
 import jax.numpy as jnp
 import jax.random as jr
-import optax as ox
-from flax import nnx
-from jax.flatten_util import ravel_pytree
 from numpyro.distributions.transforms import Transform
+import optax as ox
 from scipy.optimize import minimize
 
 from gpjax.dataset import Dataset

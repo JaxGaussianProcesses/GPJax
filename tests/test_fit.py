@@ -13,13 +13,18 @@
 # limitations under the License.
 # ==============================================================================
 
+from beartype.typing import Any
+from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import (
+    Float,
+    Num,
+)
 import optax as ox
 import pytest
 import scipy
-from beartype.typing import Any
-from flax import nnx
+
 from gpjax.dataset import Dataset
 from gpjax.fit import (
     _check_batch_size,
@@ -54,10 +59,6 @@ from gpjax.parameters import (
 )
 from gpjax.typing import Array
 from gpjax.variational_families import VariationalGaussian
-from jaxtyping import (
-    Float,
-    Num,
-)
 
 
 def test_fit_simple() -> None:
