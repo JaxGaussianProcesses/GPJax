@@ -36,6 +36,12 @@ from gpjax.kernels.nonstationary import (
     Linear,
     Polynomial,
 )
+from gpjax.kernels.orthogonal_additive import (
+    OrthogonalAdditiveGP,
+    OrthogonalAdditiveKernel,
+    compute_detailed_sobol_indices,
+    compute_sobol_indices,
+)
 from gpjax.kernels.stationary import (
     RBF,
     Matern12,
@@ -57,6 +63,8 @@ __all__ = [
     "Matern32",
     "Matern52",
     "Linear",
+    "OrthogonalAdditiveGP",
+    "OrthogonalAdditiveKernel",
     "Polynomial",
     "ProductKernel",
     "SumKernel",
@@ -70,5 +78,7 @@ __all__ = [
     "White",
     "BasisFunctionComputation",
     "RFF",
+    "compute_sobol_indices",
+    "compute_detailed_sobol_indices",
     "stationary",
 ]
