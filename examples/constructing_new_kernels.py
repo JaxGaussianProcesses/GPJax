@@ -95,7 +95,7 @@ meanf = gpx.mean_functions.Zero()
 for k, ax, c in zip(kernels, axes.ravel(), cols, strict=False):
     prior = gpx.gps.Prior(mean_function=meanf, kernel=k)
     rv = prior(x)
-    y = rv.sample(seed=key, sample_shape=(10,))
+    y = rv.sample(key=jr.key(22), sample_shape=(10,))
     ax.plot(x, y.T, alpha=0.7, color=c)
     ax.set_title(k.name)
 
@@ -326,7 +326,7 @@ opt_posterior, history = gpx.fit_scipy(
 # %%
 posterior_rv = opt_posterior.likelihood(opt_posterior.predict(angles, train_data=D))
 mu = posterior_rv.mean
-one_sigma = posterior_rv.stddev()
+one_sigma = jnp.sqrt(posterior_rv.variance)
 
 # %%
 fig = plt.figure(figsize=(7, 3.5))
