@@ -10,12 +10,12 @@
 [![PyPI version](https://badge.fury.io/py/GPJax.svg)](https://badge.fury.io/py/GPJax)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04455/status.svg)](https://doi.org/10.21105/joss.04455)
 [![Downloads](https://pepy.tech/badge/gpjax)](https://pepy.tech/project/gpjax)
-[![Slack Invite](https://img.shields.io/badge/Slack_Invite--blue?style=social&logo=slack)](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
+[![Slack Invite](https://img.shields.io/badge/Slack_Invite--blue?style=social&logo=slack)](https://join.slack.com/t/gpjax/shared_invite/zt-3cesiykcx-nzajjRdnV3ohw7~~eMlCYA)
 
 [**Quickstart**](#simple-example)
 | [**Install guide**](#installation)
 | [**Documentation**](https://docs.jaxgaussianprocesses.com/)
-| [**Slack Community**](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw)
+| [**Slack Community**](https://join.slack.com/t/gpjax/shared_invite/zt-3cesiykcx-nzajjRdnV3ohw7~~eMlCYA)
 
 GPJax aims to provide a low-level interface to Gaussian process (GP) models in
 [Jax](https://github.com/google/jax), structured to give researchers maximum
@@ -50,7 +50,7 @@ behaviours through [this form](https://jaxgaussianprocesses.com/contact/) or rea
 one of the project's [_gardeners_](https://docs.jaxgaussianprocesses.com/GOVERNANCE/#roles).
 
 Feel free to join our [Slack
-Channel](https://join.slack.com/t/gpjax/shared_invite/zt-1da57pmjn-rdBCVg9kApirEEn2E5Q2Zw),
+Channel](https://join.slack.com/t/gpjax/shared_invite/zt-3cesiykcx-nzajjRdnV3ohw7~~eMlCYA),
 where we can discuss the development of GPJax and broader support for Gaussian
 process modelling.
 
