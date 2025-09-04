@@ -105,7 +105,7 @@ lint-check = ['ruff check --fix ./gpjax ./tests ./examples']
 format = ["black-format", "imports-format", "lint-format"]
 check = ["black-check", "imports-check", "lint-check"]
 remove-unused = ["autoflake --remove-unused-variables --remove-all-unused-imports --recursive ./gpjax/*.py ./tests/*.py"]
-test = "pytest . -v -n 4 --beartype-packages='gpjax'"
+test = "pytest . -v -n 8 --beartype-packages='gpjax'"
 coverage = "pytest . -v --cov=./gpjax --cov-report=xml:./coverage.xml"
 docstrings = "xdoctest ./gpjax"
 all-tests = ['check', 'docstrings', 'test']

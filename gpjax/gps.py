@@ -682,8 +682,8 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(x)
-        Kxx += jnp.eye(Kxx.shape[0]) * self.prior.jitter
-        Kxx = psd(Dense(Kxx))
+        Kxx_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * self.prior.jitter
+        Kxx = psd(Dense(Kxx_dense))
         Lx = lower_cholesky(Kxx)
 
         # Unpack test inputs

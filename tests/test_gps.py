@@ -264,7 +264,7 @@ def test_prior_sample_approx(num_datapoints, kernel, mean_function):
     assert max_delta == 0.0  # samples same for same seed
 
     new_key = jr.key(12345)
-    sampled_fn_3 = p.sample_approx(1, new_key, 100)
+    sampled_fn_3 = p.sample_approx(1, new_key, num_features=100)
     evals_3 = sampled_fn_3(x)
     max_delta = jnp.max(jnp.abs(evals - evals_3))
     assert max_delta > 0.01  # samples different for different seed
@@ -316,28 +316,34 @@ def test_conjugate_posterior_sample_approx(
     # with pytest.raises(ValidationErrors):
     #     p.sample_approx(1, D, key, 0.5)
 
-    sampled_fn = p.sample_approx(1, D, key, 100, solver_algorithm=solver_algorithm)
+    sampled_fn = p.sample_approx(
+        1, D, key, num_features=100, solver_algorithm=solver_algorithm
+    )
     assert isinstance(sampled_fn, Callable)  # check type
 
     x = jr.uniform(key=key, minval=-2.0, maxval=2.0, shape=(num_datapoints, 2))
     evals = sampled_fn(x)
     assert evals.shape == (num_datapoints, 1.0)  # check shape
 
-    sampled_fn_2 = p.sample_approx(1, D, key, 100, solver_algorithm=solver_algorithm)
+    sampled_fn_2 = p.sample_approx(
+        1, D, key, num_features=100, solver_algorithm=solver_algorithm
+    )
     evals_2 = sampled_fn_2(x)
     max_delta = jnp.max(jnp.abs(evals - evals_2))
     assert max_delta == 0.0  # samples same for same seed
 
     new_key = jr.key(12345)
     sampled_fn_3 = p.sample_approx(
-        1, D, new_key, 100, solver_algorithm=solver_algorithm
+        1, D, new_key, num_features=100, solver_algorithm=solver_algorithm
     )
     evals_3 = sampled_fn_3(x)
     max_delta = jnp.max(jnp.abs(evals - evals_3))
     assert max_delta > 0.01  # samples different for different seed
 
     # Check validty of samples using Monte-Carlo
-    sampled_fn = p.sample_approx(10_000, D, key, 100, solver_algorithm=solver_algorithm)
+    sampled_fn = p.sample_approx(
+        10_000, D, key, num_features=100, solver_algorithm=solver_algorithm
+    )
     sampled_evals = sampled_fn(x)
     approx_mean = jnp.mean(sampled_evals, -1)
     approx_var = jnp.var(sampled_evals, -1)
