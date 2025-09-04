@@ -13,12 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
+import itertools
+
 import beartype.typing as tp
 from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Float
-import itertools
 
 from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels.computations import (
@@ -33,6 +34,14 @@ from gpjax.typing import (
     Array,
     ScalarFloat,
 )
+
+# Numerical stability constants
+EPS = 1e-6
+EPS_DIVISION = 1e-12
+CLIP_EXP_BOUNDS = (-20.0, 20.0)
+CLIP_CORRECTION_BOUNDS = (-10.0, 10.0)
+CLIP_CONTRIBUTION_BOUNDS = (-1e10, 1e10)
+CLIP_ELEMENTARY_BOUNDS = (-1e6, 1e6)
 
 
 class OrthogonalAdditiveKernel(AbstractKernel):
@@ -104,16 +113,6 @@ class OrthogonalAdditiveKernel(AbstractKernel):
         self.input_means = nnx.Variable(input_means)
         self.input_scales = PositiveReal(input_scales)
 
-        if tp.TYPE_CHECKING:
-            self.lengthscales = tp.cast(
-                PositiveReal[Float[Array, " D"]], self.lengthscales
-            )
-            self.variances = tp.cast(
-                NonNegativeReal[Float[Array, " K"]], self.variances
-            )
-            self.input_scales = tp.cast(
-                PositiveReal[Float[Array, " D"]], self.input_scales
-            )
 
     def __call__(
         self,
@@ -168,25 +167,24 @@ class OrthogonalAdditiveKernel(AbstractKernel):
         # E[S_i f(x)] = σ² * √(ℓ² / (ℓ² + δ²)) * exp(-(x-μ)² / (2(ℓ²+δ²)))
         
         # Add small epsilon for numerical stability
-        eps = 1e-6
-        var_term = ell_i**2 / (ell_i**2 + delta_i**2 + eps)
+        var_term = ell_i**2 / (ell_i**2 + delta_i**2 + EPS)
         scale_factor = jnp.sqrt(var_term)
 
         # Clamp the exponential arguments to prevent overflow
-        exp_arg_x = jnp.clip(-((x - mu_i) ** 2) / (2 * (ell_i**2 + delta_i**2 + eps)), -20, 20)
-        exp_arg_y = jnp.clip(-((y - mu_i) ** 2) / (2 * (ell_i**2 + delta_i**2 + eps)), -20, 20)
+        exp_arg_x = jnp.clip(-((x - mu_i) ** 2) / (2 * (ell_i**2 + delta_i**2 + EPS)), *CLIP_EXP_BOUNDS)
+        exp_arg_y = jnp.clip(-((y - mu_i) ** 2) / (2 * (ell_i**2 + delta_i**2 + EPS)), *CLIP_EXP_BOUNDS)
         
         exp_x = jnp.exp(exp_arg_x)
         exp_y = jnp.exp(exp_arg_y)
 
         # E[S_i²] = σ² * √(ℓ² / (ℓ² + 2δ²))
-        var_s_squared = jnp.sqrt(ell_i**2 / (ell_i**2 + 2 * delta_i**2 + eps))
+        var_s_squared = jnp.sqrt(ell_i**2 / (ell_i**2 + 2 * delta_i**2 + EPS))
 
         # Constrained kernel with numerical safety
-        correction = (scale_factor / (var_s_squared + eps)) * exp_x * exp_y
+        correction = (scale_factor / (var_s_squared + EPS)) * exp_x * exp_y
         
         # Clamp correction to prevent instability
-        correction = jnp.clip(correction, -10.0, 10.0)
+        correction = jnp.clip(correction, *CLIP_CORRECTION_BOUNDS)
         
         return k_base - correction
 
@@ -204,7 +202,7 @@ class OrthogonalAdditiveKernel(AbstractKernel):
         power_sums = []
         for ell in range(max_depth + 1):
             if ell == 0:
-                power_sums.append(jnp.array(len(base_kernels), dtype=jnp.float32))
+                power_sums.append(jnp.array(float(len(base_kernels)), dtype=jnp.float32))
             else:
                 power_sum = sum(k**ell for k in base_kernels)
                 power_sums.append(power_sum)
@@ -219,12 +217,12 @@ class OrthogonalAdditiveKernel(AbstractKernel):
                 sign = (-1.0) ** (k - 1)
                 contribution = sign * elementary_terms[ell - k] * power_sums[k]
                 # Clip individual contributions to prevent overflow
-                contribution = jnp.clip(contribution, -1e10, 1e10)
+                contribution = jnp.clip(contribution, *CLIP_CONTRIBUTION_BOUNDS)
                 term += contribution
 
             # Prevent division by zero and clip result
-            elementary_term = term / jnp.maximum(ell, 1e-12)
-            elementary_term = jnp.clip(elementary_term, -1e6, 1e6)
+            elementary_term = term / jnp.maximum(ell, EPS_DIVISION)
+            elementary_term = jnp.clip(elementary_term, *CLIP_ELEMENTARY_BOUNDS)
             elementary_terms.append(elementary_term)
 
         return elementary_terms[: max_depth + 1]
@@ -324,7 +322,7 @@ class OrthogonalAdditiveGP:
                     component_names.append(f"interaction_{'_'.join(map(str, subset))}")
 
         # Package results
-        for name, component in zip(component_names, all_components, strict=False):
+        for name, component in zip(component_names, all_components, strict=True):
             components[name] = component
 
         return components
@@ -432,8 +430,9 @@ class OrthogonalAdditiveGP:
             "constant": 0.0,
             "main_effects": 0.0,
             "order_2_interactions": 0.0,
-            "higher_order_interactions": 0.0,
         }
+        
+        higher_order_value = 0.0
 
         for name, value in individual_indices.items():
             if "constant" in name:
@@ -445,7 +444,11 @@ class OrthogonalAdditiveGP:
                 if name.count("_") == 2:  # interaction_i_j has 2 underscores
                     grouped_indices["order_2_interactions"] += value
                 else:
-                    grouped_indices["higher_order_interactions"] += value
+                    higher_order_value += value
+        
+        # Only include higher_order_interactions if it's non-zero or max_order > 2
+        if higher_order_value > 0 or self.max_order > 2:
+            grouped_indices["higher_order_interactions"] = higher_order_value
 
         return grouped_indices
 
@@ -454,7 +457,7 @@ def compute_sobol_indices(
     posterior,
     X: Float[Array, "N D"],
     y: Float[Array, "N 1"],
-    use_full_decomposition: bool = True,
+    use_full_decomposition: bool = False,
     n_samples: int = 1000,
 ) -> dict[str, float]:
     """Compute Sobol indices for OAK model feature importance.
@@ -476,45 +479,15 @@ def compute_sobol_indices(
     Returns:
         Dictionary mapping component names to normalized Sobol indices.
     """
-    if not hasattr(posterior.prior.kernel, "max_order"):
-        raise ValueError("Posterior must use OrthogonalAdditiveKernel")
+    _validate_oak_kernel(posterior)
 
     if use_full_decomposition:
-        # Use the new full implementation with proper decomposition
         from gpjax.dataset import Dataset
-
         dataset = Dataset(X=X, y=y)
         oak_gp = OrthogonalAdditiveGP(posterior, dataset)
         return oak_gp.compute_grouped_sobol_indices(n_samples=n_samples)
     else:
-        # Legacy implementation using kernel variances as proxies
-        oak_kernel = posterior.prior.kernel
-        max_order = oak_kernel.max_order
-
-        sobol_indices = {}
-        variance_contributions = []
-
-        # Use the kernel's variance parameters as proxy for importance
-        for order in range(min(max_order + 1, len(oak_kernel.variances.value))):
-            var_contribution = oak_kernel.variances.value[order]
-            variance_contributions.append(var_contribution)
-
-        # Normalize to sum to 1
-        total_contribution = sum(variance_contributions)
-
-        for order, contribution in enumerate(variance_contributions):
-            normalized_contrib = (
-                contribution / total_contribution if total_contribution > 0 else 0.0
-            )
-
-            if order == 0:
-                sobol_indices["constant"] = float(normalized_contrib)
-            elif order == 1:
-                sobol_indices["main_effects"] = float(normalized_contrib)
-            else:
-                sobol_indices[f"order_{order}_interactions"] = float(normalized_contrib)
-
-        return sobol_indices
+        return _compute_legacy_sobol_indices(posterior.prior.kernel)
 
 
 def compute_detailed_sobol_indices(
@@ -522,7 +495,7 @@ def compute_detailed_sobol_indices(
     X: Float[Array, "N D"],
     y: Float[Array, "N 1"],
     n_samples: int = 1000,
-    use_full_decomposition: bool = True,
+    use_full_decomposition: bool = False,
 ) -> dict[str, tp.Any]:
     """Compute detailed Sobol indices for individual features and interactions.
 
@@ -539,87 +512,110 @@ def compute_detailed_sobol_indices(
     Returns:
         Dictionary with detailed Sobol breakdown including individual features.
     """
+    _validate_oak_kernel(posterior)
+
+    from gpjax.dataset import Dataset
+    dataset = Dataset(X=X, y=y)
+
+    if use_full_decomposition:
+        oak_gp = OrthogonalAdditiveGP(posterior, dataset)
+        return _compute_full_detailed_sobol(oak_gp, n_samples)
+    else:
+        return _compute_legacy_detailed_sobol(posterior, dataset, n_samples)
+
+
+def _validate_oak_kernel(posterior):
+    """Validate that posterior uses OrthogonalAdditiveKernel."""
     if not hasattr(posterior.prior.kernel, "max_order"):
         raise ValueError("Posterior must use OrthogonalAdditiveKernel")
 
-    if use_full_decomposition:
-        # Use the new full implementation
-        from gpjax.dataset import Dataset
 
-        dataset = Dataset(X=X, y=y)
-        oak_gp = OrthogonalAdditiveGP(posterior, dataset)
+def _compute_legacy_sobol_indices(oak_kernel) -> dict[str, float]:
+    """Legacy implementation using kernel variances as proxies."""
+    max_order = oak_kernel.max_order
+    sobol_indices = {}
+    variance_contributions = []
 
-        # Get total variance by sampling from input distribution
-        key = jr.PRNGKey(42)
-        means = oak_gp.kernel.input_means.value
-        scales = oak_gp.kernel.input_scales.value
-        test_points = jr.normal(key, (n_samples, oak_gp.n_dims)) * scales + means
+    for order in range(min(max_order + 1, len(oak_kernel.variances.value))):
+        var_contribution = oak_kernel.variances.value[order]
+        variance_contributions.append(var_contribution)
 
-        total_pred = oak_gp.predict(test_points)
-        total_variance = float(jnp.var(total_pred.mean))
+    total_contribution = sum(variance_contributions)
 
-        # Get detailed component decomposition
-        individual_indices = oak_gp.compute_true_sobol_indices(test_points, n_samples)
-        grouped_indices = oak_gp.compute_grouped_sobol_indices(test_points, n_samples)
+    for order, contribution in enumerate(variance_contributions):
+        normalized_contrib = (
+            contribution / total_contribution if total_contribution > 0 else 0.0
+        )
 
-        # Organize results
-        results = {
-            "total_variance": total_variance,
-            "main_effects": {},
-            "interactions": {},
-            "orders": grouped_indices,
-            "individual_components": individual_indices,
-        }
+        if order == 0:
+            sobol_indices["constant"] = float(normalized_contrib)
+        elif order == 1:
+            sobol_indices["main_effects"] = float(normalized_contrib)
+        else:
+            sobol_indices[f"order_{order}_interactions"] = float(normalized_contrib)
 
-        # Extract main effects and interactions
-        for name, value in individual_indices.items():
-            if "main_effect" in name:
-                feature_idx = name.split("_")[-1]
-                results["main_effects"][f"feature_{feature_idx}"] = float(value)
-            elif "interaction" in name:
-                results["interactions"][name] = float(value)
+    return sobol_indices
 
-        return results
 
-    else:
-        # Legacy implementation
-        oak_kernel = posterior.prior.kernel
-        n_dims = oak_kernel.n_dims
+def _compute_full_detailed_sobol(oak_gp, n_samples: int) -> dict[str, tp.Any]:
+    """Compute detailed Sobol indices using full decomposition."""
+    key = jr.PRNGKey(42)
+    means = oak_gp.kernel.input_means.value
+    scales = oak_gp.kernel.input_scales.value
+    test_points = jr.normal(key, (n_samples, oak_gp.n_dims)) * scales + means
 
-        # Generate test points for variance estimation
-        means = oak_kernel.input_means.value
-        scales = oak_kernel.input_scales.value
+    total_pred = oak_gp.predict(test_points)
+    total_variance = float(jnp.var(total_pred.mean))
 
-        # Sample from input distribution for variance computation
-        key = jr.PRNGKey(42)
-        test_points = jr.normal(key, (n_samples, n_dims)) * scales + means
+    individual_indices = oak_gp.compute_true_sobol_indices(test_points, n_samples)
+    grouped_indices = oak_gp.compute_grouped_sobol_indices(test_points, n_samples)
 
-        # Get posterior predictions by creating a dataset
-        from gpjax.dataset import Dataset
+    results = {
+        "total_variance": total_variance,
+        "main_effects": {},
+        "interactions": {},
+        "orders": grouped_indices,
+        "individual_components": individual_indices,
+    }
 
-        train_data = Dataset(X=X, y=y)
-        posterior_dist = posterior(test_points, train_data)
-        predictions = posterior_dist.mean
-        total_variance = jnp.var(predictions)
+    for name, value in individual_indices.items():
+        if "main_effect" in name:
+            feature_idx = name.split("_")[-1]
+            results["main_effects"][f"feature_{feature_idx}"] = float(value)
+        elif "interaction" in name:
+            results["interactions"][name] = float(value)
 
-        results = {
-            "total_variance": float(total_variance),
-            "main_effects": {},
-            "interactions": {},
-            "orders": compute_sobol_indices(
-                posterior, X, y, use_full_decomposition=False
-            ),
-        }
+    return results
 
-        # Individual feature contributions (approximation)
-        for i in range(n_dims):
-            # This is a simplified approximation - true Sobol indices require
-            # more sophisticated variance decomposition
-            feature_weight = (
-                oak_kernel.variances.value[1] / n_dims
-                if len(oak_kernel.variances.value) > 1
-                else 0.0
-            )
-            results["main_effects"][f"feature_{i}"] = float(feature_weight)
 
-        return results
+def _compute_legacy_detailed_sobol(posterior, dataset, n_samples: int) -> dict[str, tp.Any]:
+    """Legacy implementation for detailed Sobol indices."""
+    oak_kernel = posterior.prior.kernel
+    n_dims = oak_kernel.n_dims
+
+    means = oak_kernel.input_means.value
+    scales = oak_kernel.input_scales.value
+
+    key = jr.PRNGKey(42)
+    test_points = jr.normal(key, (n_samples, n_dims)) * scales + means
+
+    posterior_dist = posterior(test_points, dataset)
+    predictions = posterior_dist.mean
+    total_variance = jnp.var(predictions)
+
+    results = {
+        "total_variance": float(total_variance),
+        "main_effects": {},
+        "interactions": {},
+        "orders": _compute_legacy_sobol_indices(oak_kernel),
+    }
+
+    for i in range(n_dims):
+        feature_weight = (
+            oak_kernel.variances.value[1] / n_dims
+            if len(oak_kernel.variances.value) > 1
+            else 0.0
+        )
+        results["main_effects"][f"feature_{i}"] = float(feature_weight)
+
+    return results
