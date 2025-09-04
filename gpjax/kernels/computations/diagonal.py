@@ -14,16 +14,16 @@
 # ==============================================================================
 
 import beartype.typing as tp
-from cola.annotations import PSD
-from cola.ops.operators import (
-    Diagonal,
-    LinearOperator,
-)
 from jax import vmap
 from jaxtyping import Float
 
 import gpjax  # noqa: F401
 from gpjax.kernels.computations import AbstractKernelComputation
+from gpjax.linalg import (
+    Diagonal,
+    LinearOperator,
+    psd,
+)
 from gpjax.typing import Array
 
 Kernel = tp.TypeVar("Kernel", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
@@ -35,7 +35,7 @@ class DiagonalKernelComputation(AbstractKernelComputation):
     """
 
     def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
-        return PSD(Diagonal(diag=vmap(lambda x: kernel(x, x))(x)))
+        return psd(Diagonal(vmap(lambda x: kernel(x, x))(x)))
 
     def _cross_covariance(
         self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]

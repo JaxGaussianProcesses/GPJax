@@ -41,7 +41,7 @@ import numpyro.distributions as npd
 import optax as ox
 
 from examples.utils import use_mpl_style
-from gpjax.lower_cholesky import lower_cholesky
+from gpjax.linalg.operations import lower_cholesky
 
 config.update("jax_enable_x64", True)
 

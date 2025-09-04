@@ -1,6 +1,5 @@
 from typing import Tuple
 
-from cola.ops import Dense
 import jax
 from jax import config
 import jax.numpy as jnp
@@ -22,6 +21,7 @@ from gpjax.kernels.stationary import (
     RationalQuadratic,
     StationaryKernel,
 )
+from gpjax.linalg.operators import Dense
 
 config.update("jax_enable_x64", True)
 _jitter = 1e-6

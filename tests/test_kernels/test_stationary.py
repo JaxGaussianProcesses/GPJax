@@ -16,7 +16,6 @@
 from itertools import product
 from typing import Any
 
-from cola.ops.operator_base import LinearOperator
 import jax
 from jax import config
 import jax.numpy as jnp
@@ -34,6 +33,7 @@ from gpjax.kernels.stationary import (
     White,
 )
 from gpjax.kernels.stationary.base import StationaryKernel
+from gpjax.linalg.operators import LinearOperator
 from gpjax.parameters import (
     NonNegativeReal,
     PositiveReal,

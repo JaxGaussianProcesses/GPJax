@@ -28,7 +28,6 @@ dependencies = [
   "jaxtyping>0.2.10",
   "tqdm>4.66.2",
   "beartype>0.16.1",
-  "cola-ml>=0.0.7",
   "flax>=0.10.0",
   "numpy>=2.0.0",
 ]

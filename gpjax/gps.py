@@ -16,11 +16,6 @@
 from abc import abstractmethod
 
 import beartype.typing as tp
-from cola.annotations import PSD
-from cola.linalg.algorithm_base import Algorithm
-from cola.linalg.decompositions.decompositions import Cholesky
-from cola.linalg.inverse.inv import solve
-from cola.ops.operators import I_like
 from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
@@ -38,7 +33,13 @@ from gpjax.likelihoods import (
     Gaussian,
     NonGaussian,
 )
-from gpjax.lower_cholesky import lower_cholesky
+from gpjax.linalg import (
+    Dense,
+    Identity,
+    psd,
+    solve,
+)
+from gpjax.linalg.operations import lower_cholesky
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.parameters import (
     Parameter,
@@ -251,8 +252,8 @@ class Prior(AbstractPrior[M, K]):
         x = test_inputs
         mx = self.mean_function(x)
         Kxx = self.kernel.gram(x)
-        Kxx += I_like(Kxx) * self.jitter
-        Kxx = PSD(Kxx)
+        Kxx_dense = Kxx.to_dense() + Identity(Kxx.shape).to_dense() * self.jitter
+        Kxx = psd(Dense(Kxx_dense))
 
         return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
 
@@ -315,15 +316,13 @@ class Prior(AbstractPrior[M, K]):
         if (not isinstance(num_samples, int)) or num_samples <= 0:
             raise ValueError("num_samples must be a positive integer")
 
-        # sample fourier features
         fourier_feature_fn = _build_fourier_features_fn(self, num_features, key)
 
-        # sample fourier weights
-        feature_weights = jr.normal(key, [num_samples, 2 * num_features])  # [B, L]
+        feature_weights = jr.normal(key, [num_samples, 2 * num_features])
 
         def sample_fn(test_inputs: Float[Array, "N D"]) -> Float[Array, "N B"]:
-            feature_evals = fourier_feature_fn(test_inputs)  # [N, L]
-            evaluated_sample = jnp.inner(feature_evals, feature_weights)  # [N, B]
+            feature_evals = fourier_feature_fn(test_inputs)
+            evaluated_sample = jnp.inner(feature_evals, feature_weights)
             return self.mean_function(test_inputs) + evaluated_sample
 
         return sample_fn
@@ -504,24 +503,23 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = self.prior.kernel.gram(x)
-        Kxx += I_like(Kxx) * self.jitter
+        Kxx_dense = Kxx.to_dense() + Identity(Kxx.shape).to_dense() * self.jitter
+        Kxx = Dense(Kxx_dense)
 
-        # Σ = Kxx + Io²
-        Sigma = Kxx + I_like(Kxx) * obs_noise
-        Sigma = PSD(Sigma)
+        Sigma_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * obs_noise
+        Sigma = psd(Dense(Sigma_dense))
 
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
-        Sigma_inv_Kxt = solve(Sigma, Kxt, Cholesky())
+        Sigma_inv_Kxt = solve(Sigma, Kxt)
 
-        # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
         mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
-        covariance = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-        covariance += I_like(covariance) * self.prior.jitter
-        covariance = PSD(covariance)
+        covariance = Ktt.to_dense() - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
+        covariance += jnp.eye(covariance.shape[0]) * self.prior.jitter
+        covariance = psd(Dense(covariance))
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 
@@ -531,7 +529,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         train_data: Dataset,
         key: KeyArray,
         num_features: int | None = 100,
-        solver_algorithm: tp.Optional[Algorithm] = Cholesky(),
+        solver_algorithm=None,
     ) -> FunctionalSample:
         r"""Draw approximate samples from the Gaussian process posterior.
 
@@ -581,16 +579,13 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         # sample fourier features
         fourier_feature_fn = _build_fourier_features_fn(self.prior, num_features, key)
 
-        # sample fourier weights
-        fourier_weights = jr.normal(key, [num_samples, 2 * num_features])  # [B, L]
+        fourier_weights = jr.normal(key, [num_samples, 2 * num_features])
 
-        # sample weights v for canonical features
-        # v = Σ⁻¹ (y + ε - ɸ⍵) for  Σ = Kxx + Io² and ε ᯈ N(0, o²)
         obs_var = self.likelihood.obs_stddev.value**2
-        Kxx = self.prior.kernel.gram(train_data.X)  #  [N, N]
-        Sigma = Kxx + I_like(Kxx) * (obs_var + self.jitter)  #  [N, N]
-        eps = jnp.sqrt(obs_var) * jr.normal(key, [train_data.n, num_samples])  #  [N, B]
-        y = train_data.y - self.prior.mean_function(train_data.X)  # account for mean
+        Kxx = self.prior.kernel.gram(train_data.X)
+        Sigma = Kxx + jnp.eye(Kxx.shape[0]) * (obs_var + self.jitter)
+        eps = jnp.sqrt(obs_var) * jr.normal(key, [train_data.n, num_samples])
+        y = train_data.y - self.prior.mean_function(train_data.X)
         Phi = fourier_feature_fn(train_data.X)
         canonical_weights = solve(
             Sigma,
@@ -599,13 +594,11 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         )  #  [N, B]
 
         def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:
-            fourier_features = fourier_feature_fn(test_inputs)  # [n, L]
-            weight_space_contribution = jnp.inner(
-                fourier_features, fourier_weights
-            )  # [n, B]
+            fourier_features = fourier_feature_fn(test_inputs)
+            weight_space_contribution = jnp.inner(fourier_features, fourier_weights)
             canonical_features = self.prior.kernel.cross_covariance(
                 test_inputs, train_data.X
-            )  # [n, N]
+            )
             function_space_contribution = jnp.matmul(
                 canonical_features, canonical_weights
             )
@@ -689,8 +682,8 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(x)
-        Kxx += I_like(Kxx) * self.prior.jitter
-        Kxx = PSD(Kxx)
+        Kxx += jnp.eye(Kxx.shape[0]) * self.prior.jitter
+        Kxx = psd(Dense(Kxx))
         Lx = lower_cholesky(Kxx)
 
         # Unpack test inputs
@@ -702,7 +695,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         mean_t = mean_function(t)
 
         # Lx⁻¹ Kxt
-        Lx_inv_Kxt = solve(Lx, Ktx.T, Cholesky())
+        Lx_inv_Kxt = solve(Lx, Ktx.T)
 
         # Whitened function values, wx, corresponding to the inputs, x
         wx = self.latent.value
@@ -711,9 +704,9 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
         mean = mean_t + jnp.matmul(Lx_inv_Kxt.T, wx)
 
         # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
-        covariance = Ktt - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-        covariance += I_like(covariance) * self.prior.jitter
-        covariance = PSD(covariance)
+        covariance = Ktt.to_dense() - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
+        covariance += jnp.eye(covariance.shape[0]) * self.prior.jitter
+        covariance = psd(Dense(covariance))
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
 

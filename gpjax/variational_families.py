@@ -16,15 +16,6 @@
 import abc
 
 import beartype.typing as tp
-from cola.annotations import PSD
-from cola.linalg.decompositions.decompositions import Cholesky
-from cola.linalg.inverse.inv import solve
-from cola.ops.operators import (
-    Dense,
-    I_like,
-    Identity,
-    Triangular,
-)
 from flax import nnx
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -41,7 +32,14 @@ from gpjax.likelihoods import (
     Gaussian,
     NonGaussian,
 )
-from gpjax.lower_cholesky import lower_cholesky
+from gpjax.linalg import (
+    Dense,
+    Identity,
+    Triangular,
+    lower_cholesky,
+    psd,
+    solve,
+)
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.parameters import (
     LowerTriangular,
@@ -189,7 +187,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
 
         muz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz = PSD(Kzz + I_like(Kzz) * self.jitter)
+        Kzz = psd(Dense(Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * self.jitter))
 
         sqrt = Triangular(sqrt)
         S = sqrt @ sqrt.T
@@ -226,7 +224,8 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         kernel = self.posterior.prior.kernel
 
         Kzz = kernel.gram(z)
-        Kzz += I_like(Kzz) * self.jitter
+        Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * self.jitter
+        Kzz = psd(Dense(Kzz_dense))
         Lz = lower_cholesky(Kzz)
         muz = mean_function(z)
 
@@ -238,10 +237,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = solve(Lz, Kzt, Cholesky())
+        Lz_inv_Kzt = solve(Lz, Kzt)
 
         # Kzz⁻¹ Kzt
-        Kzz_inv_Kzt = solve(Lz.T, Lz_inv_Kzt, Cholesky())
+        Kzz_inv_Kzt = solve(Lz.T, Lz_inv_Kzt)
 
         # Ktz Kzz⁻¹ sqrt
         Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
@@ -255,7 +254,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
-        covariance += I_like(covariance) * self.jitter
+        covariance += jnp.eye(covariance.shape[0]) * self.jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -330,7 +329,8 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
         kernel = self.posterior.prior.kernel
 
         Kzz = kernel.gram(z)
-        Kzz += I_like(Kzz) * self.jitter
+        Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * self.jitter
+        Kzz = psd(Dense(Kzz_dense))
         Lz = lower_cholesky(Kzz)
 
         # Unpack test inputs
@@ -341,7 +341,7 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = solve(Lz, Kzt, Cholesky())
+        Lz_inv_Kzt = solve(Lz, Kzt)
 
         # Ktz Lz⁻ᵀ sqrt
         Ktz_Lz_invT_sqrt = jnp.matmul(Lz_inv_Kzt.T, sqrt)
@@ -355,7 +355,7 @@ class WhitenedVariationalGaussian(VariationalGaussian[L]):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Lz_invT_sqrt, Ktz_Lz_invT_sqrt.T)
         )
-        covariance += I_like(covariance) * self.jitter
+        covariance += jnp.eye(covariance.shape[0]) * self.jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -441,7 +441,8 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
 
         muz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz += I_like(Kzz) * self.jitter
+        Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * self.jitter
+        Kzz = psd(Dense(Kzz_dense))
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
@@ -492,7 +493,8 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
         mu = jnp.matmul(S, natural_vector)
 
         Kzz = kernel.gram(z)
-        Kzz += I_like(Kzz) * self.jitter
+        Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * self.jitter
+        Kzz = psd(Dense(Kzz_dense))
         Lz = lower_cholesky(Kzz)
         muz = mean_function(z)
 
@@ -501,10 +503,10 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
         mut = mean_function(test_inputs)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = solve(Lz, Kzt, Cholesky())
+        Lz_inv_Kzt = solve(Lz, Kzt)
 
         # Kzz⁻¹ Kzt
-        Kzz_inv_Kzt = solve(Lz.T, Lz_inv_Kzt, Cholesky())
+        Kzz_inv_Kzt = solve(Lz.T, Lz_inv_Kzt)
 
         # Ktz Kzz⁻¹ L
         Ktz_Kzz_inv_L = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
@@ -518,7 +520,7 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_L, Ktz_Kzz_inv_L.T)
         )
-        covariance += I_like(covariance) * self.jitter
+        covariance += jnp.eye(covariance.shape[0]) * self.jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -592,12 +594,14 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
 
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.outer(mu, mu)
-        S = PSD(Dense(S))
-        S += I_like(S) * self.jitter
+        S = psd(Dense(S))
+        S_dense = S.to_dense() + jnp.eye(S.shape[0]) * self.jitter
+        S = psd(Dense(S_dense))
 
         muz = mean_function(z)
         Kzz = kernel.gram(z)
-        Kzz += I_like(Kzz) * self.jitter
+        Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * self.jitter
+        Kzz = psd(Dense(Kzz_dense))
 
         qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
         pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
@@ -636,14 +640,15 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
 
         # S = η₂ - η₁ η₁ᵀ
         S = expectation_matrix - jnp.matmul(mu, mu.T)
-        S = Dense(S) + I_like(S) * self.jitter
-        S = PSD(S)
+        S = Dense(S + jnp.eye(S.shape[0]) * self.jitter)
+        S = psd(S)
 
         # S = sqrt sqrtᵀ
         sqrt = lower_cholesky(S)
 
         Kzz = kernel.gram(z)
-        Kzz += I_like(Kzz) * self.jitter
+        Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * self.jitter
+        Kzz = psd(Dense(Kzz_dense))
         Lz = lower_cholesky(Kzz)
         muz = mean_function(z)
 
@@ -655,10 +660,10 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = solve(Lz, Kzt, Cholesky())
+        Lz_inv_Kzt = solve(Lz, Kzt)
 
         # Kzz⁻¹ Kzt
-        Kzz_inv_Kzt = solve(Lz.T, Lz_inv_Kzt, Cholesky())
+        Kzz_inv_Kzt = solve(Lz.T, Lz_inv_Kzt)
 
         # Ktz Kzz⁻¹ sqrt
         Ktz_Kzz_inv_sqrt = Kzz_inv_Kzt.T @ sqrt
@@ -672,7 +677,7 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
-        covariance += I_like(covariance) * self.jitter
+        covariance += jnp.eye(covariance.shape[0]) * self.jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
@@ -729,13 +734,14 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
 
         Kzx = kernel.cross_covariance(z, x)
         Kzz = kernel.gram(z)
-        Kzz += I_like(Kzz) * self.jitter
+        Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * self.jitter
+        Kzz = psd(Dense(Kzz_dense))
 
         # Lz Lzᵀ = Kzz
         Lz = lower_cholesky(Kzz)
 
         # Lz⁻¹ Kzx
-        Lz_inv_Kzx = solve(Lz, Kzx, Cholesky())
+        Lz_inv_Kzx = solve(Lz, Kzx)
 
         # A = Lz⁻¹ Kzt / o
         A = Lz_inv_Kzx / self.posterior.likelihood.obs_stddev.value
@@ -753,14 +759,14 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
         Lz_inv_Kzx_diff = jsp.linalg.cho_solve((L, True), jnp.matmul(Lz_inv_Kzx, diff))
 
         # Kzz⁻¹ Kzx (y - μx)
-        Kzz_inv_Kzx_diff = solve(Lz.T, Lz_inv_Kzx_diff, Cholesky())
+        Kzz_inv_Kzx_diff = solve(Lz.T, Lz_inv_Kzx_diff)
 
         Ktt = kernel.gram(t)
         Kzt = kernel.cross_covariance(z, t)
         mut = mean_function(t)
 
         # Lz⁻¹ Kzt
-        Lz_inv_Kzt = solve(Lz, Kzt, Cholesky())
+        Lz_inv_Kzt = solve(Lz, Kzt)
 
         # L⁻¹ Lz⁻¹ Kzt
         L_inv_Lz_inv_Kzt = jsp.linalg.solve_triangular(L, Lz_inv_Kzt, lower=True)
@@ -774,7 +780,7 @@ class CollapsedVariationalGaussian(AbstractVariationalGaussian[GL]):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(L_inv_Lz_inv_Kzt.T, L_inv_Lz_inv_Kzt)
         )
-        covariance += I_like(covariance) * self.jitter
+        covariance += jnp.eye(covariance.shape[0]) * self.jitter
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance

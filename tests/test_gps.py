@@ -26,9 +26,6 @@ from typing import (
     Type,
 )
 
-from cola.linalg.algorithm_base import Auto
-from cola.linalg.decompositions.decompositions import Cholesky
-from cola.linalg.inverse.cg import CG
 from jax import config
 import jax.numpy as jnp
 import jax.random as jr
@@ -56,6 +53,9 @@ from gpjax.likelihoods import (
     Gaussian,
     Poisson,
 )
+from gpjax.linalg.algorithms import Auto
+from gpjax.linalg.decompositions import Cholesky
+from gpjax.linalg.solvers import CG
 from gpjax.mean_functions import (
     AbstractMeanFunction,
     Constant,

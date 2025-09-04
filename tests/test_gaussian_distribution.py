@@ -23,13 +23,12 @@ import pytest
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
-import cola
-from cola.ops import (
+from gpjax.distributions import GaussianDistribution
+import gpjax.linalg as cola
+from gpjax.linalg.operators import (
     Dense,
     Diagonal,
 )
-
-from gpjax.distributions import GaussianDistribution
 
 _key = jr.key(seed=42)
 

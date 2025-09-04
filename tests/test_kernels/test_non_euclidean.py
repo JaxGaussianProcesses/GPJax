@@ -10,12 +10,12 @@
 # # See the License for the specific language governing permissions and
 # # limitations under the License.
 
-from cola.ops import I_like
 from jax import config
 import jax.numpy as jnp
 import networkx as nx
 
 from gpjax.kernels.non_euclidean import GraphKernel
+from gpjax.linalg.operators import Identity
 
 # # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
@@ -45,6 +45,6 @@ def test_graph_kernel():
     assert Kxx.shape == (n_verticies, n_verticies)
 
     # Check positive definiteness
-    Kxx += I_like(Kxx) * 1e-6
+    Kxx += Identity(Kxx.shape[0]) * 1e-6
     eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
     assert all(eigen_values > 0)

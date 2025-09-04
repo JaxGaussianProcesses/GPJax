@@ -1,8 +1,3 @@
-import cola
-from cola.ops.operators import (
-    Dense,
-    Diagonal,
-)
 import jax.numpy as jnp
 import pytest
 
@@ -23,6 +18,11 @@ from gpjax.kernels.stationary import (
     Periodic,
     PoweredExponential,
     RationalQuadratic,
+)
+import gpjax.linalg as cola
+from gpjax.linalg.operators import (
+    Dense,
+    Diagonal,
 )
 
 
