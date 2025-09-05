@@ -42,7 +42,7 @@ class EigenKernelComputation(AbstractKernelComputation):
         # Transform the eigenvalues of the graph Laplacian according to the
         # RBF kernel's SPDE form.
         S = jnp.power(
-            kernel.eigenvalues.value
+            kernel.eigenvalues
             + 2
             * kernel.smoothness.value
             / kernel.lengthscale.value

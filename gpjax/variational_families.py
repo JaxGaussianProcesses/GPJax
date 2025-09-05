@@ -44,7 +44,6 @@ from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.parameters import (
     LowerTriangular,
     Real,
-    Static,
 )
 from gpjax.typing import (
     Array,
@@ -110,11 +109,10 @@ class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
         inducing_inputs: tp.Union[
             Float[Array, "N D"],
             Real,
-            Static,
         ],
         jitter: ScalarFloat = 1e-6,
     ):
-        if not isinstance(inducing_inputs, (Real, Static)):
+        if not isinstance(inducing_inputs, Real):
             inducing_inputs = Real(inducing_inputs)
 
         self.inducing_inputs = inducing_inputs
@@ -390,8 +388,8 @@ class NaturalVariationalGaussian(AbstractVariationalGaussian[L]):
         if natural_matrix is None:
             natural_matrix = -0.5 * jnp.eye(self.num_inducing)
 
-        self.natural_vector = Static(natural_vector)
-        self.natural_matrix = Static(natural_matrix)
+        self.natural_vector = Real(natural_vector)
+        self.natural_matrix = Real(natural_matrix)
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the KL-divergence between our current variational approximation
@@ -556,8 +554,8 @@ class ExpectationVariationalGaussian(AbstractVariationalGaussian[L]):
         if expectation_matrix is None:
             expectation_matrix = jnp.eye(self.num_inducing)
 
-        self.expectation_vector = Static(expectation_vector)
-        self.expectation_matrix = Static(expectation_matrix)
+        self.expectation_vector = Real(expectation_vector)
+        self.expectation_matrix = Real(expectation_matrix)
 
     def prior_kl(self) -> ScalarFloat:
         r"""Evaluate the prior KL-divergence.

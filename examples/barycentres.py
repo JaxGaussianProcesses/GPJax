@@ -50,6 +50,7 @@ config.update("jax_enable_x64", True)
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 
 key = jr.key(123)
@@ -179,6 +180,7 @@ def fit_gp(x: jax.Array, y: jax.Array) -> npd.MultivariateNormal:
         model=posterior,
         objective=nmll,
         train_data=D,
+        trainable=Parameter,
     )
     latent_dist = opt_posterior.predict(xtest, train_data=D)
     return opt_posterior.likelihood(latent_dist)

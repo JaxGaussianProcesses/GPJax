@@ -57,7 +57,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
         Returns:
             A matrix of shape $N \times L$ representing the random fourier features where $L = 2M$.
         """
-        frequencies = kernel.frequencies.value
+        frequencies = kernel.frequencies
         scaling_factor = kernel.base_kernel.lengthscale.value
         z = jnp.matmul(x, (frequencies / scaling_factor).T)
         z = jnp.concatenate([jnp.cos(z), jnp.sin(z)], axis=-1)

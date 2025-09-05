@@ -100,6 +100,7 @@ dev-dependencies = [
   "pytest-beartype",
   "autoflake",
   "poethepoet>=0.37.0",
+  "twine>=6.2.0",
 ]
 
 

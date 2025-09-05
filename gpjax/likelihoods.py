@@ -29,7 +29,6 @@ from gpjax.integrators import (
 )
 from gpjax.parameters import (
     NonNegativeReal,
-    Static,
 )
 from gpjax.typing import (
     Array,
@@ -133,9 +132,7 @@ class Gaussian(AbstractLikelihood):
     def __init__(
         self,
         num_datapoints: int,
-        obs_stddev: tp.Union[
-            ScalarFloat, Float[Array, "#N"], NonNegativeReal, Static
-        ] = 1.0,
+        obs_stddev: tp.Union[ScalarFloat, Float[Array, "#N"], NonNegativeReal] = 1.0,
         integrator: AbstractIntegrator = AnalyticalGaussianIntegrator(),
     ):
         r"""Initializes the Gaussian likelihood.
@@ -148,7 +145,7 @@ class Gaussian(AbstractLikelihood):
                 likelihoods. Must be an instance of `AbstractIntegrator`. For the Gaussian likelihood, this defaults to
                 the `AnalyticalGaussianIntegrator`, as the expected log likelihood can be computed analytically.
         """
-        if not isinstance(obs_stddev, (NonNegativeReal, Static)):
+        if not isinstance(obs_stddev, NonNegativeReal):
             obs_stddev = NonNegativeReal(jnp.asarray(obs_stddev))
         self.obs_stddev = obs_stddev
 

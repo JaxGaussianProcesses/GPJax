@@ -23,7 +23,6 @@ from gpjax.kernels.computations import (
     DenseKernelComputation,
 )
 from gpjax.kernels.stationary.base import StationaryKernel
-from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
     ScalarArray,
@@ -72,10 +71,7 @@ class Periodic(StationaryKernel):
                 covariance matrix.
         """
 
-        if isinstance(period, nnx.Variable):
-            self.period = period
-        else:
-            self.period = PositiveReal(period)
+        self.period = period
 
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
@@ -84,8 +80,9 @@ class Periodic(StationaryKernel):
     ) -> Float[Array, ""]:
         x = self.slice_input(x)
         y = self.slice_input(y)
+        period_val = self.period.value if hasattr(self.period, "value") else self.period
         sine_squared = (
-            jnp.sin(jnp.pi * (x - y) / self.period.value) / self.lengthscale.value
+            jnp.sin(jnp.pi * (x - y) / period_val) / self.lengthscale.value
         ) ** 2
         K = self.variance.value * jnp.exp(-0.5 * jnp.sum(sine_squared, axis=0))
         return K.squeeze()

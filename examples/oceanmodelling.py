@@ -61,6 +61,7 @@ config.update("jax_enable_x64", True)
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 
 # set the default style for plotting
@@ -331,6 +332,7 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key):
         model=posterior,
         objective=objective,
         train_data=dataset,
+        trainable=Parameter,
     )
     return opt_posterior
 

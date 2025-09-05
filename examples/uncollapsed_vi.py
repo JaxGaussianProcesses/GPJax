@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.17.3
 #   kernelspec:
 #     display_name: .venv
 #     language: python
@@ -48,6 +48,7 @@ config.update("jax_enable_x64", True)
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     import gpjax.kernels as jk
+    from gpjax.parameters import Parameter
 
 key = jr.key(123)
 
@@ -255,6 +256,7 @@ opt_posterior, history = gpx.fit(
     num_iters=3000,
     key=jr.key(42),
     batch_size=128,
+    trainable=Parameter,
 )
 # %% [markdown]
 # ## Predictions

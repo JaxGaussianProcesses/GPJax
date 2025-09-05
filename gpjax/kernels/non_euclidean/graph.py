@@ -30,7 +30,6 @@ from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.parameters import (
     Parameter,
     PositiveReal,
-    Static,
 )
 from gpjax.typing import (
     Array,
@@ -55,9 +54,9 @@ class GraphKernel(StationaryKernel):
     """
 
     num_vertex: tp.Union[ScalarInt, None]
-    laplacian: Static[Float[Array, "N N"]]
-    eigenvalues: Static[Float[Array, "N 1"]]
-    eigenvectors: Static[Float[Array, "N N"]]
+    laplacian: Float[Array, "N N"]
+    eigenvalues: Float[Array, "N 1"]
+    eigenvectors: Float[Array, "N N"]
     name: str = "Graph Matérn"
 
     def __init__(
@@ -91,11 +90,11 @@ class GraphKernel(StationaryKernel):
         else:
             self.smoothness = PositiveReal(smoothness)
 
-        self.laplacian = Static(laplacian)
-        evals, eigenvectors = jnp.linalg.eigh(self.laplacian.value)
-        self.eigenvectors = Static(eigenvectors)
-        self.eigenvalues = Static(evals.reshape(-1, 1))
-        self.num_vertex = self.eigenvalues.value.shape[0]
+        self.laplacian = laplacian
+        evals, eigenvectors = jnp.linalg.eigh(self.laplacian)
+        self.eigenvectors = eigenvectors
+        self.eigenvalues = evals.reshape(-1, 1)
+        self.num_vertex = self.eigenvalues.shape[0]
 
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
@@ -107,7 +106,7 @@ class GraphKernel(StationaryKernel):
         S,
         **kwargs,
     ):
-        Kxx = (jax_gather_nd(self.eigenvectors.value, x) * S.squeeze()) @ jnp.transpose(
-            jax_gather_nd(self.eigenvectors.value, y)
+        Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(
+            jax_gather_nd(self.eigenvectors, y)
         )  # shape (n,n)
         return Kxx.squeeze()

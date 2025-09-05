@@ -12,7 +12,6 @@ from gpjax.parameters import (
     PositiveReal,
     Real,
     SigmoidBounded,
-    Static,
     _check_in_bounds,
     _check_is_lower_triangular,
     _check_is_positive,
@@ -55,7 +54,6 @@ def test_transform(param, value):
         (PositiveReal(1.0), "positive"),
         (Real(2.0), "real"),
         (SigmoidBounded(0.5), "sigmoid"),
-        (Static(2.0), "static"),
         (LowerTriangular(jnp.eye(2)), "lower_triangular"),
     ],
 )

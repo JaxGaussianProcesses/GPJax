@@ -25,6 +25,7 @@ import optax as ox
 import pytest
 import scipy
 
+import gpjax as gpx
 from gpjax.dataset import Dataset
 from gpjax.fit import (
     _check_batch_size,
@@ -55,7 +56,6 @@ from gpjax.objectives import (
 )
 from gpjax.parameters import (
     PositiveReal,
-    Static,
 )
 from gpjax.typing import Array
 from gpjax.variational_families import VariationalGaussian
@@ -72,10 +72,10 @@ def test_fit_simple() -> None:
     class LinearModel(nnx.Module):
         def __init__(self, weight: float, bias: float):
             self.weight = PositiveReal(weight)
-            self.bias = Static(bias)
+            self.bias = bias
 
         def __call__(self, x):
-            return self.weight.value * x + self.bias.value
+            return self.weight.value * x + self.bias
 
     model = LinearModel(weight=1.0, bias=1.0)
 
@@ -104,7 +104,7 @@ def test_fit_simple() -> None:
     assert mse(trained_model, D) < mse(model, D)
 
     # Test stop_gradient on bias:
-    assert trained_model.bias.value == 1.0
+    assert trained_model.bias == 1.0
 
 
 def test_fit_scipy_simple():
@@ -117,10 +117,10 @@ def test_fit_scipy_simple():
     class LinearModel(nnx.Module):
         def __init__(self, weight: float, bias: float):
             self.weight = PositiveReal(weight)
-            self.bias = Static(bias)
+            self.bias = bias
 
         def __call__(self, x):
-            return self.weight.value * x + self.bias.value
+            return self.weight.value * x + self.bias
 
     model = LinearModel(weight=1.0, bias=1.0)
 
@@ -147,7 +147,7 @@ def test_fit_scipy_simple():
     assert mse(trained_model, D) < mse(model, D)
 
     # Test stop_gradient on bias:
-    assert trained_model.bias.value == 1.0
+    assert trained_model.bias == 1.0
 
 
 def test_fit_lbfgs_simple():
@@ -160,10 +160,10 @@ def test_fit_lbfgs_simple():
     class LinearModel(nnx.Module):
         def __init__(self, weight: float, bias: float):
             self.weight = PositiveReal(weight)
-            self.bias = Static(bias)
+            self.bias = bias
 
         def __call__(self, x):
-            return self.weight.value * x + self.bias.value
+            return self.weight.value * x + self.bias
 
     model = LinearModel(weight=1.0, bias=1.0)
 
@@ -187,7 +187,7 @@ def test_fit_lbfgs_simple():
     assert mse(trained_model, D) < mse(model, D)
 
     # Test stop_gradient on bias:
-    assert trained_model.bias.value == 1.0
+    assert trained_model.bias == 1.0
 
 
 @pytest.mark.parametrize("n_data", [20])
@@ -377,10 +377,10 @@ def valid_model() -> nnx.Module:
     class LinearModel(nnx.Module):
         def __init__(self, weight: float, bias: float) -> None:
             self.weight = PositiveReal(weight)
-            self.bias = Static(bias)
+            self.bias = bias
 
         def __call__(self, x: Any) -> Any:
-            return self.weight.value * x + self.bias.value
+            return self.weight.value * x + self.bias
 
     return LinearModel(weight=1.0, bias=1.0)
 
@@ -507,3 +507,184 @@ def test_check_batch_size_invalid_value(batch_size: int) -> None:
     """Test that invalid batch_size values raise a ValueError."""
     with pytest.raises(ValueError, match="Expected batch_size to be positive or -1"):
         _check_batch_size(batch_size)
+
+
+def test_fit_filter_freeze_kernel_variance() -> None:
+    """Test that fit can freeze kernel variance parameter using filters."""
+    key = jr.key(42)
+    X = jr.uniform(key, (20, 1), minval=-3.0, maxval=3.0)
+    y = jnp.sin(X) + 0.1 * jr.normal(jr.key(43), (20, 1))
+    D = Dataset(X, y)
+
+    # Create GP with RBF kernel
+    meanf = gpx.mean_functions.Zero()
+    kernel = gpx.kernels.RBF(lengthscale=1.0, variance=1.0)
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+    posterior = prior * likelihood
+
+    # Record initial variance value
+    initial_variance = kernel.variance.value
+
+    # Train with filter that excludes variance (freezes it)
+    filter_no_variance = nnx.filterlib.Not(nnx.filterlib.PathContains("variance"))
+    trained_posterior, _ = fit(
+        model=posterior,
+        objective=gpx.objectives.conjugate_mll,
+        train_data=D,
+        trainable=filter_no_variance,
+        optim=ox.sgd(0.01),
+        num_iters=10,
+        verbose=False,
+    )
+
+    # Assert variance has not changed
+    assert jnp.allclose(trained_posterior.prior.kernel.variance.value, initial_variance)
+
+    # Assert lengthscale has changed
+    assert not jnp.allclose(trained_posterior.prior.kernel.lengthscale.value, 1.0)
+
+
+def test_fit_zero_mean_function_not_trained() -> None:
+    """Test that Zero mean function constant is not trained even with default filter."""
+    key = jr.key(42)
+    X = jr.uniform(key, (20, 1), minval=-3.0, maxval=3.0)
+    y = jnp.ones_like(X) + 0.1 * jr.normal(jr.key(43), X.shape)  # Non-zero mean data
+    D = Dataset(X, y)
+
+    # Create GP with Zero mean function
+    meanf = gpx.mean_functions.Zero()
+    kernel = gpx.kernels.RBF(lengthscale=1.0, variance=1.0)
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+    posterior = prior * likelihood
+
+    # Record initial mean function constant (should be 0.0)
+    initial_constant = meanf.constant
+
+    # Train with default filter (should not train Zero mean function's constant)
+    trained_posterior, _ = fit(
+        model=posterior,
+        objective=gpx.objectives.conjugate_mll,
+        train_data=D,
+        optim=ox.sgd(0.01),
+        num_iters=10,
+        verbose=False,
+    )
+
+    # Assert Zero mean function constant has not changed (remains 0.0)
+    assert jnp.allclose(
+        trained_posterior.prior.mean_function.constant, initial_constant
+    )
+
+
+def test_fit_constant_mean_function_with_parameter() -> None:
+    """Test that Constant mean function works with trainable Parameter."""
+    key = jr.key(42)
+    X = jr.uniform(key, (20, 1), minval=-3.0, maxval=3.0)
+    y = 5.0 * jnp.ones_like(X) + 0.1 * jr.normal(jr.key(43), X.shape)  # Mean of 5.0
+    D = Dataset(X, y)
+
+    # Create GP with Constant mean function using Parameter
+    from gpjax.parameters import Real
+
+    meanf = gpx.mean_functions.Constant(constant=Real(1.0))  # Start with mean 1.0
+    kernel = gpx.kernels.RBF(lengthscale=1.0, variance=1.0)
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_stddev=0.1)
+    posterior = prior * likelihood
+
+    # Record initial mean function constant
+    initial_constant = meanf.constant.value
+
+    # Train with default filter (should train the mean function Parameter)
+    trained_posterior, _ = fit(
+        model=posterior,
+        objective=gpx.objectives.conjugate_mll,
+        train_data=D,
+        optim=ox.adam(0.01),
+        num_iters=20,
+        verbose=False,
+    )
+
+    # Assert mean function constant has changed (parameter is trainable)
+    final_constant = trained_posterior.prior.mean_function.constant.value
+    assert not jnp.allclose(final_constant, initial_constant)
+    # Just verify the parameter changed (direction depends on optimization dynamics)
+    assert jnp.isfinite(final_constant)  # Not NaN/Inf
+
+
+def test_fit_constant_mean_function_with_raw_value() -> None:
+    """Test that Constant mean function works with fixed raw value."""
+    key = jr.key(42)
+    X = jr.uniform(key, (20, 1), minval=-3.0, maxval=3.0)
+    y = 5.0 * jnp.ones_like(X) + 0.1 * jr.normal(jr.key(43), X.shape)  # Mean of 5.0
+    D = Dataset(X, y)
+
+    # Create GP with Constant mean function using raw value
+    meanf = gpx.mean_functions.Constant(constant=1.0)  # Fixed mean 1.0
+    kernel = gpx.kernels.RBF(lengthscale=1.0, variance=0.1)
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n, obs_stddev=0.1)
+    posterior = prior * likelihood
+
+    # Record initial mean function constant
+    initial_constant = meanf.constant
+
+    # Train with default filter (should NOT train the raw value)
+    trained_posterior, _ = fit(
+        model=posterior,
+        objective=gpx.objectives.conjugate_mll,
+        train_data=D,
+        optim=ox.sgd(0.1),
+        num_iters=50,
+        verbose=False,
+    )
+
+    # Assert mean function constant has NOT changed (fixed raw value)
+    final_constant = trained_posterior.prior.mean_function.constant
+    assert jnp.allclose(final_constant, initial_constant)
+
+
+def test_fit_filter_by_type() -> None:
+    """Test filtering parameters by type using nnx.filters.OfType."""
+    key = jr.key(42)
+    X = jr.uniform(key, (20, 1), minval=-3.0, maxval=3.0)
+    y = jnp.sin(X) + 0.1 * jr.normal(jr.key(43), (20, 1))
+    D = Dataset(X, y)
+
+    # Create GP with RBF kernel
+    from gpjax.parameters import PositiveReal
+
+    meanf = gpx.mean_functions.Zero()
+    kernel = gpx.kernels.RBF(lengthscale=1.0, variance=1.0)
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+    likelihood = gpx.likelihoods.Gaussian(num_datapoints=D.n)
+    posterior = prior * likelihood
+
+    # Record initial values
+    initial_variance = kernel.variance.value
+    initial_lengthscale = kernel.lengthscale.value
+    initial_obs_stddev = likelihood.obs_stddev.value
+
+    # Train only PositiveReal parameters (should include only lengthscale)
+    filter_positive_real = nnx.filterlib.OfType(PositiveReal)
+    trained_posterior, _ = fit(
+        model=posterior,
+        objective=gpx.objectives.conjugate_mll,
+        train_data=D,
+        trainable=filter_positive_real,
+        optim=ox.sgd(0.01),
+        num_iters=10,
+        verbose=False,
+    )
+
+    # Assert that only PositiveReal parameters (lengthscale) have changed
+    # variance and obs_stddev are NonNegativeReal, so they should not change
+    assert jnp.allclose(trained_posterior.prior.kernel.variance.value, initial_variance)
+    assert not jnp.allclose(
+        trained_posterior.prior.kernel.lengthscale.value, initial_lengthscale
+    )
+    assert jnp.allclose(
+        trained_posterior.likelihood.obs_stddev.value, initial_obs_stddev
+    )

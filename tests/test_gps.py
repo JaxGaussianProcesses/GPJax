@@ -173,7 +173,7 @@ def test_nonconjugate_posterior(
     assert isinstance(posterior, NonConjugatePosterior)
 
     # Check latent values.
-    latent_values = jr.normal(posterior.key.value, (num_datapoints, 1))
+    latent_values = jr.normal(posterior.key, (num_datapoints, 1))
     assert (posterior.latent.value == latent_values).all()
 
     # Query a marginal distribution of the posterior at some inputs.

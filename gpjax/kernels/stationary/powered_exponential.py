@@ -24,7 +24,6 @@ from gpjax.kernels.computations import (
 )
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import euclidean_distance
-from gpjax.parameters import SigmoidBounded
 from gpjax.typing import (
     Array,
     ScalarArray,
@@ -76,10 +75,7 @@ class PoweredExponential(StationaryKernel):
             compute_engine: the computation engine that the kernel uses to compute the
                 covariance matrix.
         """
-        if isinstance(power, nnx.Variable):
-            self.power = power
-        else:
-            self.power = SigmoidBounded(power)
+        self.power = power
 
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
@@ -88,7 +84,6 @@ class PoweredExponential(StationaryKernel):
     ) -> Float[Array, ""]:
         x = self.slice_input(x) / self.lengthscale.value
         y = self.slice_input(y) / self.lengthscale.value
-        K = self.variance.value * jnp.exp(
-            -(euclidean_distance(x, y) ** self.power.value)
-        )
+        power_val = self.power.value if hasattr(self.power, "value") else self.power
+        K = self.variance.value * jnp.exp(-(euclidean_distance(x, y) ** power_val))
         return K.squeeze()

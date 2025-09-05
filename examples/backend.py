@@ -1,3 +1,19 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     custom_cell_magics: kql
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.11.2
+#   kernelspec:
+#     display_name: .venv
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
 # # Backend Module Design
 #
@@ -116,7 +132,7 @@ except ValueError as e:
 # the parameter's value using a tree map operation.
 
 # %%
-print(constant_param._tag)
+print(constant_param.tag)
 
 # %% [markdown]
 # For most users, you will not need to worry about this as we provide a set of default
@@ -126,7 +142,7 @@ print(constant_param._tag)
 # see how you can define your own bijectors and parameter types.
 
 # %%
-print(DEFAULT_BIJECTION[constant_param._tag])
+print(DEFAULT_BIJECTION[constant_param.tag])
 
 # %% [markdown]
 # We see here that the Softplus bijector is specified as the default for strictly
@@ -229,7 +245,6 @@ retransformed_state = transform(transformed_state, DEFAULT_BIJECTION, inverse=Fa
 # altering the way in which we invoke `nnx.split`.
 
 # %%
-
 graphdef, positive_reals, other_params = nnx.split(posterior, PositiveReal, ...)
 print(positive_reals)
 

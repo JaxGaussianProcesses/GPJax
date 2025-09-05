@@ -37,7 +37,6 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 from examples.utils import use_mpl_style
-from gpjax.parameters import Static
 from gpjax.typing import Array
 
 config.update("jax_enable_x64", True)
@@ -45,6 +44,7 @@ config.update("jax_enable_x64", True)
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 
 key = jr.key(42)
@@ -264,7 +264,7 @@ kernel = gpx.kernels.Matern52(
 prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
 
 likelihood = gpx.likelihoods.Gaussian(
-    num_datapoints=D.n, obs_stddev=Static(jnp.array(1e-3))
+    num_datapoints=D.n, obs_stddev=jnp.array(1e-3)
 )  # Our function is noise-free, so we set the observation noise's standard deviation to a very small value
 
 no_opt_posterior = prior * likelihood
@@ -281,6 +281,7 @@ opt_posterior, history = gpx.fit_scipy(
     model=no_opt_posterior,
     objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
+    trainable=Parameter,
 )
 
 
@@ -546,6 +547,9 @@ def loss(posterior, data):
     return -gpx.objectives.conjugate_mll(posterior, data)
 
 
+# Optimize all parameters. Alternative filtering strategies available:
+# - trainable=gpx.PositiveReal: train only positive parameters
+# - custom filters for specific parameter subsets
 opt_posterior, history = gpx.fit(
     model=posterior,
     objective=loss,
@@ -553,6 +557,7 @@ opt_posterior, history = gpx.fit(
     optim=ox.adamw(learning_rate=1e-2),
     num_iters=500,
     key=key,
+    trainable=Parameter,  # train all parameters (default)
 )
 
 
