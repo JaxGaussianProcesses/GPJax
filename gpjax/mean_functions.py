@@ -27,8 +27,6 @@ from jaxtyping import (
 
 from gpjax.parameters import (
     Parameter,
-    Real,
-    Static,
 )
 from gpjax.typing import (
     Array,
@@ -132,12 +130,12 @@ class Constant(AbstractMeanFunction):
 
     def __init__(
         self,
-        constant: tp.Union[ScalarFloat, Float[Array, " O"], Parameter, Static] = 0.0,
+        constant: tp.Union[ScalarFloat, Float[Array, " O"], Parameter] = 0.0,
     ):
-        if isinstance(constant, Parameter) or isinstance(constant, Static):
+        if isinstance(constant, Parameter):
             self.constant = constant
         else:
-            self.constant = Real(jnp.array(constant))
+            self.constant = jnp.array(constant)
 
     def __call__(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         r"""Evaluate the mean function at the given points.
@@ -148,7 +146,10 @@ class Constant(AbstractMeanFunction):
         Returns:
             Float[Array, "1"]: The evaluated mean function.
         """
-        return jnp.ones((x.shape[0], 1)) * self.constant.value
+        if isinstance(self.constant, Parameter):
+            return jnp.ones((x.shape[0], 1)) * self.constant.value
+        else:
+            return jnp.ones((x.shape[0], 1)) * self.constant
 
 
 class Zero(Constant):
@@ -160,7 +161,7 @@ class Zero(Constant):
     """
 
     def __init__(self):
-        super().__init__(constant=Static(jnp.array(0.0)))
+        super().__init__(constant=0.0)
 
 
 class CombinationMeanFunction(AbstractMeanFunction):

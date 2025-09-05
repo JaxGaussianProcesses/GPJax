@@ -139,15 +139,17 @@ num_adapt = 1000
 num_samples = 500
 
 
-graphdef, params, *static_state = nnx.split(posterior, gpx.parameters.Parameter, ...)
-params_bijection = gpx.parameters.DEFAULT_BIJECTION
+graphdef, params, *static_state = nnx.split(
+    posterior, gpx.parameters.Parameters.Parameter, ...
+)
+params_bijection = gpx.parameters.Parameters.DEFAULT_BIJECTION
 
 # Transform the parameters to the unconstrained space
-params = gpx.parameters.transform(params, params_bijection, inverse=True)
+params = gpx.parameters.Parameters.transform(params, params_bijection, inverse=True)
 
 
 def logprob_fn(params):
-    params = gpx.parameters.transform(params, params_bijection)
+    params = gpx.parameters.Parameters.transform(params, params_bijection)
     model = nnx.merge(graphdef, params, *static_state)
     return gpx.objectives.log_posterior_density(model, D)
 
@@ -210,7 +212,7 @@ posterior_samples = []
 
 for i in range(0, num_samples, thin_factor):
     sample_params = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
-    sample_params = gpx.parameters.transform(sample_params, params_bijection)
+    sample_params = gpx.parameters.Parameters.transform(sample_params, params_bijection)
     model = nnx.merge(graphdef, sample_params, *static_state)
     latent_dist = model.predict(xtest, train_data=D)
     predictive_dist = model.likelihood(latent_dist)

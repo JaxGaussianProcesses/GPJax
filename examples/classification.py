@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.17.3
 #   kernelspec:
 #     display_name: .venv
 #     language: python
@@ -40,13 +40,18 @@ import numpyro.distributions as npd
 import optax as ox
 
 from examples.utils import use_mpl_style
-from gpjax.linalg import lower_cholesky, PSD, solve
+from gpjax.linalg import (
+    PSD,
+    lower_cholesky,
+    solve,
+)
 
 config.update("jax_enable_x64", True)
 
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 
 identity_matrix = jnp.eye
@@ -120,6 +125,8 @@ print(type(posterior))
 # %%
 optimiser = ox.adam(learning_rate=0.01)
 
+# Train all parameters using the new trainable parameter API
+# The trainable parameter allows selective optimization of parameter subsets
 opt_posterior, history = gpx.fit(
     model=posterior,
     # we use the negative lpd as we are minimising
@@ -128,6 +135,7 @@ opt_posterior, history = gpx.fit(
     optim=ox.adamw(learning_rate=0.01),
     num_iters=1000,
     key=key,
+    trainable=Parameter,  # train all parameters (default behavior)
 )
 
 # %% [markdown]
@@ -224,7 +232,7 @@ f_hat = Lx @ opt_posterior.latent.value
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
 graphdef, params, *static_state = nnx.split(
-    opt_posterior, gpx.parameters.Parameter, ...
+    opt_posterior, gpx.parameters.Parameters.Parameter, ...
 )
 
 

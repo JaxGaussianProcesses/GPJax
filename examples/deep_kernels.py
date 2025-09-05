@@ -60,6 +60,9 @@ config.update("jax_enable_x64", True)
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     from gpjax.kernels.base import AbstractKernel
+    from gpjax.parameters import (
+        Parameter,
+    )
 
 
 # set the default style for plotting
@@ -219,6 +222,10 @@ optimiser = ox.chain(
     ox.adamw(learning_rate=schedule),
 )
 
+# Train all parameters (default behavior with trainable=Parameter)
+# Alternative options for selective training:
+# - trainable=PositiveReal  # only train positive parameters
+# - trainable=lambda module, path, value: 'kernel' in path  # only kernel params
 opt_posterior, history = gpx.fit(
     model=posterior,
     objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
@@ -226,6 +233,7 @@ opt_posterior, history = gpx.fit(
     optim=optimiser,
     num_iters=800,
     key=key,
+    trainable=Parameter,  # explicitly specify trainable filter (default)
 )
 
 # %% [markdown]

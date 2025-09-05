@@ -32,7 +32,7 @@ from gpjax.kernels.nonstationary import (
 from gpjax.linalg.operators import LinearOperator
 from gpjax.parameters import (
     NonNegativeReal,
-    Static,
+    Parameter,
 )
 
 # Enable Float64 for more stable matrix inversions.
@@ -94,7 +94,7 @@ def test_init_override_paramtype(kernel_request):
     for param, value in params.items():
         if param in ("degree", "order"):
             continue
-        new_params[param] = Static(value)
+        new_params[param] = value
 
     k = kernel(**new_params, variance=NonNegativeReal(variance))
     assert isinstance(k.variance, NonNegativeReal)
@@ -102,7 +102,8 @@ def test_init_override_paramtype(kernel_request):
     for param in params.keys():
         if param in ("degree", "order"):
             continue
-        assert isinstance(getattr(k, param), Static)
+        # Parameter is now a raw value, not a Static object
+        assert not isinstance(getattr(k, param), (Parameter, NonNegativeReal))
 
 
 @pytest.mark.parametrize("kernel", [k[0] for k in TESTED_KERNELS])

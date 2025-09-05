@@ -195,6 +195,7 @@ opt_posterior, history = gpx.fit_scipy(
     # we use the negative mll as we are minimising
     objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=training_data,
+    trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
 )
 
 print(-gpx.objectives.conjugate_mll(opt_posterior, training_data))

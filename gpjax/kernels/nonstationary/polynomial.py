@@ -72,7 +72,8 @@ class Polynomial(AbstractKernel):
         if isinstance(shift, nnx.Variable):
             self.shift = shift
         else:
-            self.shift = PositiveReal(shift)
+            # Keep raw values as raw, don't wrap in Parameter
+            self.shift = shift
             if tp.TYPE_CHECKING:
                 self.shift = tp.cast(PositiveReal[ScalarArray], self.shift)
 
@@ -88,7 +89,9 @@ class Polynomial(AbstractKernel):
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         x = self.slice_input(x)
         y = self.slice_input(y)
-        K = jnp.power(
-            self.shift.value + self.variance.value * jnp.dot(x, y), self.degree
+        shift_val = self.shift.value if hasattr(self.shift, "value") else self.shift
+        variance_val = (
+            self.variance.value if hasattr(self.variance, "value") else self.variance
         )
+        K = jnp.power(shift_val + variance_val * jnp.dot(x, y), self.degree)
         return K.squeeze()

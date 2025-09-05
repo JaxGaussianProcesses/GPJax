@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.17.3
 #   kernelspec:
 #     display_name: .venv
 #     language: python
@@ -246,6 +246,8 @@ schedule = ox.warmup_cosine_decay_schedule(
     end_value=0.001,
 )
 
+# Example of selective parameter training in variational inference
+# trainable parameter allows fine-grained control over which parameters to optimize
 opt_posterior, history = gpx.fit(
     model=q,
     # we are minimizing the elbo so we negate it
@@ -255,6 +257,7 @@ opt_posterior, history = gpx.fit(
     num_iters=3000,
     key=jr.key(42),
     batch_size=128,
+    trainable=gpx.parameters.Parameter,  # train all parameters (default)
 )
 # %% [markdown]
 # ## Predictions

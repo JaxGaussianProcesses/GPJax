@@ -35,7 +35,7 @@ def test_frequency_sampler(
 ):
     base_kernel = kernel(active_dims=list(range(n_dims)))
     approximate = RFF(base_kernel=base_kernel, num_basis_fns=num_basis_fns)
-    assert approximate.frequencies.value.shape == (num_basis_fns, n_dims)
+    assert approximate.frequencies.shape == (num_basis_fns, n_dims)
 
 
 @pytest.mark.parametrize("kernel", [RBF, Matern12, Matern32, Matern52])
@@ -164,4 +164,4 @@ def test_stochastic_init(kernel: type[StationaryKernel]):
     k1 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.PRNGKey(123))
     k2 = RFF(base_kernel=kernel, num_basis_fns=10, key=jr.PRNGKey(42))
 
-    assert (k1.frequencies.value != k2.frequencies.value).any()
+    assert (k1.frequencies != k2.frequencies).any()

@@ -331,6 +331,7 @@ def optimise_mll(posterior, dataset, NIters=1000, key=key):
         model=posterior,
         objective=objective,
         train_data=dataset,
+        trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
     )
     return opt_posterior
 

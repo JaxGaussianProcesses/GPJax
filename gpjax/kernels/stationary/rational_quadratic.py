@@ -23,7 +23,6 @@ from gpjax.kernels.computations import (
 )
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.kernels.stationary.utils import squared_distance
-from gpjax.parameters import PositiveReal
 from gpjax.typing import (
     Array,
     ScalarArray,
@@ -73,14 +72,16 @@ class RationalQuadratic(StationaryKernel):
         if isinstance(alpha, nnx.Variable):
             self.alpha = alpha
         else:
-            self.alpha = PositiveReal(alpha)
+            # Keep raw values as raw, don't wrap in Parameter
+            self.alpha = alpha
 
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
     def __call__(self, x: Float[Array, " D"], y: Float[Array, " D"]) -> ScalarFloat:
         x = self.slice_input(x) / self.lengthscale.value
         y = self.slice_input(y) / self.lengthscale.value
-        K = self.variance.value * (
-            1 + 0.5 * squared_distance(x, y) / self.alpha.value
-        ) ** (-self.alpha.value)
+        alpha_val = self.alpha.value if hasattr(self.alpha, "value") else self.alpha
+        K = self.variance.value * (1 + 0.5 * squared_distance(x, y) / alpha_val) ** (
+            -alpha_val
+        )
         return K.squeeze()

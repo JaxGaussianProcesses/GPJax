@@ -48,6 +48,7 @@ def fit(  # noqa: PLR0913
     train_data: Dataset,
     optim: ox.GradientTransformation,
     params_bijection: tp.Union[dict[Parameter, Transform], None] = DEFAULT_BIJECTION,
+    trainable: nnx.filterlib.Filter = Parameter,
     key: KeyArray = jr.PRNGKey(42),
     num_iters: int = 100,
     batch_size: int = -1,
@@ -65,7 +66,7 @@ def fit(  # noqa: PLR0913
         >>> import jax.random as jr
         >>> import optax as ox
         >>> import gpjax as gpx
-        >>> from gpjax.parameters import PositiveReal, Static
+        >>> from gpjax.parameters import PositiveReal
         >>>
         >>> # (1) Create a dataset:
         >>> X = jnp.linspace(0.0, 10.0, 100)[:, None]
@@ -75,10 +76,10 @@ def fit(  # noqa: PLR0913
         >>> class LinearModel(nnx.Module):
         >>>     def __init__(self, weight: float, bias: float):
         >>>         self.weight = PositiveReal(weight)
-        >>>         self.bias = Static(bias)
+        >>>         self.bias = bias
         >>>
         >>>     def __call__(self, x):
-        >>>         return self.weight.value * x + self.bias.value
+        >>>         return self.weight.value * x + self.bias
         >>>
         >>> model = LinearModel(weight=1.0, bias=1.0)
         >>>
@@ -100,6 +101,8 @@ def fit(  # noqa: PLR0913
         train_data (Dataset): The training data to be used for the optimisation.
         optim (GradientTransformation): The Optax optimiser that is to be used for
             learning a parameter set.
+        trainable (nnx.filterlib.Filter): Filter to determine which parameters are trainable.
+            Defaults to nnx.Param (all Parameter instances).
         num_iters (int): The number of optimisation steps to run. Defaults
             to 100.
         batch_size (int): The size of the mini-batch to use. Defaults to -1
@@ -127,7 +130,7 @@ def fit(  # noqa: PLR0913
         _check_verbose(verbose)
 
     # Model state filtering
-    graphdef, params, *static_state = nnx.split(model, Parameter, ...)
+    graphdef, params, *static_state = nnx.split(model, trainable, ...)
 
     # Parameters bijection to unconstrained space
     if params_bijection is not None:
@@ -182,6 +185,7 @@ def fit_scipy(  # noqa: PLR0913
     model: Model,
     objective: Objective,
     train_data: Dataset,
+    trainable: nnx.filterlib.Filter = Parameter,
     max_iters: int = 500,
     verbose: bool = True,
     safe: bool = True,
@@ -210,7 +214,7 @@ def fit_scipy(  # noqa: PLR0913
         _check_verbose(verbose)
 
     # Model state filtering
-    graphdef, params, *static_state = nnx.split(model, Parameter, ...)
+    graphdef, params, *static_state = nnx.split(model, trainable, ...)
 
     # Parameters bijection to unconstrained space
     params = transform(params, DEFAULT_BIJECTION, inverse=True)
@@ -258,6 +262,7 @@ def fit_lbfgs(
     objective: Objective,
     train_data: Dataset,
     params_bijection: tp.Union[dict[Parameter, Transform], None] = DEFAULT_BIJECTION,
+    trainable: nnx.filterlib.Filter = Parameter,
     max_iters: int = 100,
     safe: bool = True,
     max_linesearch_steps: int = 32,
@@ -290,7 +295,7 @@ def fit_lbfgs(
         _check_num_iters(max_iters)
 
     # Model state filtering
-    graphdef, params, *static_state = nnx.split(model, Parameter, ...)
+    graphdef, params, *static_state = nnx.split(model, trainable, ...)
 
     # Parameters bijection to unconstrained space
     if params_bijection is not None:

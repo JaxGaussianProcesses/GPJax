@@ -229,6 +229,7 @@ opt_posterior, history = gpx.fit(
     optim=ox.adam(learning_rate=1e-3),  # Smaller learning rate for stability
     num_iters=500,  # Fewer iterations
     key=key,
+    trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
 )
 
 print("Final negative log marginal likelihood:", loss_fn(opt_posterior, dataset))
@@ -345,6 +346,7 @@ rbf_prior = gpx.gps.Prior(kernel=rbf_kernel, mean_function=mean_function)
 rbf_posterior = rbf_prior * likelihood
 
 print("Optimizing RBF kernel...")
+# Train RBF baseline model for comparison
 rbf_opt_posterior, rbf_history = gpx.fit(
     model=rbf_posterior,
     objective=loss_fn,
@@ -352,6 +354,7 @@ rbf_opt_posterior, rbf_history = gpx.fit(
     optim=ox.adam(learning_rate=1e-2),
     num_iters=1000,
     key=key,
+    trainable=gpx.parameters.Parameter,  # train all parameters
 )
 
 # RBF predictions

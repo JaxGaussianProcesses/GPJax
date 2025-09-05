@@ -44,7 +44,6 @@ from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.parameters import (
     Parameter,
     Real,
-    Static,
 )
 from gpjax.typing import (
     Array,
@@ -643,7 +642,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
         # TODO: static or intermediate?
         self.latent = latent if isinstance(latent, Parameter) else Real(latent)
-        self.key = Static(key)
+        self.key = key
 
     def predict(
         self, test_inputs: Num[Array, "N D"], train_data: Dataset

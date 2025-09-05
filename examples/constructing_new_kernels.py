@@ -41,7 +41,6 @@ from gpjax.kernels.computations import DenseKernelComputation
 from gpjax.parameters import (
     DEFAULT_BIJECTION,
     PositiveReal,
-    Static,
 )
 
 config.update("jax_enable_x64", True)
@@ -249,7 +248,7 @@ DEFAULT_BIJECTION["polar"] = ShiftedSoftplusTransform()
 
 
 class Polar(gpx.kernels.AbstractKernel):
-    period: Static
+    period: float
     tau: PositiveReal
 
     def __init__(
@@ -260,13 +259,13 @@ class Polar(gpx.kernels.AbstractKernel):
         n_dims: int | None = None,
     ):
         super().__init__(active_dims, n_dims, DenseKernelComputation())
-        self.period = Static(jnp.array(period))
+        self.period = jnp.array(period)
         self.tau = PositiveReal(jnp.array(tau), tag="polar")
 
     def __call__(
         self, x: Float[Array, "1 D"], y: Float[Array, "1 D"]
     ) -> Float[Array, "1"]:
-        c = self.period.value / 2.0
+        c = self.period / 2.0
         t = angular_distance(x, y, c)
         K = (1 + self.tau.value * t / c) * jnp.clip(
             1 - t / c, 0, jnp.inf
@@ -315,6 +314,7 @@ opt_posterior, history = gpx.fit_scipy(
     model=circular_posterior,
     objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
+    trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
 )
 
 # %% [markdown]

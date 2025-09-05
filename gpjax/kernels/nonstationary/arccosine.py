@@ -85,7 +85,8 @@ class ArcCosine(AbstractKernel):
         if isinstance(weight_variance, nnx.Variable):
             self.weight_variance = weight_variance
         else:
-            self.weight_variance = PositiveReal(weight_variance)
+            # Keep raw values as raw, don't wrap in Parameter
+            self.weight_variance = weight_variance
             if tp.TYPE_CHECKING:
                 self.weight_variance = tp.cast(
                     PositiveReal[WeightVariance], self.weight_variance
@@ -101,7 +102,8 @@ class ArcCosine(AbstractKernel):
         if isinstance(bias_variance, nnx.Variable):
             self.bias_variance = bias_variance
         else:
-            self.bias_variance = PositiveReal(bias_variance)
+            # Keep raw values as raw, don't wrap in Parameter
+            self.bias_variance = bias_variance
             if tp.TYPE_CHECKING:
                 self.bias_variance = tp.cast(
                     PositiveReal[ScalarArray], self.bias_variance
@@ -141,7 +143,17 @@ class ArcCosine(AbstractKernel):
         Returns:
             ScalarFloat: The value of the weighted product between the two arguments``.
         """
-        return jnp.inner(self.weight_variance.value * x, y) + self.bias_variance.value
+        weight_var = (
+            self.weight_variance.value
+            if hasattr(self.weight_variance, "value")
+            else self.weight_variance
+        )
+        bias_var = (
+            self.bias_variance.value
+            if hasattr(self.bias_variance, "value")
+            else self.bias_variance
+        )
+        return jnp.inner(weight_var * x, y) + bias_var
 
     def _J(self, theta: ScalarFloat) -> ScalarFloat:
         r"""Evaluate the angular dependency function corresponding to the desired order.

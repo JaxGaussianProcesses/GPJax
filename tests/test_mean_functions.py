@@ -21,23 +21,24 @@ config.update("jax_enable_x64", True)
 
 import warnings
 
-import gpjax as gpx
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import (
+    Array,
+    Float,
+    Num,
+)
 import pytest
+from scipy.optimize import OptimizeWarning
+
+import gpjax as gpx
 from gpjax.mean_functions import (
     AbstractMeanFunction,
     CombinationMeanFunction,
     Constant,
     Zero,
 )
-from gpjax.parameters import Static
-from jaxtyping import (
-    Array,
-    Float,
-    Num,
-)
-from scipy.optimize import OptimizeWarning
+from gpjax.parameters import Parameter
 
 
 def test_abstract() -> None:
@@ -78,7 +79,7 @@ def test_zero_mean_remains_zero() -> None:
     y = jnp.full((20, 1), 50, dtype=jnp.float64)  # Dataset with non-zero mean
     D = gpx.Dataset(X=x, y=y)
 
-    constant = Static(jnp.array(0.0))
+    constant = jnp.array(0.0)
     kernel = gpx.kernels.Constant(constant=constant)
     meanf = Zero()
     prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
@@ -95,7 +96,7 @@ def test_zero_mean_remains_zero() -> None:
             objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
             train_data=D,
         )
-    assert opt_posterior.prior.mean_function.constant.value == 0.0
+    assert opt_posterior.prior.mean_function.constant == 0.0
 
 
 def test_initialising_zero_mean_with_constant_raises_error():
@@ -251,4 +252,74 @@ def test_chained_operations(
     # The actual result is [[6.0], [6.0]] (not 7.0 as initially expected)
     # This is because the operation works differently than we expected
     expected = jnp.array([[6.0], [6.0]])
+    assert jnp.allclose(result, expected)
+
+
+def test_constant_mean_function_with_parameter():
+    """Test Constant mean function with a Parameter object."""
+    from gpjax.parameters import Real
+
+    # Create Constant with a Parameter
+    param = Real(2.5)
+    meanf = Constant(constant=param)
+
+    # Check that the constant is stored as a Parameter
+    assert isinstance(meanf.constant, Real)
+    assert jnp.allclose(meanf.constant.value, 2.5)
+
+    # Test evaluation
+    x = jnp.array([[1.0], [2.0], [3.0]])
+    result = meanf(x)
+    expected = jnp.array([[2.5], [2.5], [2.5]])
+    assert jnp.allclose(result, expected)
+
+
+def test_constant_mean_function_with_raw_value():
+    """Test Constant mean function with a raw float/array value."""
+    # Create Constant with raw value
+    meanf = Constant(constant=3.7)
+
+    # Check that the constant is stored as a raw array, not a Parameter
+    assert not isinstance(meanf.constant, Parameter)
+    assert isinstance(meanf.constant, jnp.ndarray)
+    assert jnp.allclose(meanf.constant, 3.7)
+
+    # Test evaluation
+    x = jnp.array([[1.0], [2.0]])
+    result = meanf(x)
+    expected = jnp.array([[3.7], [3.7]])
+    assert jnp.allclose(result, expected)
+
+
+def test_constant_mean_function_with_array():
+    """Test Constant mean function with an array value."""
+    # Create Constant with array value
+    value = jnp.array([1.5, 2.5])
+    meanf = Constant(constant=value)
+
+    # Check that the constant is stored as a raw array
+    assert not isinstance(meanf.constant, Parameter)
+    assert isinstance(meanf.constant, jnp.ndarray)
+    assert jnp.allclose(meanf.constant, value)
+
+    # Test evaluation
+    x = jnp.array([[1.0], [2.0]])
+    result = meanf(x)
+    expected = jnp.array([[1.5, 2.5], [1.5, 2.5]])
+    assert jnp.allclose(result, expected)
+
+
+def test_zero_mean_function_uses_raw_value():
+    """Test that Zero mean function uses raw value, not Static Parameter."""
+    meanf = Zero()
+
+    # Check that the constant is a raw value (0.0), not a Parameter
+    assert not isinstance(meanf.constant, Parameter)
+    assert isinstance(meanf.constant, jnp.ndarray)
+    assert jnp.allclose(meanf.constant, 0.0)
+
+    # Test evaluation
+    x = jnp.array([[1.0], [2.0], [3.0]])
+    result = meanf(x)
+    expected = jnp.array([[0.0], [0.0], [0.0]])
     assert jnp.allclose(result, expected)

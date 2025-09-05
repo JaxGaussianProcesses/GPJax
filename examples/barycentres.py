@@ -179,6 +179,7 @@ def fit_gp(x: jax.Array, y: jax.Array) -> npd.MultivariateNormal:
         model=posterior,
         objective=nmll,
         train_data=D,
+        trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
     )
     latent_dist = opt_posterior.predict(xtest, train_data=D)
     return opt_posterior.likelihood(latent_dist)

@@ -122,16 +122,6 @@ class SigmoidBounded(Parameter[T]):
             )
 
 
-class Static(nnx.Variable[T]):
-    """Static parameter that is not trainable."""
-
-    def __init__(self, value: T, tag: ParameterTag = "static", **kwargs):
-        _check_is_arraylike(value)
-
-        super().__init__(value=jnp.asarray(value), tag=tag, **kwargs)
-        self._tag = tag
-
-
 class LowerTriangular(Parameter[T]):
     """Parameter that is a lower triangular matrix."""
 

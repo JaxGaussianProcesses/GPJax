@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.17.3
 #   kernelspec:
 #     display_name: .venv
 #     language: python
@@ -137,6 +137,7 @@ q = gpx.variational_families.CollapsedVariationalGaussian(
 # _optimise_ their location such that the evidence lower bound is maximised.
 
 # %%
+# Use the enhanced fit API with trainable parameter filtering
 opt_posterior, history = gpx.fit(
     model=q,
     # we want want to minimize the *negative* ELBO
@@ -145,6 +146,7 @@ opt_posterior, history = gpx.fit(
     optim=ox.adamw(learning_rate=1e-2),
     num_iters=500,
     key=key,
+    trainable=gpx.parameters.Parameter,  # train all parameters including inducing locations
 )
 
 # %%

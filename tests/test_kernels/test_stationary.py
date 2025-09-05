@@ -36,8 +36,8 @@ from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.linalg.operators import LinearOperator
 from gpjax.parameters import (
     NonNegativeReal,
+    Parameter,
     PositiveReal,
-    Static,
 )
 
 # Enable Float64 for more stable matrix inversions.
@@ -105,7 +105,7 @@ def test_init_override_paramtype(kernel_request):
 
     new_params = {}  # otherwise we change the fixture and next test fails
     for param, value in params.items():
-        new_params[param] = Static(value)
+        new_params[param] = value
 
     kwargs = {**new_params, "variance": NonNegativeReal(variance)}
     if kernel != White:
@@ -115,7 +115,8 @@ def test_init_override_paramtype(kernel_request):
     assert isinstance(k.variance, NonNegativeReal)
 
     for param in params.keys():
-        assert isinstance(getattr(k, param), Static)
+        # Parameter is now a raw value, not a Static object
+        assert not isinstance(getattr(k, param), Parameter)
 
 
 @pytest.mark.parametrize("kernel", [k[0] for k in TESTED_KERNELS])

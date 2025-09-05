@@ -179,6 +179,7 @@ opt_posterior, training_history = gpx.fit_scipy(
     model=posterior,
     objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
+    trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
 )
 
 # %% [markdown]
