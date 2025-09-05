@@ -8,9 +8,9 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.7
+#       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: gpjax
+#     display_name: .venv
 #     language: python
 #     name: python3
 # ---
@@ -22,7 +22,6 @@
 # with non-Gaussian likelihoods via maximum a posteriori (MAP). We focus on a classification task here.
 
 # %%
-import cola
 from flax import nnx
 import jax
 
@@ -41,7 +40,7 @@ import numpyro.distributions as npd
 import optax as ox
 
 from examples.utils import use_mpl_style
-from gpjax.linalg.operations import lower_cholesky
+from gpjax.linalg import lower_cholesky, PSD, solve
 
 config.update("jax_enable_x64", True)
 
@@ -219,7 +218,7 @@ jitter = 1e-6
 # Compute (latent) function value map estimates at training points:
 Kxx = opt_posterior.prior.kernel.gram(x)
 Kxx += identity_matrix(D.n) * jitter
-Kxx = cola.PSD(Kxx)
+Kxx = PSD(Kxx)
 Lx = lower_cholesky(Kxx)
 f_hat = Lx @ opt_posterior.latent.value
 
@@ -267,10 +266,10 @@ def construct_laplace(test_inputs: Float[Array, "N D"]) -> npd.MultivariateNorma
     Kxt = opt_posterior.prior.kernel.cross_covariance(x, test_inputs)
     Kxx = opt_posterior.prior.kernel.gram(x)
     Kxx += identity_matrix(D.n) * jitter
-    Kxx = cola.PSD(Kxx)
+    Kxx = PSD(Kxx)
 
     # Kxx⁻¹ Kxt
-    Kxx_inv_Kxt = cola.solve(Kxx, Kxt)
+    Kxx_inv_Kxt = solve(Kxx, Kxt)
 
     # Ktx Kxx⁻¹[ H⁻¹ ] Kxx⁻¹ Kxt
     laplace_cov_term = jnp.matmul(jnp.matmul(Kxx_inv_Kxt.T, H_inv), Kxx_inv_Kxt)

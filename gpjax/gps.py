@@ -529,7 +529,6 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         train_data: Dataset,
         key: KeyArray,
         num_features: int | None = 100,
-        solver_algorithm=None,
     ) -> FunctionalSample:
         r"""Draw approximate samples from the Gaussian process posterior.
 
@@ -563,11 +562,6 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
             key (KeyArray): The random seed used for the sample(s).
             num_features (int): The number of features used when approximating the
                 kernel.
-            solver_algorithm (Optional[Algorithm], optional): The algorithm to use for the solves of
-                the inverse of the covariance matrix. See the
-                [CoLA documentation](https://cola.readthedocs.io/en/latest/package/cola.linalg.html#algorithms)
-                for which solver to pick. For PSD matrices, CoLA currently recommends Cholesky() for small
-                matrices and CG() for larger matrices. Select Auto() to let CoLA decide. Defaults to Cholesky().
 
         Returns:
             FunctionalSample: A function representing an approximate sample from the Gaussian
@@ -590,7 +584,6 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
         canonical_weights = solve(
             Sigma,
             y + eps - jnp.inner(Phi, fourier_weights),
-            solver_algorithm,
         )  #  [N, B]
 
         def sample_fn(test_inputs: Float[Array, "n D"]) -> Float[Array, "n B"]:

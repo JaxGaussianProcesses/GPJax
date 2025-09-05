@@ -228,39 +228,6 @@ def _kl_divergence(q: GaussianDistribution, p: GaussianDistribution) -> ScalarFl
     return (mahalanobis - n_dim - logdet(sigma_q) + logdet(sigma_p) + trace) / 2.0
 
 
-# def _check_loc_scale(loc: Optional[Any], scale: Optional[Any]) -> None:
-#     r"""Checks that the inputs are correct."""
-#     if loc is None and scale is None:
-#         raise ValueError("At least one of `loc` or `scale` must be specified.")
-
-#     if loc is not None and loc.ndim < 1:
-#         raise ValueError("The parameter `loc` must have at least one dimension.")
-
-#     if scale is not None and len(scale.shape) < 2:  # scale.ndim < 2:
-#         raise ValueError(
-#             "The `scale` must have at least two dimensions, but "
-#             f"`scale.shape = {scale.shape}`."
-#         )
-
-#     if scale is not None and not isinstance(scale, LinearOperator):
-#         raise ValueError(
-#             f"The `scale` must be a CoLA LinearOperator but got {type(scale)}"
-#         )
-
-#     if scale is not None and (scale.shape[-1] != scale.shape[-2]):
-#         raise ValueError(
-#             f"The `scale` must be a square matrix, but `scale.shape = {scale.shape}`."
-#         )
-
-#     if loc is not None:
-#         num_dims = loc.shape[-1]
-#         if scale is not None and (scale.shape[-1] != num_dims):
-#             raise ValueError(
-#                 f"Shapes are not compatible: `loc.shape = {loc.shape}` and "
-#                 f"`scale.shape = {scale.shape}`."
-#             )
-
-
 __all__ = [
     "GaussianDistribution",
 ]

@@ -73,7 +73,6 @@ def lower_cholesky(A: LinearOperator) -> LinearOperator:
 def solve(
     A: LinearOperator,
     b: Union[Float[Array, " N"], Float[Array, " N M"]],
-    solver_algorithm=None,
 ) -> Union[Float[Array, " N"], Float[Array, " N M"]]:
     """Solve the linear system A @ x = b for x.
 
@@ -83,7 +82,6 @@ def solve(
     Args:
         A: A LinearOperator representing the matrix A.
         b: The right-hand side vector or matrix.
-        solver_algorithm: Optional solver algorithm (ignored in this implementation).
 
     Returns:
         The solution x to the linear system.

@@ -1,8 +1,4 @@
-"""Linear algebra module for GPJax.
-
-This module provides lightweight LinearOperator abstractions and operations
-to replace the cola dependency.
-"""
+"""Linear algebra module for GPJax."""
 
 from gpjax.linalg.operations import (
     diag,

@@ -7,7 +7,7 @@ class PSDAnnotation:
     """Marker class for PSD (Positive Semi-Definite) annotations."""
 
     def __call__(self, A: LinearOperator) -> LinearOperator:
-        """Make PSD annotation callable like cola.PSD."""
+        """Make PSD annotation callable."""
         return psd(A)
 
 
@@ -19,7 +19,6 @@ def psd(A: LinearOperator) -> LinearOperator:
     """Mark a linear operator as positive semi-definite.
 
     This function acts as a marker/wrapper for positive semi-definite matrices.
-    It replaces cola.PSD and adds annotations.
 
     Args:
         A: A LinearOperator that is assumed to be positive semi-definite.
