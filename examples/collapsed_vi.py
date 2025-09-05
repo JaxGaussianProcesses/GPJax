@@ -45,6 +45,7 @@ config.update("jax_enable_x64", True)
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 
 # set the default style for plotting
@@ -146,7 +147,7 @@ opt_posterior, history = gpx.fit(
     optim=ox.adamw(learning_rate=1e-2),
     num_iters=500,
     key=key,
-    trainable=gpx.parameters.Parameter,  # train all parameters including inducing locations
+    trainable=Parameter,
 )
 
 # %%

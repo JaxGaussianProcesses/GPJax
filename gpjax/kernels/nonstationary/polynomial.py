@@ -69,13 +69,9 @@ class Polynomial(AbstractKernel):
 
         self.degree = degree
 
-        if isinstance(shift, nnx.Variable):
-            self.shift = shift
-        else:
-            # Keep raw values as raw, don't wrap in Parameter
-            self.shift = shift
-            if tp.TYPE_CHECKING:
-                self.shift = tp.cast(PositiveReal[ScalarArray], self.shift)
+        self.shift = shift
+        if tp.TYPE_CHECKING and not isinstance(shift, nnx.Variable):
+            self.shift = tp.cast(PositiveReal[ScalarArray], self.shift)
 
         if isinstance(variance, nnx.Variable):
             self.variance = variance

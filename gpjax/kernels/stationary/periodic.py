@@ -71,11 +71,7 @@ class Periodic(StationaryKernel):
                 covariance matrix.
         """
 
-        if isinstance(period, nnx.Variable):
-            self.period = period
-        else:
-            # Keep raw values as raw, don't wrap in Parameter
-            self.period = period
+        self.period = period
 
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 

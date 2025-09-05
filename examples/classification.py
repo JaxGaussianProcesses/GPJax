@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.17.3
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: .venv
 #     language: python
@@ -124,9 +124,6 @@ print(type(posterior))
 
 # %%
 optimiser = ox.adam(learning_rate=0.01)
-
-# Train all parameters using the new trainable parameter API
-# The trainable parameter allows selective optimization of parameter subsets
 opt_posterior, history = gpx.fit(
     model=posterior,
     # we use the negative lpd as we are minimising
@@ -232,7 +229,7 @@ f_hat = Lx @ opt_posterior.latent.value
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
 graphdef, params, *static_state = nnx.split(
-    opt_posterior, gpx.parameters.Parameters.Parameter, ...
+    opt_posterior, Parameter, ...
 )
 
 

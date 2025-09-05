@@ -44,6 +44,7 @@ config.update("jax_enable_x64", True)
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 
 key = jr.key(42)
@@ -280,7 +281,7 @@ opt_posterior, history = gpx.fit_scipy(
     model=no_opt_posterior,
     objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
-    trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
+    trainable=Parameter,
 )
 
 
@@ -556,7 +557,7 @@ opt_posterior, history = gpx.fit(
     optim=ox.adamw(learning_rate=1e-2),
     num_iters=500,
     key=key,
-    trainable=gpx.parameters.Parameter,  # train all parameters (default)
+    trainable=Parameter,  # train all parameters (default)
 )
 
 

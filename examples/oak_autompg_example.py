@@ -53,6 +53,7 @@ config.update("jax_enable_x64", True)
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 key = jr.PRNGKey(42)
 
@@ -229,7 +230,7 @@ opt_posterior, history = gpx.fit(
     optim=ox.adam(learning_rate=1e-3),  # Smaller learning rate for stability
     num_iters=500,  # Fewer iterations
     key=key,
-    trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
+    trainable=Parameter,
 )
 
 print("Final negative log marginal likelihood:", loss_fn(opt_posterior, dataset))
@@ -354,7 +355,7 @@ rbf_opt_posterior, rbf_history = gpx.fit(
     optim=ox.adam(learning_rate=1e-2),
     num_iters=1000,
     key=key,
-    trainable=gpx.parameters.Parameter,  # train all parameters
+    trainable=Parameter,  # train all parameters
 )
 
 # RBF predictions

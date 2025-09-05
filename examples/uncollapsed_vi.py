@@ -48,6 +48,7 @@ config.update("jax_enable_x64", True)
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
     import gpjax.kernels as jk
+    from gpjax.parameters import Parameter
 
 key = jr.key(123)
 
@@ -246,8 +247,6 @@ schedule = ox.warmup_cosine_decay_schedule(
     end_value=0.001,
 )
 
-# Example of selective parameter training in variational inference
-# trainable parameter allows fine-grained control over which parameters to optimize
 opt_posterior, history = gpx.fit(
     model=q,
     # we are minimizing the elbo so we negate it
@@ -257,7 +256,7 @@ opt_posterior, history = gpx.fit(
     num_iters=3000,
     key=jr.key(42),
     batch_size=128,
-    trainable=gpx.parameters.Parameter,  # train all parameters (default)
+    trainable=Parameter,
 )
 # %% [markdown]
 # ## Predictions

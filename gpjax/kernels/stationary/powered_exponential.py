@@ -75,11 +75,7 @@ class PoweredExponential(StationaryKernel):
             compute_engine: the computation engine that the kernel uses to compute the
                 covariance matrix.
         """
-        if isinstance(power, nnx.Variable):
-            self.power = power
-        else:
-            # Keep raw values as raw, don't wrap in Parameter
-            self.power = power
+        self.power = power
 
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 

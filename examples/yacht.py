@@ -47,6 +47,7 @@ config.update("jax_enable_x64", True)
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 
 # set the default style for plotting
@@ -192,10 +193,9 @@ training_data = gpx.Dataset(X=scaled_Xtr, y=scaled_ytr)
 
 opt_posterior, history = gpx.fit_scipy(
     model=posterior,
-    # we use the negative mll as we are minimising
     objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=training_data,
-    trainable=gpx.parameters.Parameter,  # train all parameters with new fit API
+    trainable=Parameter,
 )
 
 print(-gpx.objectives.conjugate_mll(opt_posterior, training_data))

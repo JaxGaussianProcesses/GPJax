@@ -25,7 +25,6 @@ from gpjax.kernels.computations import (
 )
 from gpjax.parameters import (
     NonNegativeReal,
-    PositiveReal,
 )
 from gpjax.typing import (
     Array,
@@ -82,32 +81,13 @@ class ArcCosine(AbstractKernel):
 
         self.order = order
 
-        if isinstance(weight_variance, nnx.Variable):
-            self.weight_variance = weight_variance
-        else:
-            # Keep raw values as raw, don't wrap in Parameter
-            self.weight_variance = weight_variance
-            if tp.TYPE_CHECKING:
-                self.weight_variance = tp.cast(
-                    PositiveReal[WeightVariance], self.weight_variance
-                )
+        self.weight_variance = weight_variance
 
         if isinstance(variance, nnx.Variable):
             self.variance = variance
         else:
             self.variance = NonNegativeReal(variance)
-            if tp.TYPE_CHECKING:
-                self.variance = tp.cast(NonNegativeReal[ScalarArray], self.variance)
-
-        if isinstance(bias_variance, nnx.Variable):
-            self.bias_variance = bias_variance
-        else:
-            # Keep raw values as raw, don't wrap in Parameter
-            self.bias_variance = bias_variance
-            if tp.TYPE_CHECKING:
-                self.bias_variance = tp.cast(
-                    PositiveReal[ScalarArray], self.bias_variance
-                )
+        self.bias_variance = bias_variance
 
         self.name = f"ArcCosine (order {self.order})"
 

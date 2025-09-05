@@ -69,11 +69,7 @@ class RationalQuadratic(StationaryKernel):
             compute_engine: The computation engine that the kernel uses to compute the
                 covariance matrix.
         """
-        if isinstance(alpha, nnx.Variable):
-            self.alpha = alpha
-        else:
-            # Keep raw values as raw, don't wrap in Parameter
-            self.alpha = alpha
+        self.alpha = alpha
 
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 

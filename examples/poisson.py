@@ -7,9 +7,9 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.17.3
+#       jupytext_version: 1.11.2
 #   kernelspec:
-#     display_name: base
+#     display_name: .venv
 #     language: python
 #     name: python3
 # ---
@@ -38,6 +38,7 @@ from examples.utils import use_mpl_style
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
+    from gpjax.parameters import Parameter
 
 
 # Enable Float64 for more stable matrix inversions.
@@ -52,16 +53,21 @@ key = jr.key(42)
 # %% [markdown]
 # ## Dataset
 #
-# For count data regression, the Poisson distribution is a natural choice for the likelihood function. The probability mass function of the Poisson distribution is given by
+# For count data regression, the Poisson distribution is a natural choice for the likelihood
+# function. The probability mass function of the Poisson distribution is given by
 #
 # $$ p(y \,|\, \lambda) = \frac{\lambda^{y} e^{-\lambda}}{y!},$$
 #
-# where $y$ is the count and the parameter $\lambda \in \mathbb{R}_{>0}$ is the rate of the Poisson distribution.
+# where $y$ is the count and the parameter $\lambda \in \mathbb{R}_{>0}$ is the rate of the Poisson
+# distribution.
 #
-# We than set $\lambda = \exp(f)$ where $f$ is the latent Gaussian process. The exponential function is the _link function_ for the Poisson distribution: it maps the output of a GP to the positive real line, which is suitable for modeling count data.
+# We than set $\lambda = \exp(f)$ where $f$ is the latent Gaussian process. The exponential function
+# is the _link function_ for the Poisson distribution: it maps the output of a GP to the positive
+# real line, which is suitable for modeling count data.
 #
-# We simulate a dataset $\mathcal{D} = \{(\mathbf{X}, \mathbf{y})\}$ with inputs $\mathbf{X} \in \mathbb{R}^d$ and corresponding count outputs $\mathbf{y}$.
-# We store our data $\mathcal{D}$ as a GPJax `Dataset`.
+# We simulate a dataset $\mathcal{D} = \{(\mathbf{X}, \mathbf{y})\}$ with inputs $\mathbf{X} \in
+# \mathbb{R}^d$ and corresponding count outputs $\mathbf{y}$.  We store our data $\mathcal{D}$ as a
+# GPJax `Dataset`.
 
 # %%
 key, subkey = jr.split(key)
@@ -140,22 +146,23 @@ num_samples = 500
 
 
 graphdef, params, *static_state = nnx.split(
-    posterior, gpx.parameters.Parameters.Parameter, ...
+    posterior, Parameter, ...
 )
-params_bijection = gpx.parameters.Parameters.DEFAULT_BIJECTION
+params_bijection = gpx.parameters.DEFAULT_BIJECTION
 
 # Transform the parameters to the unconstrained space
-params = gpx.parameters.Parameters.transform(params, params_bijection, inverse=True)
+params = gpx.parameters.transform(params, params_bijection, inverse=True)
 
 
 def logprob_fn(params):
-    params = gpx.parameters.Parameters.transform(params, params_bijection)
+    params = gpx.parameters.transform(params, params_bijection)
     model = nnx.merge(graphdef, params, *static_state)
     return gpx.objectives.log_posterior_density(model, D)
 
 
 step_size = 1e-3
-inverse_mass_matrix = jnp.ones(53)
+n_params = sum(jnp.size(leaf) for leaf in jtu.tree_leaves(params))
+inverse_mass_matrix = jnp.ones(n_params)
 nuts = blackjax.nuts(logprob_fn, step_size, inverse_mass_matrix)
 
 state = nuts.init(params)
@@ -212,7 +219,7 @@ posterior_samples = []
 
 for i in range(0, num_samples, thin_factor):
     sample_params = jtu.tree_map(lambda samples, i=i: samples[i], states.position)
-    sample_params = gpx.parameters.Parameters.transform(sample_params, params_bijection)
+    sample_params = gpx.parameters.transform(sample_params, params_bijection)
     model = nnx.merge(graphdef, sample_params, *static_state)
     latent_dist = model.predict(xtest, train_data=D)
     predictive_dist = model.likelihood(latent_dist)
