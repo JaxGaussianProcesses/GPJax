@@ -979,7 +979,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../_examples/backend/" class="md-nav__link">
+      <a href="../_examples/backend.md" class="md-nav__link">
         
   
   
@@ -2229,18 +2229,114 @@
   
   
   
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_9" id="__nav_7_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Linalg
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Linalg
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../api/lower_cholesky/" class="md-nav__link">
+      <a href="../api/linalg/operations/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Lower Cholesky
+    Operations
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/linalg/operators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Operators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/linalg/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2591,12 +2687,12 @@ you through every detail!</p>
   Always use a <code>feature</code> branch. It's good practice to avoid
   work on the <code>main</code> branch of any repository.</p>
 <ol>
-<li>We use <a href="https://hatch.pypa.io/latest/">Hatch</a> for packaging and dependency management. Project requirements are in <code>pyproject.toml</code>. To install GPJax into a Hatch virtual environment, run:</li>
+<li>We use <a href="https://docs.astral.sh/uv/">uv</a> for packaging and dependency management. Project requirements are in <code>pyproject.toml</code>. To install GPJax with uv, run:</li>
 </ol>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>hatch<span class="w"> </span>env<span class="w"> </span>create
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>dev
 </span></code></pre></div>
 <p>At this point we recommend you check your installation passes the supplied unit tests:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>hatch<span class="w"> </span>run<span class="w"> </span>dev:all-tests
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>poe<span class="w"> </span>all-tests
 </span></code></pre></div>
 <ol>
 <li>Add changed files using <code>git add</code> and then <code>git commit</code> files to record your
@@ -2645,7 +2741,7 @@ request, we recommend you check the following:</p>
 <li>
 <p>Documentation and high-coverage tests are necessary for enhancements to be
   accepted. Test coverage can be checked with:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>$<span class="w"> </span>hatch<span class="w"> </span>run<span class="w"> </span>dev:coverage
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>$<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>poe<span class="w"> </span>coverage
 </span></code></pre></div>
 </li>
 </ul>

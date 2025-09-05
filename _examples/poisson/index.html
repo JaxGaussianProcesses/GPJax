@@ -988,7 +988,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../backend/" class="md-nav__link">
+      <a href="../backend.md" class="md-nav__link">
         
   
   
@@ -2238,18 +2238,114 @@
   
   
   
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_9" id="__nav_7_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Linalg
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Linalg
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../api/lower_cholesky/" class="md-nav__link">
+      <a href="../../api/linalg/operations/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Lower Cholesky
+    Operations
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/linalg/operators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Operators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/linalg/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2598,14 +2694,14 @@ We store our data <span class="arithmatex">\(\mathcal{D}\)</span> as a GPJax <co
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">xtest</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Rate $\lambda$&quot;</span><span class="p">)</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>/home/runner/.local/share/hatch/env/virtual/gpjax/9bz-h8Il/docs/lib/python3.10/site-packages/jaxtyping/_decorator.py:473: UserWarning: y is not of type float64.Got y.dtype=int64. This may lead to numerical instability.
+<div class="language-text highlight"><pre><span></span><code>/home/runner/work/GPJax/GPJax/.venv/lib/python3.11/site-packages/jaxtyping/_decorator.py:473: UserWarning: y is not of type float64.Got y.dtype=int64. This may lead to numerical instability.
   out = fn(*args, **kwargs)
 
 
 
 
 
-&lt;matplotlib.legend.Legend at 0x7f715cfaf310&gt;
+&lt;matplotlib.legend.Legend at 0x7fc8bcaab650&gt;
 </code></pre></div>
 <p><img alt="png" src="../poisson_files/poisson_3_2.png" /></p>
 <h2 id="gaussian-process-definition">Gaussian Process definition<a class="headerlink" href="#gaussian-process-definition" title="Permanent link"></a></h2>
@@ -2747,7 +2843,7 @@ against the observed data.</p>
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;95% CI&quot;</span><span class="p">,</span>
 </span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.collections.FillBetweenPolyCollection at 0x7f7122f9d990&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.collections.FillBetweenPolyCollection at 0x7fc899f22850&gt;
 </code></pre></div>
 <p><img alt="png" src="../poisson_files/poisson_17_1.png" /></p>
 <h2 id="system-configuration">System configuration<a class="headerlink" href="#system-configuration" title="Permanent link"></a></h2>
@@ -2756,18 +2852,18 @@ against the observed data.</p>
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Francesco Zanetta
 
-Last updated: Thu Aug 28 2025
+Last updated: Fri Sep 05 2025
 
 Python implementation: CPython
-Python version       : 3.10.18
-IPython version      : 8.37.0
+Python version       : 3.11.13
+IPython version      : 9.5.0
 
-gpjax     : 0.11.2
-jax       : 0.6.2
-blackjax  : 1.2.5
-matplotlib: 3.10.5
-flax      : 0.10.7
 jaxtyping : 0.3.2
+jax       : 0.7.1
+flax      : 0.11.2
+gpjax     : 0.12.0
+matplotlib: 3.10.6
+blackjax  : 1.2.5
 
 Watermark: 2.5.0
 </code></pre></div>

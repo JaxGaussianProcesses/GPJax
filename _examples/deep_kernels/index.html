@@ -1012,7 +1012,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../backend/" class="md-nav__link">
+      <a href="../backend.md" class="md-nav__link">
         
   
   
@@ -2262,18 +2262,114 @@
   
   
   
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_9" id="__nav_7_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Linalg
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Linalg
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../api/lower_cholesky/" class="md-nav__link">
+      <a href="../../api/linalg/operations/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Lower Cholesky
+    Operations
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/linalg/operators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Operators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/linalg/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2664,7 +2760,7 @@ discontinuities. To highlight this, we will use a sawtooth function as our data.
 </span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtest</span><span class="p">,</span> <span class="n">ytest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;True function&quot;</span><span class="p">)</span>
 </span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f6ab228eb30&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fc74739bb10&gt;
 </code></pre></div>
 <p><img alt="png" src="../deep_kernels_files/deep_kernels_3_1.png" /></p>
 <h2 id="deep-kernels">Deep kernels<a class="headerlink" href="#deep-kernels" title="Permanent link"></a></h2>
@@ -2816,7 +2912,7 @@ of the model. We can do this by simply applying the model to a test data set.</p
 </span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a><span class="p">)</span>
 </span><span id="__span-6-32"><a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7f6a88332950&gt;
+<div class="language-text highlight"><pre><span></span><code>&lt;matplotlib.legend.Legend at 0x7fc70cee8e90&gt;
 </code></pre></div>
 <p><img alt="png" src="../deep_kernels_files/deep_kernels_13_1.png" /></p>
 <h2 id="system-configuration">System configuration<a class="headerlink" href="#system-configuration" title="Permanent link"></a></h2>
@@ -2825,19 +2921,19 @@ of the model. We can do this by simply applying the model to a test data set.</p
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code>Author: Thomas Pinder
 
-Last updated: Thu Aug 28 2025
+Last updated: Fri Sep 05 2025
 
 Python implementation: CPython
-Python version       : 3.10.18
-IPython version      : 8.37.0
+Python version       : 3.11.13
+IPython version      : 9.5.0
 
+jax       : 0.7.1
+flax      : 0.11.2
 jaxtyping : 0.3.2
+gpjax     : 0.12.0
+matplotlib: 3.10.6
+scipy     : 1.16.1
 optax     : 0.2.5
-matplotlib: 3.10.5
-flax      : 0.10.7
-scipy     : 1.15.3
-jax       : 0.6.2
-gpjax     : 0.11.2
 
 Watermark: 2.5.0
 </code></pre></div>

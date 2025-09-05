@@ -10,25 +10,25 @@
       
       
       
-        <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/api/lower_cholesky/">
+        <link rel="canonical" href="https://docs.jaxgaussianprocesses.com/api/linalg/operators/">
       
       
-        <link rel="prev" href="../likelihoods/">
+        <link rel="prev" href="../operations/">
       
       
-        <link rel="next" href="../mean_functions/">
+        <link rel="next" href="../utils/">
       
       
-      <link rel="icon" href="../../static/favicon.ico">
+      <link rel="icon" href="../../../static/favicon.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
     
     
       
-        <title>Lower Cholesky - GPJax</title>
+        <title>Operators - GPJax</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e37652d.min.css">
       
       
 
@@ -47,15 +47,15 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
-      <link rel="stylesheet" href="../../stylesheets/permalinks.css">
+      <link rel="stylesheet" href="../../../stylesheets/permalinks.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gpjax.lower_cholesky.lower_cholesky" class="md-skip">
+        <a href="#gpjax.linalg.operators.LinearOperator" class="md-skip">
           Skip to content
         </a>
       
@@ -100,9 +100,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="GPJax" class="md-header__button md-logo" aria-label="GPJax" data-md-component="logo">
+    <a href="../../.." title="GPJax" class="md-header__button md-logo" aria-label="GPJax" data-md-component="logo">
       
-  <img src="../../static/favicon.ico" alt="logo">
+  <img src="../../../static/favicon.ico" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -119,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Lower Cholesky
+              Operators
             
           </span>
         </div>
@@ -211,9 +211,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="GPJax" class="md-nav__button md-logo" aria-label="GPJax" data-md-component="logo">
+    <a href="../../.." title="GPJax" class="md-nav__button md-logo" aria-label="GPJax" data-md-component="logo">
       
-  <img src="../../static/favicon.ico" alt="logo">
+  <img src="../../../static/favicon.ico" alt="logo">
 
     </a>
     GPJax
@@ -240,7 +240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -307,7 +307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../installation/" class="md-nav__link">
+      <a href="../../../installation/" class="md-nav__link">
         
   
   
@@ -330,7 +330,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/" class="md-nav__link">
+      <a href="../../../design/" class="md-nav__link">
         
   
   
@@ -353,7 +353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/" class="md-nav__link">
+      <a href="../../../contributing/" class="md-nav__link">
         
   
   
@@ -376,7 +376,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../sharp_bits/" class="md-nav__link">
+      <a href="../../../sharp_bits/" class="md-nav__link">
         
   
   
@@ -474,7 +474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/intro_to_gps/" class="md-nav__link">
+      <a href="../../../_examples/intro_to_gps/" class="md-nav__link">
         
   
   
@@ -497,7 +497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/intro_to_kernels/" class="md-nav__link">
+      <a href="../../../_examples/intro_to_kernels/" class="md-nav__link">
         
   
   
@@ -572,7 +572,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/regression/" class="md-nav__link">
+      <a href="../../../_examples/regression/" class="md-nav__link">
         
   
   
@@ -595,7 +595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/classification/" class="md-nav__link">
+      <a href="../../../_examples/classification/" class="md-nav__link">
         
   
   
@@ -618,7 +618,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/poisson/" class="md-nav__link">
+      <a href="../../../_examples/poisson/" class="md-nav__link">
         
   
   
@@ -641,7 +641,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/barycentres/" class="md-nav__link">
+      <a href="../../../_examples/barycentres/" class="md-nav__link">
         
   
   
@@ -664,7 +664,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/deep_kernels/" class="md-nav__link">
+      <a href="../../../_examples/deep_kernels/" class="md-nav__link">
         
   
   
@@ -687,7 +687,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/graph_kernels/" class="md-nav__link">
+      <a href="../../../_examples/graph_kernels/" class="md-nav__link">
         
   
   
@@ -710,7 +710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/collapsed_vi/" class="md-nav__link">
+      <a href="../../../_examples/collapsed_vi/" class="md-nav__link">
         
   
   
@@ -733,7 +733,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/uncollapsed_vi/" class="md-nav__link">
+      <a href="../../../_examples/uncollapsed_vi/" class="md-nav__link">
         
   
   
@@ -756,7 +756,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/oceanmodelling/" class="md-nav__link">
+      <a href="../../../_examples/oceanmodelling/" class="md-nav__link">
         
   
   
@@ -831,7 +831,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/constructing_new_kernels/" class="md-nav__link">
+      <a href="../../../_examples/constructing_new_kernels/" class="md-nav__link">
         
   
   
@@ -854,7 +854,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/likelihoods_guide/" class="md-nav__link">
+      <a href="../../../_examples/likelihoods_guide/" class="md-nav__link">
         
   
   
@@ -877,7 +877,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/backend/" class="md-nav__link">
+      <a href="../../../_examples/backend.md" class="md-nav__link">
         
   
   
@@ -900,7 +900,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../_examples/yacht/" class="md-nav__link">
+      <a href="../../../_examples/yacht/" class="md-nav__link">
         
   
   
@@ -975,7 +975,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../CODE_OF_CONDUCT/" class="md-nav__link">
+      <a href="../../../CODE_OF_CONDUCT/" class="md-nav__link">
         
   
   
@@ -998,7 +998,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../GOVERNANCE/" class="md-nav__link">
+      <a href="../../../GOVERNANCE/" class="md-nav__link">
         
   
   
@@ -1138,7 +1138,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../citation/" class="md-nav__link">
+      <a href="../../citation/" class="md-nav__link">
         
   
   
@@ -1161,7 +1161,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dataset/" class="md-nav__link">
+      <a href="../../dataset/" class="md-nav__link">
         
   
   
@@ -1184,7 +1184,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../distributions/" class="md-nav__link">
+      <a href="../../distributions/" class="md-nav__link">
         
   
   
@@ -1207,7 +1207,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fit/" class="md-nav__link">
+      <a href="../../fit/" class="md-nav__link">
         
   
   
@@ -1230,7 +1230,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gps/" class="md-nav__link">
+      <a href="../../gps/" class="md-nav__link">
         
   
   
@@ -1253,7 +1253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../integrators/" class="md-nav__link">
+      <a href="../../integrators/" class="md-nav__link">
         
   
   
@@ -1360,7 +1360,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/approximations/rff/" class="md-nav__link">
+      <a href="../../kernels/approximations/rff/" class="md-nav__link">
         
   
   
@@ -1391,7 +1391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/base/" class="md-nav__link">
+      <a href="../../kernels/base/" class="md-nav__link">
         
   
   
@@ -1456,7 +1456,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/computations/base/" class="md-nav__link">
+      <a href="../../kernels/computations/base/" class="md-nav__link">
         
   
   
@@ -1479,7 +1479,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/computations/basis_functions/" class="md-nav__link">
+      <a href="../../kernels/computations/basis_functions/" class="md-nav__link">
         
   
   
@@ -1502,7 +1502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/computations/constant_diagonal/" class="md-nav__link">
+      <a href="../../kernels/computations/constant_diagonal/" class="md-nav__link">
         
   
   
@@ -1525,7 +1525,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/computations/dense/" class="md-nav__link">
+      <a href="../../kernels/computations/dense/" class="md-nav__link">
         
   
   
@@ -1548,7 +1548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/computations/diagonal/" class="md-nav__link">
+      <a href="../../kernels/computations/diagonal/" class="md-nav__link">
         
   
   
@@ -1571,7 +1571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/computations/eigen/" class="md-nav__link">
+      <a href="../../kernels/computations/eigen/" class="md-nav__link">
         
   
   
@@ -1644,7 +1644,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/non_euclidean/graph/" class="md-nav__link">
+      <a href="../../kernels/non_euclidean/graph/" class="md-nav__link">
         
   
   
@@ -1667,7 +1667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/non_euclidean/utils/" class="md-nav__link">
+      <a href="../../kernels/non_euclidean/utils/" class="md-nav__link">
         
   
   
@@ -1740,7 +1740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/nonstationary/arccosine/" class="md-nav__link">
+      <a href="../../kernels/nonstationary/arccosine/" class="md-nav__link">
         
   
   
@@ -1763,7 +1763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/nonstationary/linear/" class="md-nav__link">
+      <a href="../../kernels/nonstationary/linear/" class="md-nav__link">
         
   
   
@@ -1786,7 +1786,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/nonstationary/polynomial/" class="md-nav__link">
+      <a href="../../kernels/nonstationary/polynomial/" class="md-nav__link">
         
   
   
@@ -1859,7 +1859,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/base/" class="md-nav__link">
+      <a href="../../kernels/stationary/base/" class="md-nav__link">
         
   
   
@@ -1882,7 +1882,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/matern12/" class="md-nav__link">
+      <a href="../../kernels/stationary/matern12/" class="md-nav__link">
         
   
   
@@ -1905,7 +1905,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/matern32/" class="md-nav__link">
+      <a href="../../kernels/stationary/matern32/" class="md-nav__link">
         
   
   
@@ -1928,7 +1928,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/matern52/" class="md-nav__link">
+      <a href="../../kernels/stationary/matern52/" class="md-nav__link">
         
   
   
@@ -1951,7 +1951,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/periodic/" class="md-nav__link">
+      <a href="../../kernels/stationary/periodic/" class="md-nav__link">
         
   
   
@@ -1974,7 +1974,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/powered_exponential/" class="md-nav__link">
+      <a href="../../kernels/stationary/powered_exponential/" class="md-nav__link">
         
   
   
@@ -1997,7 +1997,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/rational_quadratic/" class="md-nav__link">
+      <a href="../../kernels/stationary/rational_quadratic/" class="md-nav__link">
         
   
   
@@ -2020,7 +2020,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/rbf/" class="md-nav__link">
+      <a href="../../kernels/stationary/rbf/" class="md-nav__link">
         
   
   
@@ -2043,7 +2043,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/utils/" class="md-nav__link">
+      <a href="../../kernels/stationary/utils/" class="md-nav__link">
         
   
   
@@ -2066,7 +2066,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kernels/stationary/white/" class="md-nav__link">
+      <a href="../../kernels/stationary/white/" class="md-nav__link">
         
   
   
@@ -2105,12 +2105,77 @@
   
   
     <li class="md-nav__item">
-      <a href="../likelihoods/" class="md-nav__link">
+      <a href="../../likelihoods/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     Likelihoods
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_1_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7_1_9" id="__nav_7_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Linalg
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_1_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Linalg
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Operations
     
   </span>
   
@@ -2140,7 +2205,7 @@
   
   
   <span class="md-ellipsis">
-    Lower Cholesky
+    Operators
     
   </span>
   
@@ -2153,7 +2218,7 @@
   
   
   <span class="md-ellipsis">
-    Lower Cholesky
+    Operators
     
   </span>
   
@@ -2174,11 +2239,269 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gpjax.lower_cholesky.lower_cholesky" class="md-nav__link">
+  <a href="#gpjax.linalg.operators.LinearOperator" class="md-nav__link">
     <span class="md-ellipsis">
-      lower_cholesky
+      LinearOperator
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="LinearOperator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      shape
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.dtype" class="md-nav__link">
+    <span class="md-ellipsis">
+      dtype
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.T" class="md-nav__link">
+    <span class="md-ellipsis">
+      T
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.to_dense" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dense
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Dense" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dense
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dense">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Dense.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Dense.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Diagonal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Diagonal
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Diagonal">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Diagonal.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Diagonal.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Identity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Identity
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Identity.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Identity.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Triangular" class="md-nav__link">
+    <span class="md-ellipsis">
+      Triangular
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Triangular">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Triangular.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Triangular.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.BlockDiag" class="md-nav__link">
+    <span class="md-ellipsis">
+      BlockDiag
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BlockDiag">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.BlockDiag.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.BlockDiag.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Kronecker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kronecker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Kronecker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Kronecker.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Kronecker.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2198,7 +2521,38 @@
   
   
     <li class="md-nav__item">
-      <a href="../mean_functions/" class="md-nav__link">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mean_functions/" class="md-nav__link">
         
   
   
@@ -2221,7 +2575,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../numpyro_extras/" class="md-nav__link">
+      <a href="../../numpyro_extras/" class="md-nav__link">
         
   
   
@@ -2244,7 +2598,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../objectives/" class="md-nav__link">
+      <a href="../../objectives/" class="md-nav__link">
         
   
   
@@ -2267,7 +2621,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../parameters/" class="md-nav__link">
+      <a href="../../parameters/" class="md-nav__link">
         
   
   
@@ -2290,7 +2644,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../scan/" class="md-nav__link">
+      <a href="../../scan/" class="md-nav__link">
         
   
   
@@ -2313,7 +2667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../typing/" class="md-nav__link">
+      <a href="../../typing/" class="md-nav__link">
         
   
   
@@ -2336,7 +2690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../variational_families/" class="md-nav__link">
+      <a href="../../variational_families/" class="md-nav__link">
         
   
   
@@ -2392,11 +2746,269 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gpjax.lower_cholesky.lower_cholesky" class="md-nav__link">
+  <a href="#gpjax.linalg.operators.LinearOperator" class="md-nav__link">
     <span class="md-ellipsis">
-      lower_cholesky
+      LinearOperator
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="LinearOperator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      shape
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.dtype" class="md-nav__link">
+    <span class="md-ellipsis">
+      dtype
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.T" class="md-nav__link">
+    <span class="md-ellipsis">
+      T
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.to_dense" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dense
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.LinearOperator.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Dense" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dense
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dense">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Dense.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Dense.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Diagonal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Diagonal
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Diagonal">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Diagonal.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Diagonal.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Identity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Identity
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Identity.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Identity.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Triangular" class="md-nav__link">
+    <span class="md-ellipsis">
+      Triangular
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Triangular">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Triangular.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Triangular.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.BlockDiag" class="md-nav__link">
+    <span class="md-ellipsis">
+      BlockDiag
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BlockDiag">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.BlockDiag.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.BlockDiag.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Kronecker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kronecker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Kronecker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Kronecker.__add__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __add__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.linalg.operators.Kronecker.__mul__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __mul__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2419,7 +3031,7 @@
   
 
 
-  <h1>Lower Cholesky</h1>
+  <h1>Operators</h1>
 
 <div class="doc doc-object doc-module">
 
@@ -2427,6 +3039,221 @@
 
 
     <div class="doc doc-contents first">
+
+        <p>Linear operator abstractions for GPJax.</p>
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="gpjax.linalg.operators.LinearOperator" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">LinearOperator</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">LinearOperator</span><span class="p">()</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
+
+
+        <p>Abstract base class for linear operators.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="gpjax.linalg.operators.LinearOperator.shape" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">shape</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">shape</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the shape of the operator.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="gpjax.linalg.operators.LinearOperator.dtype" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">dtype</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">dtype</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the data type of the operator.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="gpjax.linalg.operators.LinearOperator.T" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">T</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">T</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the transpose of the operator.</p>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.LinearOperator.to_dense" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">to_dense</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_dense</span><span class="p">()</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Convert the operator to a dense JAX array.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.LinearOperator.__add__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__add__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__add__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Addition with another array or operator.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.LinearOperator.__mul__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__mul__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__mul__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Scalar multiplication (self * scalar).</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="gpjax.linalg.operators.Dense" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Dense</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Dense</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="gpjax.linalg.operators.LinearOperator" href="#gpjax.linalg.operators.LinearOperator">LinearOperator</a></code></p>
+
+
+        <p>Dense linear operator wrapping a JAX array.</p>
+
 
 
 
@@ -2448,46 +3275,464 @@
 <div class="doc doc-object doc-function">
 
 
-<h2 id="gpjax.lower_cholesky.lower_cholesky" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">lower_cholesky</span>
+<h3 id="gpjax.linalg.operators.Dense.__add__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__add__</span>
 
 
-</h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">lower_cholesky</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__add__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returns the lower Cholesky factor of a linear operator.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>A</code></b>
-              (<code><span title="cola.ops.operator_base.LinearOperator">LinearOperator</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The input linear operator.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-<b><code>Triangular</code></b> (              <code><span title="cola.ops.operators.Triangular">Triangular</span></code>
-)          –
-          <div class="doc-md-description">
-            <p>The lower Cholesky factor of A.</p>
-          </div>
-        </li>
-    </ul>
+        <p>Addition with another array or operator.</p>
 
     </div>
 
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Dense.__mul__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__mul__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__mul__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Scalar multiplication (self * scalar).</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="gpjax.linalg.operators.Diagonal" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Diagonal</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Diagonal</span><span class="p">(</span><span class="n">diagonal</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="gpjax.linalg.operators.LinearOperator" href="#gpjax.linalg.operators.LinearOperator">LinearOperator</a></code></p>
+
+
+        <p>Diagonal linear operator.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Diagonal.__add__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__add__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__add__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Addition with another array or operator.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Diagonal.__mul__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__mul__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__mul__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Scalar multiplication (self * scalar).</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="gpjax.linalg.operators.Identity" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Identity</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Identity</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="gpjax.linalg.operators.LinearOperator" href="#gpjax.linalg.operators.LinearOperator">LinearOperator</a></code></p>
+
+
+        <p>Identity linear operator.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Identity.__add__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__add__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__add__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Addition with another array or operator.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Identity.__mul__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__mul__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__mul__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Scalar multiplication (self * scalar).</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="gpjax.linalg.operators.Triangular" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Triangular</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Triangular</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="gpjax.linalg.operators.LinearOperator" href="#gpjax.linalg.operators.LinearOperator">LinearOperator</a></code></p>
+
+
+        <p>Triangular linear operator.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Triangular.__add__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__add__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__add__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Addition with another array or operator.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Triangular.__mul__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__mul__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__mul__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Scalar multiplication (self * scalar).</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="gpjax.linalg.operators.BlockDiag" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">BlockDiag</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">BlockDiag</span><span class="p">(</span><span class="n">operators</span><span class="p">,</span> <span class="n">multiplicities</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="gpjax.linalg.operators.LinearOperator" href="#gpjax.linalg.operators.LinearOperator">LinearOperator</a></code></p>
+
+
+        <p>Block diagonal linear operator.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.BlockDiag.__add__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__add__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__add__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Addition with another array or operator.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.BlockDiag.__mul__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__mul__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__mul__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Scalar multiplication (self * scalar).</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="gpjax.linalg.operators.Kronecker" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Kronecker</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Kronecker</span><span class="p">(</span><span class="n">operators</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="gpjax.linalg.operators.LinearOperator" href="#gpjax.linalg.operators.LinearOperator">LinearOperator</a></code></p>
+
+
+        <p>Kronecker product linear operator.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Kronecker.__add__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__add__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__add__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Addition with another array or operator.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.linalg.operators.Kronecker.__mul__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__mul__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__mul__</span><span class="p">(</span><span class="nf">other</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Scalar multiplication (self * scalar).</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 
 
 
@@ -2552,10 +3797,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.92b07e13.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.92b07e13.min.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
@@ -2563,7 +3808,7 @@
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
       
-        <script src="../../javascripts/katex.js"></script>
+        <script src="../../../javascripts/katex.js"></script>
       
     
   </body>
