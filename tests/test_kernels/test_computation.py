@@ -1,8 +1,3 @@
-import cola
-from cola.ops.operators import (
-    Dense,
-    Diagonal,
-)
 import jax.numpy as jnp
 import pytest
 
@@ -23,6 +18,11 @@ from gpjax.kernels.stationary import (
     Periodic,
     PoweredExponential,
     RationalQuadratic,
+)
+from gpjax.linalg import PSD
+from gpjax.linalg.operators import (
+    Dense,
+    Diagonal,
 )
 
 
@@ -49,7 +49,7 @@ def test_change_computation(kernel: AbstractKernel):
     dense_diagonals = jnp.diag(dense_matrix)
 
     assert isinstance(dense_linop, Dense)
-    assert cola.PSD in dense_linop.annotations
+    assert PSD in dense_linop.annotations
 
     # Let's now change the computation to DiagonalKernelComputation
     kernel.compute_engine = DiagonalKernelComputation()
@@ -58,7 +58,7 @@ def test_change_computation(kernel: AbstractKernel):
     diag_entries = jnp.diag(diagonal_matrix)
 
     assert isinstance(diagonal_linop, Diagonal)
-    assert cola.PSD in diagonal_linop.annotations
+    assert PSD in diagonal_linop.annotations
 
     # The diagonal entries should be the same as the dense matrix
     assert jnp.allclose(diag_entries, dense_diagonals)
@@ -72,7 +72,7 @@ def test_change_computation(kernel: AbstractKernel):
     constant_diagonal_matrix = constant_diagonal_linop.to_dense()
     constant_entries = jnp.diag(constant_diagonal_matrix)
 
-    assert cola.PSD in constant_diagonal_linop.annotations
+    assert PSD in constant_diagonal_linop.annotations
 
     # Assert all the diagonal entries are the same
     assert jnp.allclose(constant_entries, constant_entries[0])

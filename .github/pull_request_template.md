@@ -1,6 +1,6 @@
 ## Checklist
 
-- [ ] I've formatted the new code by running `hatch run dev:format` before committing.
+- [ ] I've formatted the new code by running `uv run poe format` before committing.
 - [ ] I've added tests for new code.
 - [ ] I've added docstrings for the new code.
 

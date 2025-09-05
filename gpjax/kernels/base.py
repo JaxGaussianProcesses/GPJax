@@ -17,7 +17,6 @@ import abc
 import functools as ft
 
 import beartype.typing as tp
-from cola.ops.operator_base import LinearOperator
 from flax import nnx
 import jax.numpy as jnp
 from jaxtyping import (
@@ -29,6 +28,7 @@ from gpjax.kernels.computations import (
     AbstractKernelComputation,
     DenseKernelComputation,
 )
+from gpjax.linalg import LinearOperator
 from gpjax.parameters import (
     Parameter,
     Real,

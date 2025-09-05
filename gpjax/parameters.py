@@ -21,23 +21,20 @@ def transform(
     r"""Transforms parameters using a bijector.
 
     Example:
-    ```pycon
         >>> from gpjax.parameters import PositiveReal, transform
         >>> import jax.numpy as jnp
         >>> import numpyro.distributions.transforms as npt
         >>> from flax import nnx
         >>> params = nnx.State(
-        >>>     {
-        >>>         "a": PositiveReal(jnp.array([1.0])),
-        >>>         "b": PositiveReal(jnp.array([2.0])),
-        >>>     }
-        >>> )
+        ...     {
+        ...         "a": PositiveReal(jnp.array([1.0])),
+        ...         "b": PositiveReal(jnp.array([2.0])),
+        ...     }
+        ... )
         >>> params_bijection = {'positive': npt.SoftplusTransform()}
         >>> transformed_params = transform(params, params_bijection)
         >>> print(transformed_params["a"].value)
-         [1.3132617]
-    ```
-
+        [1.3132617]
 
     Args:
         params: A nnx.State object containing parameters to be transformed.
@@ -49,7 +46,7 @@ def transform(
     """
 
     def _inner(param):
-        bijector = params_bijection.get(param._tag, npt.IdentityTransform())
+        bijector = params_bijection.get(param.tag, npt.IdentityTransform())
         if inverse:
             transformed_value = bijector.inv(param.value)
         else:
@@ -60,10 +57,11 @@ def transform(
 
     gp_params, *other_params = params.split(Parameter, ...)
 
+    # Transform each parameter in the state
     transformed_gp_params: nnx.State = jtu.tree_map(
-        lambda x: _inner(x),
+        lambda x: _inner(x) if isinstance(x, Parameter) else x,
         gp_params,
-        is_leaf=lambda x: isinstance(x, nnx.VariableState),
+        is_leaf=lambda x: isinstance(x, Parameter),
     )
     return nnx.State.merge(transformed_gp_params, *other_params)
 
@@ -79,7 +77,7 @@ class Parameter(nnx.Variable[T]):
         _check_is_arraylike(value)
 
         super().__init__(value=jnp.asarray(value), **kwargs)
-        self._tag = tag
+        self.tag = tag
 
 
 class NonNegativeReal(Parameter[T]):

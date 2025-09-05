@@ -13,7 +13,7 @@ jobs:
       matrix:
         # Select the Python versions to test against
         os: ["ubuntu-latest", "macos-latest"]
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
       fail-fast: true
     steps:
       - name: Check out the code
@@ -25,10 +25,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Install Hatch
-      - name: Install Hatch
-        uses: pypa/hatch@install
+      # Install uv
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
 
       # Run the unit tests and build the coverage report
       - name: Run Integration Tests
-        run: hatch run docs:integration
+        run: |
+          uv sync --extra docs
+          uv run python tests/integration_tests.py

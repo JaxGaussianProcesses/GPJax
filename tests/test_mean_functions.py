@@ -19,16 +19,12 @@ from jax import config
 config.update("jax_enable_x64", True)
 
 
-import jax.numpy as jnp
-import jax.random as jr
-from jaxtyping import (
-    Array,
-    Float,
-    Num,
-)
-import pytest
+import warnings
 
 import gpjax as gpx
+import jax.numpy as jnp
+import jax.random as jr
+import pytest
 from gpjax.mean_functions import (
     AbstractMeanFunction,
     CombinationMeanFunction,
@@ -36,6 +32,12 @@ from gpjax.mean_functions import (
     Zero,
 )
 from gpjax.parameters import Static
+from jaxtyping import (
+    Array,
+    Float,
+    Num,
+)
+from scipy.optimize import OptimizeWarning
 
 
 def test_abstract() -> None:
@@ -85,11 +87,14 @@ def test_zero_mean_remains_zero() -> None:
     )
     posterior = prior * likelihood
 
-    opt_posterior, _ = gpx.fit_scipy(
-        model=posterior,
-        objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
-        train_data=D,
-    )
+    # Suppress optimisation warnings as we only care about the assertion, not convergence
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", OptimizeWarning)
+        opt_posterior, _ = gpx.fit_scipy(
+            model=posterior,
+            objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
+            train_data=D,
+        )
     assert opt_posterior.prior.mean_function.constant.value == 0.0
 
 

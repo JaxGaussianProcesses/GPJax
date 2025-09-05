@@ -72,16 +72,16 @@ you through every detail!
   Always use a `feature` branch. It's good practice to avoid
   work on the ``main`` branch of any repository.
 
-4.  We use [Hatch](https://hatch.pypa.io/latest/) for packaging and dependency management. Project requirements are in ``pyproject.toml``. To install GPJax into a Hatch virtual environment, run:
+4.  We use [uv](https://docs.astral.sh/uv/) for packaging and dependency management. Project requirements are in ``pyproject.toml``. To install GPJax into a uv virtual environment, run:
 
   ```bash
-  $ hatch env create
+  $ uv sync --extra dev
   ```
 
   At this point we recommend you check your installation passes the supplied unit tests:
 
   ```bash
-  $ hatch run dev:all-tests
+  $ uv run poe all-tests
   ```
 
 5.  Add changed files using `git add` and then `git commit` files to record your
@@ -142,7 +142,7 @@ request, we recommend you check the following:
   accepted. Test coverage can be checked with:
 
     ```bash
-    $ hatch run dev:coverage
+    $ uv run poe coverage
     ```
 
   Navigate to the newly created folder `htmlcov` and open `index.html` to view

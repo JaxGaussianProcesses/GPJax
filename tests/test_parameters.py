@@ -43,7 +43,7 @@ def test_transform(param, value):
 
     # Test forward transformation
     t_params = transform(params, DEFAULT_BIJECTION)
-    t_param1_expected = DEFAULT_BIJECTION[params["param1"]._tag](value)
+    t_param1_expected = DEFAULT_BIJECTION[params["param1"].tag](value)
     assert jnp.allclose(t_params["param1"].value, t_param1_expected)
     assert jnp.allclose(t_params["param2"].value, 2.0)
 
@@ -60,7 +60,7 @@ def test_transform(param, value):
     ],
 )
 def test_default_tags(param, tag):
-    assert param._tag == tag
+    assert param.tag == tag
 
 
 def test_check_is_positive():

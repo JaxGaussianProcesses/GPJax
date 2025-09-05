@@ -23,13 +23,12 @@ import pytest
 # Enable Float64 for more stable matrix inversions.
 config.update("jax_enable_x64", True)
 
-import cola
-from cola.ops import (
+from gpjax.distributions import GaussianDistribution
+from gpjax.linalg import PSD
+from gpjax.linalg.operators import (
     Dense,
     Diagonal,
 )
-
-from gpjax.distributions import GaussianDistribution
 
 _key = jr.key(seed=42)
 
@@ -51,7 +50,7 @@ def test_array_arguments(n: int) -> None:
     # check that cholesky does not error
     _L = jnp.linalg.cholesky(covariance)  # noqa: F841
 
-    dist = GaussianDistribution(loc=mean, scale=cola.PSD(Dense(covariance)))
+    dist = GaussianDistribution(loc=mean, scale=PSD(Dense(covariance)))
 
     assert approx_equal(dist.mean, mean)
     assert approx_equal(dist.variance, covariance.diagonal())
@@ -59,7 +58,7 @@ def test_array_arguments(n: int) -> None:
     assert approx_equal(dist.covariance(), covariance)
 
     assert isinstance(dist.scale, Dense)
-    assert cola.PSD in dist.scale.annotations
+    assert PSD in dist.scale.annotations
 
     y = jr.uniform(_key, shape=(n,))
 
@@ -82,7 +81,7 @@ def test_diag_linear_operator(n: int) -> None:
 
     # We check that the PSD annotation is added automatically.
     assert isinstance(dist_diag.scale, Diagonal)
-    assert cola.PSD in dist_diag.scale.annotations
+    assert PSD in dist_diag.scale.annotations
 
     assert approx_equal(dist_diag.mean, npt_dist.mean)
     assert approx_equal(dist_diag.entropy(), npt_dist.entropy())
@@ -109,7 +108,7 @@ def test_dense_linear_operator(n: int) -> None:
 
     sqrt = jnp.linalg.cholesky(covariance + jnp.eye(n) * 1e-10)
 
-    dist_dense = GaussianDistribution(loc=mean, scale=cola.PSD(Dense(covariance)))
+    dist_dense = GaussianDistribution(loc=mean, scale=PSD(Dense(covariance)))
     npt_dist = MultivariateNormal(loc=mean, covariance_matrix=covariance)
 
     assert approx_equal(dist_dense.mean, npt_dist.mean)
@@ -133,8 +132,8 @@ def test_kl_divergence(n: int) -> None:
     covariance_a = sqrt_a @ sqrt_a.T
     covariance_b = sqrt_b @ sqrt_b.T
 
-    dist_a = GaussianDistribution(loc=mean_a, scale=cola.PSD(Dense(covariance_a)))
-    dist_b = GaussianDistribution(loc=mean_b, scale=cola.PSD(Dense(covariance_b)))
+    dist_a = GaussianDistribution(loc=mean_a, scale=PSD(Dense(covariance_a)))
+    dist_b = GaussianDistribution(loc=mean_b, scale=PSD(Dense(covariance_b)))
 
     npt_dist_a = MultivariateNormal(loc=mean_a, covariance_matrix=covariance_a)
     npt_dist_b = MultivariateNormal(loc=mean_b, covariance_matrix=covariance_b)

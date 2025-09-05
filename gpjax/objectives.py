@@ -1,13 +1,5 @@
 from typing import TypeVar
 
-from cola.annotations import PSD
-from cola.linalg.decompositions.decompositions import Cholesky
-from cola.linalg.inverse.inv import (
-    inv,
-    solve,
-)
-from cola.linalg.trace.diag_trace import diag
-from cola.ops.operators import I_like
 from flax import nnx
 from jax import vmap
 import jax.numpy as jnp
@@ -22,7 +14,12 @@ from gpjax.gps import (
     ConjugatePosterior,
     NonConjugatePosterior,
 )
-from gpjax.lower_cholesky import lower_cholesky
+from gpjax.linalg import (
+    Dense,
+    lower_cholesky,
+    psd,
+    solve,
+)
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -100,9 +97,9 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
 
     # Σ = (Kxx + Io²) = LLᵀ
     Kxx = posterior.prior.kernel.gram(x)
-    Kxx += I_like(Kxx) * posterior.prior.jitter
-    Sigma = Kxx + I_like(Kxx) * obs_noise
-    Sigma = PSD(Sigma)
+    Kxx_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * posterior.prior.jitter
+    Sigma_dense = Kxx_dense + jnp.eye(Kxx.shape[0]) * obs_noise
+    Sigma = psd(Dense(Sigma_dense))
 
     # p(y | x, θ), where θ are the model hyperparameters:
     mll = GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Sigma)
@@ -164,11 +161,14 @@ def conjugate_loocv(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat
 
     # Σ = (Kxx + Io²)
     Kxx = posterior.prior.kernel.gram(x)
-    Sigma = Kxx + I_like(Kxx) * (obs_var + posterior.prior.jitter)
-    Sigma = PSD(Sigma)  # [N, N]
+    Sigma_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * (
+        obs_var + posterior.prior.jitter
+    )
+    Sigma = psd(Dense(Sigma_dense))  # [N, N]
 
-    Sigma_inv_y = solve(Sigma, y - mx, Cholesky())  # [N, 1]
-    Sigma_inv_diag = diag(inv(Sigma, Cholesky()))[:, None]  # [N, 1]
+    Sigma_inv_y = solve(Sigma, y - mx)  # [N, 1]
+    Sigma_inv = jnp.linalg.inv(Sigma.to_dense())
+    Sigma_inv_diag = jnp.diag(Sigma_inv)[:, None]  # [N, 1]
 
     loocv_means = mx + (y - mx) - Sigma_inv_y / Sigma_inv_diag
     loocv_stds = jnp.sqrt(1.0 / Sigma_inv_diag)
@@ -213,8 +213,8 @@ def log_posterior_density(
 
     # Gram matrix
     Kxx = posterior.prior.kernel.gram(x)
-    Kxx += I_like(Kxx) * posterior.prior.jitter
-    Kxx = PSD(Kxx)
+    Kxx_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * posterior.prior.jitter
+    Kxx = psd(Dense(Kxx_dense))
     Lx = lower_cholesky(Kxx)
 
     # Compute the prior mean function
@@ -349,8 +349,8 @@ def collapsed_elbo(variational_family: VF, data: Dataset) -> ScalarFloat:
     noise = variational_family.posterior.likelihood.obs_stddev.value**2
     z = variational_family.inducing_inputs.value
     Kzz = kernel.gram(z)
-    Kzz += I_like(Kzz) * variational_family.jitter
-    Kzz = PSD(Kzz)
+    Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * variational_family.jitter
+    Kzz = psd(Dense(Kzz_dense))
     Kzx = kernel.cross_covariance(z, x)
     Kxx_diag = vmap(kernel, in_axes=(0, 0))(x, x)
     μx = mean_function(x)
@@ -383,7 +383,7 @@ def collapsed_elbo(variational_family: VF, data: Dataset) -> ScalarFloat:
     #
     #   with A and B defined as above.
 
-    A = solve(Lz, Kzx, Cholesky()) / jnp.sqrt(noise)
+    A = solve(Lz, Kzx) / jnp.sqrt(noise)
 
     # AAᵀ
     AAT = jnp.matmul(A, A.T)

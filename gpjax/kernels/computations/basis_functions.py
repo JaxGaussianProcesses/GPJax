@@ -1,17 +1,18 @@
 import typing as tp
 
-from cola.annotations import PSD
-from cola.ops.operators import Dense
 import jax.numpy as jnp
 from jaxtyping import Float
 
 import gpjax
 from gpjax.kernels.computations.base import AbstractKernelComputation
+from gpjax.linalg import (
+    Dense,
+    Diagonal,
+    psd,
+)
 from gpjax.typing import Array
 
 K = tp.TypeVar("K", bound="gpjax.kernels.approximations.RFF")  # noqa: F821
-
-from cola.ops import Diagonal
 
 # TODO: Use low rank linear operator!
 
@@ -28,7 +29,7 @@ class BasisFunctionComputation(AbstractKernelComputation):
 
     def _gram(self, kernel: K, inputs: Float[Array, "N D"]) -> Dense:
         z1 = self.compute_features(kernel, inputs)
-        return PSD(Dense(self.scaling(kernel) * jnp.matmul(z1, z1.T)))
+        return psd(Dense(self.scaling(kernel) * jnp.matmul(z1, z1.T)))
 
     def diagonal(self, kernel: K, inputs: Float[Array, "N D"]) -> Diagonal:
         r"""For a given kernel, compute the elementwise diagonal of the

@@ -15,36 +15,34 @@
 
 import typing as tp
 
-from cola.annotations import PSD
-from cola.ops.operators import (
-    Diagonal,
-    Identity,
-    Product,
-)
 from jax import vmap
 import jax.numpy as jnp
 from jaxtyping import Float
 
 import gpjax
 from gpjax.kernels.computations import AbstractKernelComputation
+from gpjax.linalg import (
+    Diagonal,
+    psd,
+)
 from gpjax.typing import Array
 
 K = tp.TypeVar("K", bound="gpjax.kernels.base.AbstractKernel")  # noqa: F821
-ConstantDiagonalType = Product
+ConstantDiagonalType = Diagonal
 
 
 class ConstantDiagonalKernelComputation(AbstractKernelComputation):
     r"""Computation engine for constant diagonal kernels."""
 
-    def gram(self, kernel: K, x: Float[Array, "N D"]) -> Product:
+    def gram(self, kernel: K, x: Float[Array, "N D"]) -> Diagonal:
         value = kernel(x[0], x[0])
-        dtype = value.dtype
-        shape = (x.shape[0], x.shape[0])
-        return PSD(jnp.atleast_1d(value) * Identity(shape=shape, dtype=dtype))
+        # Create a diagonal matrix with constant values
+        diag = jnp.full(x.shape[0], value)
+        return psd(Diagonal(diag))
 
     def _diagonal(self, kernel: K, inputs: Float[Array, "N D"]) -> Diagonal:
         diag = vmap(lambda x: kernel(x, x))(inputs)
-        return PSD(Diagonal(diag=diag))
+        return psd(Diagonal(diag))
 
     def _cross_covariance(
         self, kernel: K, x: Float[Array, "N D"], y: Float[Array, "M D"]
