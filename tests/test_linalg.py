@@ -18,6 +18,7 @@ from gpjax.linalg import (
     psd,
     solve,
 )
+from gpjax.linalg.utils import add_jitter
 
 # Enable 64-bit precision for tests
 config.update("jax_enable_x64", True)
@@ -482,3 +483,76 @@ class TestDiag:
 
         expected = jnp.array([1.0, 2.0, 3.0, 3.0])  # B is repeated twice
         assert jnp.allclose(d, expected)
+
+
+class TestAddJitter:
+    """Tests for the add_jitter utility function."""
+
+    def test_square_matrix_default_jitter(self):
+        """Test adding default jitter to a square matrix."""
+        key = jr.key(123)
+        matrix = jr.normal(key, shape=(3, 3))
+
+        jittered = add_jitter(matrix)
+        expected = matrix + jnp.eye(3) * 1e-6
+
+        assert jnp.allclose(jittered, expected)
+        assert jittered.shape == matrix.shape
+
+    def test_square_matrix_custom_jitter(self):
+        """Test adding custom jitter value to a square matrix."""
+        matrix = jnp.array([[1.0, 0.5], [0.5, 1.0]])
+        jitter_val = 0.01
+
+        jittered = add_jitter(matrix, jitter=jitter_val)
+        expected = matrix + jnp.eye(2) * jitter_val
+
+        assert jnp.allclose(jittered, expected)
+        # Check diagonal elements specifically
+        assert jnp.allclose(jnp.diag(jittered), jnp.array([1.01, 1.01]))
+
+    def test_1x1_matrix(self):
+        """Test edge case with 1x1 matrix."""
+        matrix = jnp.array([[5.0]])
+        jitter_val = 0.1
+
+        jittered = add_jitter(matrix, jitter=jitter_val)
+        expected = jnp.array([[5.1]])
+
+        assert jnp.allclose(jittered, expected)
+
+    def test_large_matrix_performance(self):
+        """Test with a large matrix for performance."""
+        key = jr.key(456)
+        matrix = jr.normal(key, shape=(100, 100))
+        jitter_val = 1e-4
+
+        jittered = add_jitter(matrix, jitter=jitter_val)
+
+        # Check that only diagonal changed
+        off_diagonal_unchanged = jnp.allclose(
+            jittered - jnp.diag(jnp.diag(jittered)), matrix - jnp.diag(jnp.diag(matrix))
+        )
+        assert off_diagonal_unchanged
+
+        # Check diagonal changed correctly
+        diagonal_diff = jnp.diag(jittered) - jnp.diag(matrix)
+        assert jnp.allclose(diagonal_diff, jitter_val)
+
+    def test_non_square_matrix_raises_error(self):
+        """Test that non-square matrix raises ValueError."""
+        matrix = jnp.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+
+        with pytest.raises(ValueError, match="Expected square matrix"):
+            add_jitter(matrix)
+
+    def test_non_2d_array_raises_error(self):
+        """Test that non-2D array raises ValueError."""
+        array_1d = jnp.array([1.0, 2.0, 3.0])
+        array_3d = jnp.ones((2, 2, 2))
+
+        with pytest.raises(ValueError, match="Expected 2D matrix"):
+            add_jitter(array_1d)
+
+        with pytest.raises(ValueError, match="Expected 2D matrix"):
+            add_jitter(array_3d)

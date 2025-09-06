@@ -35,11 +35,11 @@ from gpjax.likelihoods import (
 )
 from gpjax.linalg import (
     Dense,
-    Identity,
     psd,
     solve,
 )
 from gpjax.linalg.operations import lower_cholesky
+from gpjax.linalg.utils import add_jitter
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.parameters import (
     Parameter,
@@ -251,7 +251,7 @@ class Prior(AbstractPrior[M, K]):
         x = test_inputs
         mx = self.mean_function(x)
         Kxx = self.kernel.gram(x)
-        Kxx_dense = Kxx.to_dense() + Identity(Kxx.shape).to_dense() * self.jitter
+        Kxx_dense = add_jitter(Kxx.to_dense(), self.jitter)
         Kxx = psd(Dense(Kxx_dense))
 
         return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
@@ -502,7 +502,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = self.prior.kernel.gram(x)
-        Kxx_dense = Kxx.to_dense() + Identity(Kxx.shape).to_dense() * self.jitter
+        Kxx_dense = add_jitter(Kxx.to_dense(), self.jitter)
         Kxx = Dense(Kxx_dense)
 
         Sigma_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * obs_noise
@@ -517,7 +517,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt.to_dense() - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-        covariance += jnp.eye(covariance.shape[0]) * self.prior.jitter
+        covariance = add_jitter(covariance, self.prior.jitter)
         covariance = psd(Dense(covariance))
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
@@ -576,7 +576,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         obs_var = self.likelihood.obs_stddev.value**2
         Kxx = self.prior.kernel.gram(train_data.X)
-        Sigma = Kxx + jnp.eye(Kxx.shape[0]) * (obs_var + self.jitter)
+        Sigma = Dense(add_jitter(Kxx.to_dense(), obs_var + self.jitter))
         eps = jnp.sqrt(obs_var) * jr.normal(key, [train_data.n, num_samples])
         y = train_data.y - self.prior.mean_function(train_data.X)
         Phi = fourier_feature_fn(train_data.X)
@@ -674,7 +674,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(x)
-        Kxx_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * self.prior.jitter
+        Kxx_dense = add_jitter(Kxx.to_dense(), self.prior.jitter)
         Kxx = psd(Dense(Kxx_dense))
         Lx = lower_cholesky(Kxx)
 
@@ -697,7 +697,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
         # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt.to_dense() - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-        covariance += jnp.eye(covariance.shape[0]) * self.prior.jitter
+        covariance = add_jitter(covariance, self.prior.jitter)
         covariance = psd(Dense(covariance))
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)

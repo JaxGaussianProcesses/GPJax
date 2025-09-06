@@ -20,6 +20,7 @@ from gpjax.linalg import (
     psd,
     solve,
 )
+from gpjax.linalg.utils import add_jitter
 from gpjax.typing import (
     Array,
     ScalarFloat,
@@ -97,7 +98,7 @@ def conjugate_mll(posterior: ConjugatePosterior, data: Dataset) -> ScalarFloat:
 
     # Σ = (Kxx + Io²) = LLᵀ
     Kxx = posterior.prior.kernel.gram(x)
-    Kxx_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * posterior.prior.jitter
+    Kxx_dense = add_jitter(Kxx.to_dense(), posterior.prior.jitter)
     Sigma_dense = Kxx_dense + jnp.eye(Kxx.shape[0]) * obs_noise
     Sigma = psd(Dense(Sigma_dense))
 
@@ -213,7 +214,7 @@ def log_posterior_density(
 
     # Gram matrix
     Kxx = posterior.prior.kernel.gram(x)
-    Kxx_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * posterior.prior.jitter
+    Kxx_dense = add_jitter(Kxx.to_dense(), posterior.prior.jitter)
     Kxx = psd(Dense(Kxx_dense))
     Lx = lower_cholesky(Kxx)
 
@@ -349,7 +350,7 @@ def collapsed_elbo(variational_family: VF, data: Dataset) -> ScalarFloat:
     noise = variational_family.posterior.likelihood.obs_stddev.value**2
     z = variational_family.inducing_inputs.value
     Kzz = kernel.gram(z)
-    Kzz_dense = Kzz.to_dense() + jnp.eye(Kzz.shape[0]) * variational_family.jitter
+    Kzz_dense = add_jitter(Kzz.to_dense(), variational_family.jitter)
     Kzz = psd(Dense(Kzz_dense))
     Kzx = kernel.cross_covariance(z, x)
     Kxx_diag = vmap(kernel, in_axes=(0, 0))(x, x)
