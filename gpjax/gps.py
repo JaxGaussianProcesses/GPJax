@@ -509,16 +509,18 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         Sigma_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * obs_noise
         Sigma = psd(Dense(Sigma_dense))
+        L_sigma = lower_cholesky(Sigma)
 
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
-        Sigma_inv_Kxt = solve(Sigma, Kxt)
 
-        mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
+        L_inv_Kxt = solve(L_sigma, Kxt)
+        L_inv_y_diff = solve(L_sigma, y - mx)
 
-        # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
-        covariance = Ktt.to_dense() - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
+        mean = mean_t + jnp.matmul(L_inv_Kxt.T, L_inv_y_diff)
+
+        covariance = Ktt.to_dense() - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
         covariance = add_jitter(covariance, self.prior.jitter)
         covariance = psd(Dense(covariance))
 

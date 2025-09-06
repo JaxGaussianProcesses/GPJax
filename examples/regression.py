@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.17.3
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: .venv
 #     language: python
@@ -38,7 +38,6 @@ config.update("jax_enable_x64", True)
 
 with install_import_hook("gpjax", "beartype.beartype"):
     import gpjax as gpx
-    from gpjax.parameters import Parameter
 
 
 key = jr.key(123)
@@ -200,7 +199,7 @@ opt_posterior, history = gpx.fit_scipy(
     model=posterior,
     objective=lambda p, d: -gpx.objectives.conjugate_mll(p, d),
     train_data=D,
-    trainable=Parameter,
+    trainable=gpx.parameters.Parameter,
 )
 
 print(-gpx.objectives.conjugate_mll(opt_posterior, D))

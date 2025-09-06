@@ -113,6 +113,11 @@ Source = "https://github.com/JaxGaussianProcesses/GPJax"
 path = "gpjax/__init__.py"
 
 [tool.poe.tasks]
+# Run Github actions locally
+[tool.poe.tasks.local-actions]
+cmd = "act -W .github/workflows/tests.yml"
+help = "Run Github actions locally"
+
 # Formatting tasks
 [tool.poe.tasks.format]
 sequence = [
@@ -167,6 +172,8 @@ help = "Run integration tests"
 [tool.poe.tasks.all-tests]
 sequence = ["lint", "docstrings", "test"]
 help = "Run all checks and tests"
+
+
 
 [tool.coverage.run]
 source_pkgs = ["gpjax", "tests"]

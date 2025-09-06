@@ -6,18 +6,14 @@ on:
 jobs:
   test-docs:
     # Functionality for testing documentation builds on multiple OSes and Python versions
-    name: Build docs (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Build docs
+    runs-on: "ubuntu-latest"
     concurrency:
       group: ${{ github.head_ref }}
       cancel-in-progress: true
     defaults:
       run:
         shell: bash -l {0}
-    strategy:
-      matrix:
-        os: ["ubuntu-latest"]
-        python-version: ["3.11"]
 
     steps:
       # Grap the latest commit from the branch
@@ -31,7 +27,8 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
+          miniforge-version: "latest"
 
       # Install uv
       - name: Install uv
