@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -65,15 +65,15 @@ jobs:
           # Reduce matrix size - test all Python versions on Ubuntu, subset on others
           - os: macos-latest
             python-version: '3.10'
-          - os: macos-latest  
+          - os: macos-latest
             python-version: '3.12'
           - os: windows-latest
             python-version: '3.10'
           - os: windows-latest
             python-version: '3.12'
-            
+
     runs-on: ${{ matrix.os }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -109,7 +109,7 @@ jobs:
     name: "Pre-Release Security Scan"
     needs: validate-release
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -131,7 +131,7 @@ jobs:
         run: |
           # Check for known vulnerabilities
           uv run safety check --json --output safety-report.json || echo "Safety check completed with warnings"
-          
+
           # Static security analysis
           uv run bandit -r gpjax/ -f json -o bandit-report.json || echo "Bandit scan completed with warnings"
 
@@ -147,7 +147,7 @@ jobs:
     name: "Build Distribution Package"
     needs: [validate-release, multi-platform-tests, security-scan]
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -182,7 +182,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       changelog: ${{ steps.changelog.outputs.changelog }}
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -195,24 +195,24 @@ jobs:
           # Get the previous tag
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
           CURRENT_TAG="${{ needs.validate-release.outputs.version }}"
-          
+
           echo "Generating changelog from $PREVIOUS_TAG to $CURRENT_TAG"
-          
+
           # Generate changelog based on conventional commits
           CHANGELOG=""
-          
+
           if [ -n "$PREVIOUS_TAG" ]; then
             COMMITS=$(git log --pretty=format:"%s" $PREVIOUS_TAG..HEAD)
           else
             COMMITS=$(git log --pretty=format:"%s")
           fi
-          
+
           # Parse conventional commits
           FEATURES=""
           FIXES=""
           BREAKING=""
           OTHERS=""
-          
+
           while IFS= read -r commit; do
             if [[ $commit =~ ^feat(\(.+\))?: ]]; then
               FEATURES="$FEATURES\n- ${commit#feat*: }"
@@ -224,34 +224,34 @@ jobs:
               OTHERS="$OTHERS\n- $commit"
             fi
           done <<< "$COMMITS"
-          
+
           # Build changelog
           CHANGELOG="## Release $CURRENT_TAG\n\n"
-          
+
           if [ -n "$BREAKING" ]; then
             CHANGELOG="$CHANGELOG### 🚨 Breaking Changes\n$BREAKING\n\n"
           fi
-          
+
           if [ -n "$FEATURES" ]; then
             CHANGELOG="$CHANGELOG### ✨ New Features\n$FEATURES\n\n"
           fi
-          
+
           if [ -n "$FIXES" ]; then
             CHANGELOG="$CHANGELOG### 🐛 Bug Fixes\n$FIXES\n\n"
           fi
-          
+
           if [ -n "$OTHERS" ]; then
             CHANGELOG="$CHANGELOG### 📝 Other Changes\n$OTHERS\n\n"
           fi
-          
+
           # Add performance and ML-specific sections
           CHANGELOG="$CHANGELOG### 📊 Performance & ML Improvements\n"
           CHANGELOG="$CHANGELOG- See performance regression tests in this release\n"
           CHANGELOG="$CHANGELOG- Model validation results available in CI artifacts\n\n"
-          
+
           CHANGELOG="$CHANGELOG### 🔍 What's Changed\n"
           CHANGELOG="$CHANGELOG- Full diff: https://github.com/JaxGaussianProcesses/GPJax/compare/$PREVIOUS_TAG...$CURRENT_TAG\n\n"
-          
+
           # Escape for GitHub output
           EOF_MARKER=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "changelog<<$EOF_MARKER" >> $GITHUB_OUTPUT
@@ -262,7 +262,7 @@ jobs:
     name: "Create GitHub Release"
     needs: [validate-release, build-package, generate-changelog]
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -295,7 +295,7 @@ jobs:
     environment:
       name: production
       url: https://pypi.org/project/gpjax/
-    
+
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -307,22 +307,3 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           print-hash: true
-
-  update-conda-forge:
-    name: "Update Conda-forge"
-    needs: [validate-release, publish-pypi]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(needs.validate-release.outputs.version, '-')
-    
-    steps:
-      - name: Trigger conda-forge update
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.CONDA_FORGE_TOKEN }}
-          repository: conda-forge/gpjax-feedstock
-          event-type: version-update
-          client-payload: |
-            {
-              "version": "${{ needs.validate-release.outputs.version }}",
-              "sha256": "${{ needs.build-package.outputs.sha256 }}"
-            }
