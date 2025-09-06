@@ -7,21 +7,6 @@ on:
     types: [opened, edited, synchronize]
 
 jobs:
-  conventional-commits:
-    name: "Validate Conventional Commits"
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Validate commit messages
-        uses: wagoid/commitlint-github-action@v6
-        with:
-          configFile: .github/commitlint.config.js
-
   commit-message-check:
     name: "Check Commit Message Format"
     runs-on: ubuntu-latest

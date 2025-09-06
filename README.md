@@ -54,18 +54,9 @@ Channel](https://join.slack.com/t/gpjax/shared_invite/zt-3cesiykcx-nzajjRdnV3ohw
 where we can discuss the development of GPJax and broader support for Gaussian
 process modelling.
 
-
-## Governance
-
-GPJax was founded by [Thomas Pinder](https://github.com/thomaspinder). Today, the
-project's gardeners are [daniel-dodd@](https://github.com/daniel-dodd),
-[henrymoss@](https://github.com/henrymoss), [st--@](https://github.com/st--), and
-[thomaspinder@](https://github.com/thomaspinder), listed in alphabetical order. The full
-governance structure of GPJax is detailed [here](docs/GOVERNANCE.md). We appreciate all
-[the contributors to
-GPJax](https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors) who have
-helped to shape GPJax into the package it is today.
-
+We appreciate all [the contributors to
+GPJax](https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors) who have helped to shape
+GPJax into the package it is today.
 
 # Supported methods and interfaces
 
