@@ -40,7 +40,7 @@ jobs:
 
       # Install katex for math support
       - name: Install NPM
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 16
       - name: Install KaTeX
