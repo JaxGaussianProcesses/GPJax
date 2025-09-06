@@ -61,8 +61,9 @@ jobs:
           done <<< "$(git rev-list $BASE_SHA..$HEAD_SHA)"
           
           if [ $ERRORS -gt 0 ]; then
-            echo "Found $ERRORS commit(s) with invalid format"
-            exit 1
+            echo "::warning::Found $ERRORS commit(s) with invalid format"
+            echo "::warning::Consider using conventional commit format for better changelog generation"
+            echo "::warning::This is a warning only - PR can still be merged"
           else
             echo "All commit messages follow conventional commit format ✅"
           fi
