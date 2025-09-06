@@ -3052,7 +3052,7 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">dist</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3063,24 +3063,11 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>dist</code></b>
+              (<code><span title="beartype.typing.Union">Union</span>[<span title="numpyro.distributions.MultivariateNormal">MultivariateNormal</span>, <a class="autorefs autorefs-internal" title="gpjax.distributions.GaussianDistribution" href="../distributions/#gpjax.distributions.GaussianDistribution">GaussianDistribution</a>]</code>)
           –
           <div class="doc-md-description">
-            <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Keyword arguments to be passed to the likelihood's
-<code>predict</code> method.</p>
+            <p>The predictive distribution to evaluate the likelihood at.</p>
           </div>
         </li>
     </ul>
@@ -3113,7 +3100,7 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">predict</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3124,24 +3111,11 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>dist</code></b>
+              (<code><span title="beartype.typing.Union">Union</span>[<span title="numpyro.distributions.MultivariateNormal">MultivariateNormal</span>, <a class="autorefs autorefs-internal" title="gpjax.distributions.GaussianDistribution" href="../distributions/#gpjax.distributions.GaussianDistribution">GaussianDistribution</a>]</code>)
           –
           <div class="doc-md-description">
-            <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Keyword arguments to be passed to the likelihood's
-<code>predict</code> method.</p>
+            <p>The predictive distribution to evaluate the likelihood at.</p>
           </div>
         </li>
     </ul>
@@ -3385,7 +3359,7 @@ the <code>AnalyticalGaussianIntegrator</code>, as the expected log likelihood ca
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">dist</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3396,24 +3370,11 @@ the <code>AnalyticalGaussianIntegrator</code>, as the expected log likelihood ca
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>dist</code></b>
+              (<code><span title="beartype.typing.Union">Union</span>[<span title="numpyro.distributions.MultivariateNormal">MultivariateNormal</span>, <a class="autorefs autorefs-internal" title="gpjax.distributions.GaussianDistribution" href="../distributions/#gpjax.distributions.GaussianDistribution">GaussianDistribution</a>]</code>)
           –
           <div class="doc-md-description">
-            <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Keyword arguments to be passed to the likelihood's
-<code>predict</code> method.</p>
+            <p>The predictive distribution to evaluate the likelihood at.</p>
           </div>
         </li>
     </ul>
@@ -3685,7 +3646,7 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">dist</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3696,24 +3657,11 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>dist</code></b>
+              (<code><span title="beartype.typing.Union">Union</span>[<span title="numpyro.distributions.MultivariateNormal">MultivariateNormal</span>, <a class="autorefs autorefs-internal" title="gpjax.distributions.GaussianDistribution" href="../distributions/#gpjax.distributions.GaussianDistribution">GaussianDistribution</a>]</code>)
           –
           <div class="doc-md-description">
-            <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Keyword arguments to be passed to the likelihood's
-<code>predict</code> method.</p>
+            <p>The predictive distribution to evaluate the likelihood at.</p>
           </div>
         </li>
     </ul>
@@ -3983,7 +3931,7 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">dist</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3994,24 +3942,11 @@ likelihoods. Must be an instance of <code>AbstractIntegrator</code>.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>dist</code></b>
+              (<code><span title="beartype.typing.Union">Union</span>[<span title="numpyro.distributions.MultivariateNormal">MultivariateNormal</span>, <a class="autorefs autorefs-internal" title="gpjax.distributions.GaussianDistribution" href="../distributions/#gpjax.distributions.GaussianDistribution">GaussianDistribution</a>]</code>)
           –
           <div class="doc-md-description">
-            <p>Arguments to be passed to the likelihood's <code>predict</code> method.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Keyword arguments to be passed to the likelihood's
-<code>predict</code> method.</p>
+            <p>The predictive distribution to evaluate the likelihood at.</p>
           </div>
         </li>
     </ul>

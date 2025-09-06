@@ -3021,7 +3021,7 @@
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">test_inputs</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3039,23 +3039,11 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>test_inputs</code></b>
+              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
           –
           <div class="doc-md-description">
-            <p>The arguments to pass to the GP's <code>predict</code> method.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The keyword arguments to pass to the GP's <code>predict</code> method.</p>
+            <p>Input locations where the GP should be evaluated.</p>
           </div>
         </li>
     </ul>
@@ -3089,7 +3077,7 @@ of the Gaussian process.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3103,23 +3091,11 @@ this method must be implemented.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>test_inputs</code></b>
+              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
           –
           <div class="doc-md-description">
-            <p>Arguments to the predict method.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Keyword arguments to the predict method.</p>
+            <p>Input locations where the GP should be evaluated.</p>
           </div>
         </li>
     </ul>
@@ -3230,7 +3206,7 @@ function <span class="arithmatex">\(k(\cdot, \cdot)\)</span> is given by
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">test_inputs</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3248,23 +3224,11 @@ reasons, classes inheriting the <code>AbstractPrior</code> class, should not ove
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>test_inputs</code></b>
+              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
           –
           <div class="doc-md-description">
-            <p>The arguments to pass to the GP's <code>predict</code> method.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The keyword arguments to pass to the GP's <code>predict</code> method.</p>
+            <p>Input locations where the GP should be evaluated.</p>
           </div>
         </li>
     </ul>
@@ -3582,7 +3546,7 @@ covariance matrix to ensure numerical stability.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">test_inputs</span><span class="p">,</span> <span class="n">train_data</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3593,30 +3557,26 @@ covariance matrix to ensure numerical stability.</p>
 from which the the latent function's mean and covariance can be
 evaluated and the distribution can be sampled.</p>
 <p>Under the hood, <code>__call__</code> is calling the objects <code>predict</code> method. For this
-reasons, classes inheriting the <code>AbstractPrior</code> class, should not overwrite the
+reasons, classes inheriting the <code>AbstractPosterior</code> class, should not overwrite the
 <code>__call__</code> method and should instead define a <code>predict</code> method.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>test_inputs</code></b>
+              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
           –
           <div class="doc-md-description">
-            <p>The arguments to pass to the GP's <code>predict</code> method.</p>
+            <p>Input locations where the GP should be evaluated.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
+            <b><code>train_data</code></b>
+              (<code><a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../dataset/#gpjax.dataset.Dataset">Dataset</a></code>)
           –
           <div class="doc-md-description">
-            <p>The keyword arguments to pass to the GP's <code>predict</code> method.</p>
+            <p>Training dataset to condition on.</p>
           </div>
         </li>
     </ul>
@@ -3650,36 +3610,32 @@ of the Gaussian process.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">predict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">,</span> <span class="n">train_data</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Compute the latent function's multivariate normal distribution for a
-given set of parameters. For any class inheriting the <code>AbstractPrior</code> class,
+given set of parameters. For any class inheriting the <code>AbstractPosterior</code> class,
 this method must be implemented.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>test_inputs</code></b>
+              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
           –
           <div class="doc-md-description">
-            <p>Arguments to the predict method.</p>
+            <p>Input locations where the GP should be evaluated.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
+            <b><code>train_data</code></b>
+              (<code><a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../dataset/#gpjax.dataset.Dataset">Dataset</a></code>)
           –
           <div class="doc-md-description">
-            <p>Keyword arguments to the predict method.</p>
+            <p>Training dataset to condition on.</p>
           </div>
         </li>
     </ul>
@@ -3836,7 +3792,7 @@ covariance matrix to ensure numerical stability.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">test_inputs</span><span class="p">,</span> <span class="n">train_data</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3847,30 +3803,26 @@ covariance matrix to ensure numerical stability.</p>
 from which the the latent function's mean and covariance can be
 evaluated and the distribution can be sampled.</p>
 <p>Under the hood, <code>__call__</code> is calling the objects <code>predict</code> method. For this
-reasons, classes inheriting the <code>AbstractPrior</code> class, should not overwrite the
+reasons, classes inheriting the <code>AbstractPosterior</code> class, should not overwrite the
 <code>__call__</code> method and should instead define a <code>predict</code> method.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>test_inputs</code></b>
+              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
           –
           <div class="doc-md-description">
-            <p>The arguments to pass to the GP's <code>predict</code> method.</p>
+            <p>Input locations where the GP should be evaluated.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
+            <b><code>train_data</code></b>
+              (<code><a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../dataset/#gpjax.dataset.Dataset">Dataset</a></code>)
           –
           <div class="doc-md-description">
-            <p>The keyword arguments to pass to the GP's <code>predict</code> method.</p>
+            <p>Training dataset to condition on.</p>
           </div>
         </li>
     </ul>
@@ -4169,7 +4121,7 @@ covariance matrix to ensure numerical stability.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="nf">test_inputs</span><span class="p">,</span> <span class="n">train_data</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4180,30 +4132,26 @@ covariance matrix to ensure numerical stability.</p>
 from which the the latent function's mean and covariance can be
 evaluated and the distribution can be sampled.</p>
 <p>Under the hood, <code>__call__</code> is calling the objects <code>predict</code> method. For this
-reasons, classes inheriting the <code>AbstractPrior</code> class, should not overwrite the
+reasons, classes inheriting the <code>AbstractPosterior</code> class, should not overwrite the
 <code>__call__</code> method and should instead define a <code>predict</code> method.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>*args</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>()</code>
-)
+            <b><code>test_inputs</code></b>
+              (<code><span title="jaxtyping.Num">Num</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
           –
           <div class="doc-md-description">
-            <p>The arguments to pass to the GP's <code>predict</code> method.</p>
+            <p>Input locations where the GP should be evaluated.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>**kwargs</code></b>
-              (<code><span title="Any">Any</span></code>, default:
-                  <code>{}</code>
-)
+            <b><code>train_data</code></b>
+              (<code><a class="autorefs autorefs-internal" title="gpjax.dataset.Dataset" href="../dataset/#gpjax.dataset.Dataset">Dataset</a></code>)
           –
           <div class="doc-md-description">
-            <p>The keyword arguments to pass to the GP's <code>predict</code> method.</p>
+            <p>Training dataset to condition on.</p>
           </div>
         </li>
     </ul>
