@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.17.3
 #   kernelspec:
 #     display_name: .venv
 #     language: python
@@ -145,9 +145,7 @@ num_adapt = 1000
 num_samples = 500
 
 
-graphdef, params, *static_state = nnx.split(
-    posterior, Parameter, ...
-)
+graphdef, params, *static_state = nnx.split(posterior, Parameter, ...)
 params_bijection = gpx.parameters.DEFAULT_BIJECTION
 
 # Transform the parameters to the unconstrained space

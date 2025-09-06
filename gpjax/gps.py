@@ -16,9 +16,9 @@
 from abc import abstractmethod
 
 import beartype.typing as tp
-from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
+from flax import nnx
 from jaxtyping import (
     Float,
     Num,
@@ -35,11 +35,11 @@ from gpjax.likelihoods import (
 )
 from gpjax.linalg import (
     Dense,
-    Identity,
     psd,
     solve,
 )
 from gpjax.linalg.operations import lower_cholesky
+from gpjax.linalg.utils import add_jitter
 from gpjax.mean_functions import AbstractMeanFunction
 from gpjax.parameters import (
     Parameter,
@@ -77,7 +77,7 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
         self.mean_function = mean_function
         self.jitter = jitter
 
-    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
+    def __call__(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
         r"""Evaluate the Gaussian process at the given points.
 
         The output of this function is a
@@ -90,17 +90,16 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
         `__call__` method and should instead define a `predict` method.
 
         Args:
-            *args (Any): The arguments to pass to the GP's `predict` method.
-            **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
+            test_inputs: Input locations where the GP should be evaluated.
 
         Returns:
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
-        return self.predict(*args, **kwargs)
+        return self.predict(test_inputs)
 
     @abstractmethod
-    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
+    def predict(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
         r"""Evaluate the predictive distribution.
 
         Compute the latent function's multivariate normal distribution for a
@@ -108,8 +107,7 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
         this method must be implemented.
 
         Args:
-            *args (Any): Arguments to the predict method.
-            **kwargs (Any): Keyword arguments to the predict method.
+            test_inputs: Input locations where the GP should be evaluated.
 
         Returns:
             GaussianDistribution: A multivariate normal random variable representation
@@ -248,13 +246,12 @@ class Prior(AbstractPrior[M, K]):
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
-        x = test_inputs
-        mx = self.mean_function(x)
-        Kxx = self.kernel.gram(x)
-        Kxx_dense = Kxx.to_dense() + Identity(Kxx.shape).to_dense() * self.jitter
+        mean_at_test = self.mean_function(test_inputs)
+        Kxx = self.kernel.gram(test_inputs)
+        Kxx_dense = add_jitter(Kxx.to_dense(), self.jitter)
         Kxx = psd(Dense(Kxx_dense))
 
-        return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
+        return GaussianDistribution(jnp.atleast_1d(mean_at_test.squeeze()), Kxx)
 
     def sample_approx(
         self,
@@ -358,7 +355,9 @@ class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
         self.likelihood = likelihood
         self.jitter = jitter
 
-    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
+    def __call__(
+        self, test_inputs: Num[Array, "N D"], train_data: Dataset
+    ) -> GaussianDistribution:
         r"""Evaluate the Gaussian process posterior at the given points.
 
         The output of this function is a
@@ -367,28 +366,30 @@ class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
         evaluated and the distribution can be sampled.
 
         Under the hood, `__call__` is calling the objects `predict` method. For this
-        reasons, classes inheriting the `AbstractPrior` class, should not overwrite the
+        reasons, classes inheriting the `AbstractPosterior` class, should not overwrite the
         `__call__` method and should instead define a `predict` method.
 
         Args:
-            *args (Any): The arguments to pass to the GP's `predict` method.
-            **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
+            test_inputs: Input locations where the GP should be evaluated.
+            train_data: Training dataset to condition on.
 
         Returns:
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
-        return self.predict(*args, **kwargs)
+        return self.predict(test_inputs, train_data)
 
     @abstractmethod
-    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
+    def predict(
+        self, test_inputs: Num[Array, "N D"], train_data: Dataset
+    ) -> GaussianDistribution:
         r"""Compute the latent function's multivariate normal distribution for a
-        given set of parameters. For any class inheriting the `AbstractPrior` class,
+        given set of parameters. For any class inheriting the `AbstractPosterior` class,
         this method must be implemented.
 
         Args:
-            *args (Any): Arguments to the predict method.
-            **kwargs (Any): Keyword arguments to the predict method.
+            test_inputs: Input locations where the GP should be evaluated.
+            train_data: Training dataset to condition on.
 
         Returns:
             GaussianDistribution: A multivariate normal random variable representation
@@ -502,22 +503,24 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         # Precompute Gram matrix, Kxx, at training inputs, x
         Kxx = self.prior.kernel.gram(x)
-        Kxx_dense = Kxx.to_dense() + Identity(Kxx.shape).to_dense() * self.jitter
+        Kxx_dense = add_jitter(Kxx.to_dense(), self.jitter)
         Kxx = Dense(Kxx_dense)
 
         Sigma_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * obs_noise
         Sigma = psd(Dense(Sigma_dense))
+        L_sigma = lower_cholesky(Sigma)
 
         mean_t = self.prior.mean_function(t)
         Ktt = self.prior.kernel.gram(t)
         Kxt = self.prior.kernel.cross_covariance(x, t)
-        Sigma_inv_Kxt = solve(Sigma, Kxt)
 
-        mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mx)
+        L_inv_Kxt = solve(L_sigma, Kxt)
+        L_inv_y_diff = solve(L_sigma, y - mx)
 
-        # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
-        covariance = Ktt.to_dense() - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-        covariance += jnp.eye(covariance.shape[0]) * self.prior.jitter
+        mean = mean_t + jnp.matmul(L_inv_Kxt.T, L_inv_y_diff)
+
+        covariance = Ktt.to_dense() - jnp.matmul(L_inv_Kxt.T, L_inv_Kxt)
+        covariance = add_jitter(covariance, self.prior.jitter)
         covariance = psd(Dense(covariance))
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)
@@ -576,7 +579,7 @@ class ConjugatePosterior(AbstractPosterior[P, GL]):
 
         obs_var = self.likelihood.obs_stddev.value**2
         Kxx = self.prior.kernel.gram(train_data.X)
-        Sigma = Kxx + jnp.eye(Kxx.shape[0]) * (obs_var + self.jitter)
+        Sigma = Dense(add_jitter(Kxx.to_dense(), obs_var + self.jitter))
         eps = jnp.sqrt(obs_var) * jr.normal(key, [train_data.n, num_samples])
         y = train_data.y - self.prior.mean_function(train_data.X)
         Phi = fourier_feature_fn(train_data.X)
@@ -674,7 +677,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
         # Precompute lower triangular of Gram matrix, Lx, at training inputs, x
         Kxx = kernel.gram(x)
-        Kxx_dense = Kxx.to_dense() + jnp.eye(Kxx.shape[0]) * self.prior.jitter
+        Kxx_dense = add_jitter(Kxx.to_dense(), self.prior.jitter)
         Kxx = psd(Dense(Kxx_dense))
         Lx = lower_cholesky(Kxx)
 
@@ -697,7 +700,7 @@ class NonConjugatePosterior(AbstractPosterior[P, NGL]):
 
         # Ktt - Ktx Kxx⁻¹ Kxt, TODO: Take advantage of covariance structure to compute Schur complement more efficiently.
         covariance = Ktt.to_dense() - jnp.matmul(Lx_inv_Kxt.T, Lx_inv_Kxt)
-        covariance += jnp.eye(covariance.shape[0]) * self.prior.jitter
+        covariance = add_jitter(covariance, self.prior.jitter)
         covariance = psd(Dense(covariance))
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), covariance)

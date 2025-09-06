@@ -1,0 +1,54 @@
+name: "Commit Message Linting"
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  commit-message-check:
+    name: "Check Commit Message Format"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit message format
+        run: |
+          # Get all commit messages in the PR
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.event.pull_request.head.sha }}
+          
+          # Check each commit message
+          ERRORS=0
+          while IFS= read -r commit_sha; do
+            COMMIT_MSG=$(git log --format=%s -n 1 $commit_sha)
+            echo "Checking commit: $commit_sha"
+            echo "Message: $COMMIT_MSG"
+            
+            # Validate conventional commit format
+            if [[ $COMMIT_MSG =~ ^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\(.+\))?: ]]; then
+              echo "✅ Valid conventional commit format"
+            elif [[ $COMMIT_MSG =~ ^(BREAKING|Merge|Initial) ]]; then
+              echo "✅ Special commit type allowed"  
+            else
+              echo "❌ Invalid commit format: $COMMIT_MSG"
+              echo "Expected format: type(scope): description"
+              echo "Valid types: build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test"
+              echo "Example: feat(kernels): add Matern kernel implementation"
+              ERRORS=$((ERRORS + 1))
+            fi
+            echo ""
+          done <<< "$(git rev-list $BASE_SHA..$HEAD_SHA)"
+          
+          if [ $ERRORS -gt 0 ]; then
+            echo "::warning::Found $ERRORS commit(s) with invalid format"
+            echo "::warning::Consider using conventional commit format for better changelog generation"
+            echo "::warning::This is a warning only - PR can still be merged"
+          else
+            echo "All commit messages follow conventional commit format ✅"
+          fi

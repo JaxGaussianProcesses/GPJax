@@ -1,0 +1,221 @@
+# Automatic labeling based on file paths - v5 format
+# Format: label-name: 
+#   - changed-files:
+#     - any-glob-to-any-file: pattern
+
+# Core Components
+kernels:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'gpjax/kernels/**'
+      - 'tests/test_kernels/**'
+
+gps:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/gps.py'
+      - 'gpjax/gps/**'
+      - 'tests/test_gps.py'
+      - 'tests/test_gps/**'
+
+likelihoods:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/likelihoods.py'
+      - 'gpjax/likelihoods/**'
+      - 'tests/test_likelihoods.py'
+      - 'tests/test_likelihoods/**'
+
+mean-functions:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/mean_functions.py'
+      - 'gpjax/mean_functions/**'
+      - 'tests/test_mean_functions.py'
+      - 'tests/test_mean_functions/**'
+
+variational:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/variational_families.py'
+      - 'gpjax/variational_families/**'
+      - 'tests/test_variational_families.py'
+      - 'tests/test_variational_families/**'
+
+objectives:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/objectives.py'
+      - 'gpjax/objectives/**'
+      - 'tests/test_objectives.py'
+      - 'tests/test_objectives/**'
+
+parameters:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/parameters.py'
+      - 'gpjax/parameters/**'
+      - 'tests/test_parameters.py'
+      - 'tests/test_parameters/**'
+
+optimization:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/fit.py'
+      - 'gpjax/fit/**'
+      - 'tests/test_fit.py'
+      - 'tests/test_fit/**'
+
+linalg:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/linalg/**'
+      - 'tests/test_linalg/**'
+
+dataset:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/dataset.py'
+      - 'tests/test_dataset.py'
+
+utils:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/utils/**'
+      - 'tests/test_utils/**'
+
+scan:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/scan.py'
+      - 'tests/test_scan.py'
+
+# Testing and Validation
+tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tests/**'
+      - '**/test_*.py'
+      - '**/*_test.py'
+
+integration-tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tests/integration_tests.py'
+      - 'tests/integration/**'
+
+benchmarks:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'benchmarks/**'
+      - '**/benchmark*.py'
+
+validation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'validation/**'
+      - '**/validation*.py'
+
+# Examples and Documentation  
+examples:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'examples/**'
+      - 'docs/_examples/**'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**'
+      - '**/*.md'
+      - '**/*.rst'
+      - '**/README*'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CITATION*'
+
+# Infrastructure
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+      - 'setup.py'
+      - 'setup.cfg'
+
+security:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/*security*'
+      - '.github/workflows/*codeql*'
+      - '.github/dependabot.yml'
+      - 'SECURITY.md'
+
+performance:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/*performance*'
+      - '.github/workflows/*benchmark*'
+      - 'benchmarks/**'
+      - '**/performance*.py'
+
+# Development Tools
+dev-tools:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.pre-commit-config.yaml'
+      - 'pyproject.toml'
+      - '.github/workflows/ruff.yml'
+      - '**/.gitignore'
+
+formatting:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/ruff.yml'
+      - 'pyproject.toml'
+
+typing:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.pyi'
+      - '**/py.typed'
+
+# Release and Packaging
+release:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/release.yml'
+      - '.github/workflows/*release*'
+      - 'CHANGELOG*'
+      - '__init__.py'
+
+# Model-specific labels for ML context
+numerical-stability:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gpjax/linalg/**'
+      - '**/numerical*.py'
+      - '**/stability*.py'
+
+gpu-support:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*gpu*.py'
+      - '**/*device*.py'
+      - '**/*cuda*.py'
+
+jax-compatibility:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*jax*.py'
+      - '**/*jit*.py'
+      - '**/*vmap*.py'
