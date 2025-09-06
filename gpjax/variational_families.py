@@ -176,25 +176,31 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
                 approximation and the GP prior.
         """
         # Unpack variational parameters
-        mu = self.variational_mean.value
-        sqrt = self.variational_root_covariance.value
-        z = self.inducing_inputs.value
+        variational_mean = self.variational_mean.value
+        variational_sqrt = self.variational_root_covariance.value
+        inducing_inputs = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
         kernel = self.posterior.prior.kernel
 
-        muz = mean_function(z)
-        Kzz = kernel.gram(z)
+        inducing_mean = mean_function(inducing_inputs)
+        Kzz = kernel.gram(inducing_inputs)
         Kzz = psd(Dense(add_jitter(Kzz.to_dense(), self.jitter)))
 
-        sqrt = Triangular(sqrt)
-        S = sqrt @ sqrt.T
+        variational_sqrt_triangular = Triangular(variational_sqrt)
+        variational_covariance = (
+            variational_sqrt_triangular @ variational_sqrt_triangular.T
+        )
 
-        qu = GaussianDistribution(loc=jnp.atleast_1d(mu.squeeze()), scale=S)
-        pu = GaussianDistribution(loc=jnp.atleast_1d(muz.squeeze()), scale=Kzz)
+        q_inducing = GaussianDistribution(
+            loc=jnp.atleast_1d(variational_mean.squeeze()), scale=variational_covariance
+        )
+        p_inducing = GaussianDistribution(
+            loc=jnp.atleast_1d(inducing_mean.squeeze()), scale=Kzz
+        )
 
-        return qu.kl_divergence(pu)
+        return q_inducing.kl_divergence(p_inducing)
 
     def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
         r"""Compute the predictive distribution of the GP at the test inputs t.
@@ -214,26 +220,26 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
                 the test inputs.
         """
         # Unpack variational parameters
-        mu = self.variational_mean.value
-        sqrt = self.variational_root_covariance.value
-        z = self.inducing_inputs.value
+        variational_mean = self.variational_mean.value
+        variational_sqrt = self.variational_root_covariance.value
+        inducing_inputs = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
         kernel = self.posterior.prior.kernel
 
-        Kzz = kernel.gram(z)
+        Kzz = kernel.gram(inducing_inputs)
         Kzz_dense = add_jitter(Kzz.to_dense(), self.jitter)
         Kzz = psd(Dense(Kzz_dense))
         Lz = lower_cholesky(Kzz)
-        muz = mean_function(z)
+        inducing_mean = mean_function(inducing_inputs)
 
         # Unpack test inputs
-        t = test_inputs
+        test_points = test_inputs
 
-        Ktt = kernel.gram(t)
-        Kzt = kernel.cross_covariance(z, t)
-        mut = mean_function(t)
+        Ktt = kernel.gram(test_points)
+        Kzt = kernel.cross_covariance(inducing_inputs, test_points)
+        test_mean = mean_function(test_points)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = solve(Lz, Kzt)
@@ -242,10 +248,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         Kzz_inv_Kzt = solve(Lz.T, Lz_inv_Kzt)
 
         # Ktz Kzz⁻¹ sqrt
-        Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, sqrt)
+        Ktz_Kzz_inv_sqrt = jnp.matmul(Kzz_inv_Kzt.T, variational_sqrt)
 
         # μt + Ktz Kzz⁻¹ (μ - μz)
-        mean = mut + jnp.matmul(Kzz_inv_Kzt.T, mu - muz)
+        mean = test_mean + jnp.matmul(Kzz_inv_Kzt.T, variational_mean - inducing_mean)
 
         # Ktt - Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
         covariance = (

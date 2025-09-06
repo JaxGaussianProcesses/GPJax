@@ -77,7 +77,7 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
         self.mean_function = mean_function
         self.jitter = jitter
 
-    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
+    def __call__(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
         r"""Evaluate the Gaussian process at the given points.
 
         The output of this function is a
@@ -90,17 +90,16 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
         `__call__` method and should instead define a `predict` method.
 
         Args:
-            *args (Any): The arguments to pass to the GP's `predict` method.
-            **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
+            test_inputs: Input locations where the GP should be evaluated.
 
         Returns:
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
-        return self.predict(*args, **kwargs)
+        return self.predict(test_inputs)
 
     @abstractmethod
-    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
+    def predict(self, test_inputs: Num[Array, "N D"]) -> GaussianDistribution:
         r"""Evaluate the predictive distribution.
 
         Compute the latent function's multivariate normal distribution for a
@@ -108,8 +107,7 @@ class AbstractPrior(nnx.Module, tp.Generic[M, K]):
         this method must be implemented.
 
         Args:
-            *args (Any): Arguments to the predict method.
-            **kwargs (Any): Keyword arguments to the predict method.
+            test_inputs: Input locations where the GP should be evaluated.
 
         Returns:
             GaussianDistribution: A multivariate normal random variable representation
@@ -248,13 +246,13 @@ class Prior(AbstractPrior[M, K]):
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
-        x = test_inputs
-        mx = self.mean_function(x)
-        Kxx = self.kernel.gram(x)
+        test_points = test_inputs
+        mean_at_test = self.mean_function(test_points)
+        Kxx = self.kernel.gram(test_points)
         Kxx_dense = add_jitter(Kxx.to_dense(), self.jitter)
         Kxx = psd(Dense(Kxx_dense))
 
-        return GaussianDistribution(jnp.atleast_1d(mx.squeeze()), Kxx)
+        return GaussianDistribution(jnp.atleast_1d(mean_at_test.squeeze()), Kxx)
 
     def sample_approx(
         self,
@@ -358,7 +356,9 @@ class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
         self.likelihood = likelihood
         self.jitter = jitter
 
-    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
+    def __call__(
+        self, test_inputs: Num[Array, "N D"], train_data: Dataset
+    ) -> GaussianDistribution:
         r"""Evaluate the Gaussian process posterior at the given points.
 
         The output of this function is a
@@ -367,28 +367,30 @@ class AbstractPosterior(nnx.Module, tp.Generic[P, L]):
         evaluated and the distribution can be sampled.
 
         Under the hood, `__call__` is calling the objects `predict` method. For this
-        reasons, classes inheriting the `AbstractPrior` class, should not overwrite the
+        reasons, classes inheriting the `AbstractPosterior` class, should not overwrite the
         `__call__` method and should instead define a `predict` method.
 
         Args:
-            *args (Any): The arguments to pass to the GP's `predict` method.
-            **kwargs (Any): The keyword arguments to pass to the GP's `predict` method.
+            test_inputs: Input locations where the GP should be evaluated.
+            train_data: Training dataset to condition on.
 
         Returns:
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
-        return self.predict(*args, **kwargs)
+        return self.predict(test_inputs, train_data)
 
     @abstractmethod
-    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> GaussianDistribution:
+    def predict(
+        self, test_inputs: Num[Array, "N D"], train_data: Dataset
+    ) -> GaussianDistribution:
         r"""Compute the latent function's multivariate normal distribution for a
-        given set of parameters. For any class inheriting the `AbstractPrior` class,
+        given set of parameters. For any class inheriting the `AbstractPosterior` class,
         this method must be implemented.
 
         Args:
-            *args (Any): Arguments to the predict method.
-            **kwargs (Any): Keyword arguments to the predict method.
+            test_inputs: Input locations where the GP should be evaluated.
+            train_data: Training dataset to condition on.
 
         Returns:
             GaussianDistribution: A multivariate normal random variable representation

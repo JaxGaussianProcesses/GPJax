@@ -58,27 +58,27 @@ class AbstractLikelihood(nnx.Module):
         self.num_datapoints = num_datapoints
         self.integrator = integrator
 
-    def __call__(self, *args: tp.Any, **kwargs: tp.Any) -> npd.Distribution:
+    def __call__(
+        self, dist: tp.Union[npd.MultivariateNormal, GaussianDistribution]
+    ) -> npd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
-            *args (Any): Arguments to be passed to the likelihood's `predict` method.
-            **kwargs (Any): Keyword arguments to be passed to the likelihood's
-                `predict` method.
+            dist: The predictive distribution to evaluate the likelihood at.
 
         Returns:
             The predictive distribution.
         """
-        return self.predict(*args, **kwargs)
+        return self.predict(dist)
 
     @abc.abstractmethod
-    def predict(self, *args: tp.Any, **kwargs: tp.Any) -> npd.Distribution:
+    def predict(
+        self, dist: tp.Union[npd.MultivariateNormal, GaussianDistribution]
+    ) -> npd.Distribution:
         r"""Evaluate the likelihood function at a given predictive distribution.
 
         Args:
-            *args (Any): Arguments to be passed to the likelihood's `predict` method.
-            **kwargs (Any): Keyword arguments to be passed to the likelihood's
-                `predict` method.
+            dist: The predictive distribution to evaluate the likelihood at.
 
         Returns:
             npd.Distribution: The predictive distribution.
