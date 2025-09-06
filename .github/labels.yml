@@ -4,6 +4,9 @@
 #
 # The repository labels will be automatically configured using this file and
 # the GitHub Action https://github.com/marketplace/actions/github-labeler.
+- name: automated
+  description: Automated PRs
+  color: 000000
 - name: breaking
   description: Breaking Changes
   color: bfd4f2
@@ -28,8 +31,8 @@
 - name: enhancement
   description: New feature or request
   color: a2eeef
-- name: github_actions
-  description: Pull requests that update Github_actions code
+- name: github-actions
+  description: Pull requests that update Github actions code
   color: "000000"
 - name: good first issue
   description: Good for newcomers
