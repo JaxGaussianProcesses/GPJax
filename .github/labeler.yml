@@ -1,0 +1,161 @@
+# Automatic labeling based on file paths
+# Format: label-name: [file patterns]
+
+# Core Components
+kernels:
+  - 'gpjax/kernels/**'
+  - 'tests/test_kernels/**'
+
+gps:
+  - 'gpjax/gps.py'
+  - 'gpjax/gps/**'
+  - 'tests/test_gps.py'
+  - 'tests/test_gps/**'
+
+likelihoods:
+  - 'gpjax/likelihoods.py'
+  - 'gpjax/likelihoods/**'
+  - 'tests/test_likelihoods.py'
+  - 'tests/test_likelihoods/**'
+
+mean-functions:
+  - 'gpjax/mean_functions.py'
+  - 'gpjax/mean_functions/**'
+  - 'tests/test_mean_functions.py'
+  - 'tests/test_mean_functions/**'
+
+variational:
+  - 'gpjax/variational_families.py'
+  - 'gpjax/variational_families/**'
+  - 'tests/test_variational_families.py'
+  - 'tests/test_variational_families/**'
+
+objectives:
+  - 'gpjax/objectives.py'
+  - 'gpjax/objectives/**'
+  - 'tests/test_objectives.py'
+  - 'tests/test_objectives/**'
+
+parameters:
+  - 'gpjax/parameters.py'
+  - 'gpjax/parameters/**'
+  - 'tests/test_parameters.py'
+  - 'tests/test_parameters/**'
+
+optimization:
+  - 'gpjax/fit.py'
+  - 'gpjax/fit/**'
+  - 'tests/test_fit.py'
+  - 'tests/test_fit/**'
+
+linalg:
+  - 'gpjax/linalg/**'
+  - 'tests/test_linalg/**'
+
+dataset:
+  - 'gpjax/dataset.py'
+  - 'tests/test_dataset.py'
+
+utils:
+  - 'gpjax/utils/**'
+  - 'tests/test_utils/**'
+
+scan:
+  - 'gpjax/scan.py'
+  - 'tests/test_scan.py'
+
+# Testing and Validation
+tests:
+  - 'tests/**'
+  - '**/test_*.py'
+  - '**/*_test.py'
+
+integration-tests:
+  - 'tests/integration_tests.py'
+  - 'tests/integration/**'
+
+benchmarks:
+  - 'benchmarks/**'
+  - '**/benchmark*.py'
+
+validation:
+  - 'validation/**'
+  - '**/validation*.py'
+
+# Examples and Documentation  
+examples:
+  - 'examples/**'
+  - 'docs/_examples/**'
+
+documentation:
+  - 'docs/**'
+  - '**/*.md'
+  - '**/*.rst'
+  - '**/README*'
+  - 'CHANGELOG*'
+  - 'CONTRIBUTING*'
+  - 'CITATION*'
+
+# Infrastructure
+ci:
+  - '.github/**'
+  - '**/*.yml'
+  - '**/*.yaml'
+  - 'pyproject.toml'
+  - 'requirements*.txt'
+
+dependencies:
+  - 'pyproject.toml'
+  - 'requirements*.txt'
+  - 'setup.py'
+  - 'setup.cfg'
+
+security:
+  - '.github/workflows/*security*'
+  - '.github/workflows/*codeql*'
+  - '.github/dependabot.yml'
+  - 'SECURITY.md'
+
+performance:
+  - '.github/workflows/*performance*'
+  - '.github/workflows/*benchmark*'
+  - 'benchmarks/**'
+  - '**/performance*.py'
+
+# Development Tools
+dev-tools:
+  - '.pre-commit-config.yaml'
+  - 'pyrproject.toml'
+  - '.github/workflows/ruff.yml'
+  - '**/.gitignore'
+
+formatting:
+  - '.github/workflows/ruff.yml'
+  - 'pyproject.toml'
+
+typing:
+  - '**/*.pyi'
+  - '**/py.typed'
+
+# Release and Packaging
+release:
+  - '.github/workflows/release.yml'
+  - '.github/workflows/*release*'
+  - 'CHANGELOG*'
+  - '__init__.py'
+
+# Model-specific labels for ML context
+numerical-stability:
+  - 'gpjax/linalg/**'
+  - '**/numerical*.py'
+  - '**/stability*.py'
+
+gpu-support:
+  - '**/*gpu*.py'
+  - '**/*device*.py'
+  - '**/*cuda*.py'
+
+jax-compatibility:
+  - '**/*jax*.py'
+  - '**/*jit*.py'
+  - '**/*vmap*.py'

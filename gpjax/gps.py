@@ -16,9 +16,9 @@
 from abc import abstractmethod
 
 import beartype.typing as tp
-from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
+from flax import nnx
 from jaxtyping import (
     Float,
     Num,
@@ -246,9 +246,8 @@ class Prior(AbstractPrior[M, K]):
             GaussianDistribution: A multivariate normal random variable representation
                 of the Gaussian process.
         """
-        test_points = test_inputs
-        mean_at_test = self.mean_function(test_points)
-        Kxx = self.kernel.gram(test_points)
+        mean_at_test = self.mean_function(test_inputs)
+        Kxx = self.kernel.gram(test_inputs)
         Kxx_dense = add_jitter(Kxx.to_dense(), self.jitter)
         Kxx = psd(Dense(Kxx_dense))
 

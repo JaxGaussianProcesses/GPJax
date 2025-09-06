@@ -1,0 +1,71 @@
+version: 2
+updates:
+  # Enable version updates for Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Europe/Amsterdam"
+    open-pull-requests-limit: 10
+    assignees:
+      - "thomaspinder"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "dev-deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "automated"
+    # Group related updates together
+    groups:
+      jax-ecosystem:
+        patterns:
+          - "jax"
+          - "jaxlib"
+          - "flax"
+          - "optax"
+          - "jaxtyping"
+          - "equinox"
+      ml-tools:
+        patterns:
+          - "numpy"
+          - "scipy"
+          - "scikit-learn"
+          - "matplotlib"
+          - "pandas"
+      testing:
+        patterns:
+          - "pytest*"
+          - "coverage"
+          - "beartype"
+      dev-tools:
+        patterns:
+          - "black"
+          - "ruff"
+          - "isort"
+          - "pre-commit"
+          - "mypy"
+    # Ignore major version updates for stable dependencies
+    ignore:
+      - dependency-name: "numpy"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "scipy"
+        update-types: ["version-update:semver-major"]
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Europe/Amsterdam"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "github-actions"
+      - "automated"

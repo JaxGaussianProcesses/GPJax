@@ -1,0 +1,328 @@
+name: "Release Automation"
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v0.6.0)'
+        required: true
+        type: string
+      draft:
+        description: 'Create draft release'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  id-token: write  # For PyPI trusted publishing
+
+jobs:
+  validate-release:
+    name: "Release Validation"
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if [[ ! $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+            echo "Invalid version format: $VERSION"
+            echo "Expected format: v1.2.3 or v1.2.3-alpha1"
+            exit 1
+          fi
+
+  multi-platform-tests:
+    name: "Multi-Platform Testing"
+    needs: validate-release
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        exclude:
+          # Reduce matrix size - test all Python versions on Ubuntu, subset on others
+          - os: macos-latest
+            python-version: '3.10'
+          - os: macos-latest  
+            python-version: '3.12'
+          - os: windows-latest
+            python-version: '3.10'
+          - os: windows-latest
+            python-version: '3.12'
+            
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: |
+          uv sync --extra dev
+
+      - name: Run tests
+        run: |
+          uv run pytest . -v --tb=short
+
+      - name: Run docstring tests
+        run: |
+          uv run xdoctest ./gpjax
+
+      - name: Test installation
+        run: |
+          uv build
+          cd dist
+          pip install *.whl
+          python -c "import gpjax; print(f'GPJax {gpjax.__version__} installed successfully')"
+
+  security-scan:
+    name: "Pre-Release Security Scan"
+    needs: validate-release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: |
+          uv sync --extra dev
+          uv add safety bandit[toml]
+
+      - name: Run security scans
+        run: |
+          # Check for known vulnerabilities
+          uv run safety check --json --output safety-report.json || echo "Safety check completed with warnings"
+          
+          # Static security analysis
+          uv run bandit -r gpjax/ -f json -o bandit-report.json || echo "Bandit scan completed with warnings"
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: |
+            safety-report.json
+            bandit-report.json
+
+  build-package:
+    name: "Build Distribution Package"
+    needs: [validate-release, multi-platform-tests, security-scan]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Build package
+        run: |
+          uv build
+
+      - name: Verify package
+        run: |
+          uv add twine
+          uv run twine check dist/*
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-packages
+          path: dist/
+          retention-days: 90
+
+  generate-changelog:
+    name: "Generate Release Changelog"
+    needs: validate-release
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          CURRENT_TAG="${{ needs.validate-release.outputs.version }}"
+          
+          echo "Generating changelog from $PREVIOUS_TAG to $CURRENT_TAG"
+          
+          # Generate changelog based on conventional commits
+          CHANGELOG=""
+          
+          if [ -n "$PREVIOUS_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"%s" $PREVIOUS_TAG..HEAD)
+          else
+            COMMITS=$(git log --pretty=format:"%s")
+          fi
+          
+          # Parse conventional commits
+          FEATURES=""
+          FIXES=""
+          BREAKING=""
+          OTHERS=""
+          
+          while IFS= read -r commit; do
+            if [[ $commit =~ ^feat(\(.+\))?: ]]; then
+              FEATURES="$FEATURES\n- ${commit#feat*: }"
+            elif [[ $commit =~ ^fix(\(.+\))?: ]]; then
+              FIXES="$FIXES\n- ${commit#fix*: }"
+            elif [[ $commit =~ BREAKING ]]; then
+              BREAKING="$BREAKING\n- $commit"
+            else
+              OTHERS="$OTHERS\n- $commit"
+            fi
+          done <<< "$COMMITS"
+          
+          # Build changelog
+          CHANGELOG="## Release $CURRENT_TAG\n\n"
+          
+          if [ -n "$BREAKING" ]; then
+            CHANGELOG="$CHANGELOG### 🚨 Breaking Changes\n$BREAKING\n\n"
+          fi
+          
+          if [ -n "$FEATURES" ]; then
+            CHANGELOG="$CHANGELOG### ✨ New Features\n$FEATURES\n\n"
+          fi
+          
+          if [ -n "$FIXES" ]; then
+            CHANGELOG="$CHANGELOG### 🐛 Bug Fixes\n$FIXES\n\n"
+          fi
+          
+          if [ -n "$OTHERS" ]; then
+            CHANGELOG="$CHANGELOG### 📝 Other Changes\n$OTHERS\n\n"
+          fi
+          
+          # Add performance and ML-specific sections
+          CHANGELOG="$CHANGELOG### 📊 Performance & ML Improvements\n"
+          CHANGELOG="$CHANGELOG- See performance regression tests in this release\n"
+          CHANGELOG="$CHANGELOG- Model validation results available in CI artifacts\n\n"
+          
+          CHANGELOG="$CHANGELOG### 🔍 What's Changed\n"
+          CHANGELOG="$CHANGELOG- Full diff: https://github.com/JaxGaussianProcesses/GPJax/compare/$PREVIOUS_TAG...$CURRENT_TAG\n\n"
+          
+          # Escape for GitHub output
+          EOF_MARKER=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "changelog<<$EOF_MARKER" >> $GITHUB_OUTPUT
+          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "$EOF_MARKER" >> $GITHUB_OUTPUT
+
+  create-release:
+    name: "Create GitHub Release"
+    needs: [validate-release, build-package, generate-changelog]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-packages
+          path: dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.validate-release.outputs.version }}
+          name: "GPJax ${{ needs.validate-release.outputs.version }}"
+          body: ${{ needs.generate-changelog.outputs.changelog }}
+          draft: ${{ github.event.inputs.draft == 'true' }}
+          prerelease: ${{ contains(needs.validate-release.outputs.version, '-') }}
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
+          generate_release_notes: true
+
+  publish-pypi:
+    name: "Publish to PyPI"
+    needs: [validate-release, create-release]
+    runs-on: ubuntu-latest
+    # Only publish on actual tag push, not workflow_dispatch
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: production
+      url: https://pypi.org/project/gpjax/
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-packages
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          print-hash: true
+
+  update-conda-forge:
+    name: "Update Conda-forge"
+    needs: [validate-release, publish-pypi]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(needs.validate-release.outputs.version, '-')
+    
+    steps:
+      - name: Trigger conda-forge update
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CONDA_FORGE_TOKEN }}
+          repository: conda-forge/gpjax-feedstock
+          event-type: version-update
+          client-payload: |
+            {
+              "version": "${{ needs.validate-release.outputs.version }}",
+              "sha256": "${{ needs.build-package.outputs.sha256 }}"
+            }
