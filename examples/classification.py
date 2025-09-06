@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.2
+#       jupytext_version: 1.17.3
 #   kernelspec:
 #     display_name: .venv
 #     language: python
@@ -228,9 +228,7 @@ Lx = lower_cholesky(Kxx)
 f_hat = Lx @ opt_posterior.latent.value
 
 # Negative Hessian,  H = -∇²p_tilde(y|f):
-graphdef, params, *static_state = nnx.split(
-    opt_posterior, Parameter, ...
-)
+graphdef, params, *static_state = nnx.split(opt_posterior, Parameter, ...)
 
 
 def loss(params, D):

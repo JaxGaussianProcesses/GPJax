@@ -43,7 +43,6 @@ __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contrib
 __version__ = "0.12.1"
 
 __all__ = [
-    "base",
     "gps",
     "integrators",
     "kernels",
@@ -55,8 +54,6 @@ __all__ = [
     "Dataset",
     "cite",
     "fit",
-    "Module",
-    "param_field",
     "fit_lbfgs",
     "fit_scipy",
 ]
