@@ -143,14 +143,14 @@ configuration in development mode.
 ```bash
 git clone https://github.com/JaxGaussianProcesses/GPJax.git
 cd GPJax
-hatch env create
-hatch shell
+uv venv
+uv sync --extra dev
 ```
 
 > We recommend you check your installation passes the supplied unit tests:
 >
 > ```python
-> hatch run dev:test
+> uv run poe all-tests
 > ```
 
 # Citing GPJax
