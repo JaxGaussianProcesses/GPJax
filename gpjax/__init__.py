@@ -26,6 +26,7 @@ from gpjax import (
     mean_functions,
     objectives,
     parameters,
+    sampling,
     variational_families,
 )
 from gpjax.citation import cite
@@ -40,7 +41,7 @@ __license__ = "MIT"
 __description__ = "Gaussian processes in JAX and Flax"
 __url__ = "https://github.com/JaxGaussianProcesses/GPJax"
 __contributors__ = "https://github.com/JaxGaussianProcesses/GPJax/graphs/contributors"
-__version__ = "0.12.2"
+__version__ = "0.12.3"
 
 __all__ = [
     "gps",
@@ -50,6 +51,7 @@ __all__ = [
     "mean_functions",
     "objectives",
     "parameters",
+    "sampling",
     "variational_families",
     "Dataset",
     "cite",
