@@ -109,6 +109,12 @@ pip:
 pip install gpjax
 ```
 
+or conda 
+
+```bash
+conda install conda-forge::gpjax
+```
+
 > **Note**
 >
 > We recommend you check your installation version:
