@@ -103,17 +103,19 @@ jupytext --to py:percent example.ipynb
 
 ## Stable version
 
-The latest stable version of GPJax can be installed via
-pip:
+The latest stable version of GPJax can be installed from [PyPI](https://pypi.org/project/gpjax/):
 
 ```bash
 pip install gpjax
 ```
 
-or conda 
+or from [conda-forge](https://github.com/conda-forge/gpjax-feedstock):
 
 ```bash
-conda install conda-forge::gpjax
+# with Pixi
+pixi add gpjax
+# or with conda
+conda install --channel conda-forge gpjax
 ```
 
 > **Note**

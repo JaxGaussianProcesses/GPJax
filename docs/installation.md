@@ -2,10 +2,22 @@
 
 ## Stable version
 
-The latest stable release of `GPJax` can be installed via `pip`:
+The latest stable release of `GPJax` can be installed from [PyPI](https://pypi.org/project/gpjax/):
 
 ```bash
 pip install gpjax
+```
+
+or from [conda-forge](https://github.com/conda-forge/gpjax-feedstock) with [Pixi](https://pixi.sh/):
+
+```bash
+pixi add gpjax
+```
+
+or with [conda](https://docs.conda.io/projects/conda/):
+
+```bash
+conda install --channel conda-forge gpjax
 ```
 
 !!! note "Check your installation"
