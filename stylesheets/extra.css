@@ -1,8 +1,21 @@
 :root {
-    --md-primary-fg-color:        #b5121b;
-    --md-primary-fg-color--light: #ECB7B7;
-    --md-primary-fg-color--dark:  #7d030b;
-  }
+  --md-primary-fg-color: #b71c1c !important;
+  --md-primary-600: #b71c1c !important;
+  --md-primary-700: #9b1a1a !important;
+  --md-accent-fg-color: #d32f2f !important;
+}
+
+/* Top header and navigation background */
+.md-header, .md-header__panel, .md-header__inner, header.md-header {
+  background-color: var(--md-primary-600) !important;
+  color: #fff !important;
+  border-color: var(--md-primary-700) !important;
+}
+
+.md-nav__link--active, .md-nav__link:hover, .md-nav__link:focus {
+  background: transparent !important;
+  color: #d32f2f;
+}
 
 html {
     /* Decrease font size for overall webpage
