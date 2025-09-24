@@ -334,6 +334,7 @@ class GraphVariationalGaussian(AbstractVariationalGaussian[L]):
             variational_sqrt_triangular @ variational_sqrt_triangular.T
         )
 
+
         q_inducing = GaussianDistribution(
             loc=jnp.atleast_1d(variational_mean.squeeze()), scale=variational_covariance
         )
@@ -381,9 +382,8 @@ class GraphVariationalGaussian(AbstractVariationalGaussian[L]):
         X_id = test_inputs[:, 0].astype(jnp.int64)
         
         S = self.eval_S(kernel)
-        U = jnp.take(kernel.eigenvectors, X_id, axis=0) * S[None, :]
-
-        mean = U @ variational_mean
+        U = jnp.take(kernel.eigenvectors, X_id) * S[None, :]
+        mean = jnp.einsum('ij,jl->il', U, variational_mean)
         
         if variational_sqrt.ndim == 3:
             q_cov = jnp.einsum("ijn,kjn->ijk", variational_sqrt, variational_sqrt)
@@ -399,11 +399,15 @@ class GraphVariationalGaussian(AbstractVariationalGaussian[L]):
             if variational_sqrt.ndim == 3:
                 covariance = jnp.einsum('ij,njk,ik->in', U, q_cov, U)
             if variational_sqrt.ndim == 2:
-                
                 covariance = jnp.einsum('ij, jn,ij->in', U, q_cov, U)
         
         prior_mean = self.posterior.prior.mean_function(test_inputs)
         mean += prior_mean
+        
+        if hasattr(covariance, "to_dense"):
+            covariance = covariance.to_dense()
+
+        covariance += self.jitter * jnp.eye(jnp.shape(covariance)[0], dtype=covariance.dtype)
         covariance = Dense(covariance)
 
         return GaussianDistribution(
