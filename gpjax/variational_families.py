@@ -27,6 +27,7 @@ from gpjax.gps import (
     AbstractPosterior,
     AbstractPrior,
 )
+from gpjax.kernels import GraphKernel
 from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
     Gaussian,
@@ -127,6 +128,15 @@ class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
         return self.inducing_inputs.value.shape[0]
 
 
+def ensure_2d(mat):
+    mat = jnp.asarray(mat)
+    if mat.ndim == 0:
+        return mat[None, None]
+    if mat.ndim == 1:
+        return mat[:, None]
+    return mat
+
+
 class VariationalGaussian(AbstractVariationalGaussian[L]):
     r"""The variational Gaussian family of probability distributions.
 
@@ -146,6 +156,9 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         jitter: ScalarFloat = 1e-6,
     ):
         super().__init__(posterior, inducing_inputs, jitter)
+
+        if isinstance(self.posterior.prior.kernel, GraphKernel):
+            self.inducing_inputs = self.inducing_inputs.value.astype(jnp.int64)
 
         if variational_mean is None:
             variational_mean = jnp.zeros((self.num_inducing, 1))
@@ -178,7 +191,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack variational parameters
         variational_mean = self.variational_mean.value
         variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs.value
+        if isinstance(self.posterior.prior.kernel, GraphKernel):
+            inducing_inputs = self.inducing_inputs
+        else:
+            inducing_inputs = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -222,7 +238,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack variational parameters
         variational_mean = self.variational_mean.value
         variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs.value
+        if isinstance(self.posterior.prior.kernel, GraphKernel):
+            inducing_inputs = self.inducing_inputs
+        else:
+            inducing_inputs = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -240,6 +259,12 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         Ktt = kernel.gram(test_points)
         Kzt = kernel.cross_covariance(inducing_inputs, test_points)
         test_mean = mean_function(test_points)
+
+        if isinstance(kernel, GraphKernel):
+            Ktt = Ktt.to_dense() if hasattr(Ktt, "to_dense") else Ktt
+            Kzt = Kzt.to_dense() if hasattr(Kzt, "to_dense") else Kzt
+            Ktt = ensure_2d(Ktt)
+            Kzt = ensure_2d(Kzt)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = solve(Lz, Kzt)
@@ -259,14 +284,24 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
+
         if hasattr(covariance, "to_dense"):
             covariance = covariance.to_dense()
+
         covariance = add_jitter(covariance, self.jitter)
         covariance = Dense(covariance)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
+
+    @property
+    def num_inducing(self) -> int:
+        """The number of inducing inputs."""
+        if isinstance(self.posterior.prior.kernel, GraphKernel):
+            return self.inducing_inputs.shape[0]
+        else:
+            return self.inducing_inputs.value.shape[0]
 
 
 class WhitenedVariationalGaussian(VariationalGaussian[L]):
