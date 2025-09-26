@@ -28,6 +28,7 @@ from gpjax.gps import (
     AbstractPrior,
 )
 from gpjax.kernels.base import AbstractKernel
+from gpjax.kernels import GraphKernel
 from gpjax.likelihoods import (
     Gaussian,
     NonGaussian,
@@ -241,6 +242,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         Kzt = kernel.cross_covariance(inducing_inputs, test_points)
         test_mean = mean_function(test_points)
 
+        if isinstance(kernel, GraphKernel):
+            Ktt = self.ensure_2d(Ktt)
+            Kzt = self.ensure_2d(Kzt)
+
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = solve(Lz, Kzt)
 
@@ -268,151 +273,14 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
 
-class GraphVariationalGaussian(AbstractVariationalGaussian[L]):
-    r"""The variational Gaussian family of probability distributions.
+    def ensure_2d(self, mat):
+        mat = jnp.asarray(mat)
+        if mat.ndim == 0:
+            return mat[None, None]        # scalar -> (1,1)
+        if mat.ndim == 1:
+            return mat[:, None]           # vector -> column (N,1)
+        return mat
 
-    The variational family is $q(f(\cdot)) = \int p(f(\cdot)\mid u) q(u) \mathrm{d}u$, where
-    $u = f(z)$ are the function values at the inducing inputs $z$
-    and the distribution over the inducing inputs is
-    $q(u) = \mathcal{N}(\mu, S)$.  We parameterise this over
-    $\mu$ and $sqrt$ with $S = sqrt sqrt^{\top}$.
-    """
-
-    def __init__(
-        self,
-        posterior: AbstractPosterior[P, L],
-        inducing_inputs: Float[Array, "N D"],
-        variational_mean: tp.Union[Float[Array, "N 1"], None] = None,
-        variational_root_covariance: tp.Union[Float[Array, "N N"], None] = None,
-        jitter: ScalarFloat = 1e-6,
-    ):
-        super().__init__(posterior, inducing_inputs, jitter)
-
-        if variational_mean is None:
-            variational_mean = jnp.zeros((self.num_inducing, 1))
-
-        if variational_root_covariance is None:
-            variational_root_covariance = jnp.eye(self.num_inducing)
-
-        self.variational_mean = Real(variational_mean)
-        self.variational_root_covariance = LowerTriangular(variational_root_covariance)
-
-    def prior_kl(self) -> ScalarFloat:
-        r"""Compute the prior KL divergence.
-
-        Compute the KL-divergence between our variational approximation and the
-        Gaussian process prior.
-
-        For this variational family, we have
-        ```math
-        \begin{align}
-        \operatorname{KL}[q(f(\cdot))\mid\mid p(\cdot)] & = \operatorname{KL}[q(u)\mid\mid p(u)]\\
-        & = \operatorname{KL}[ \mathcal{N}(\mu, S) \mid\mid N(\mu z, \mathbf{K}_{zz}) ],
-        \end{align}
-        ```
-        where $u = f(z)$ and $z$ are the inducing inputs.
-
-        Returns:
-            ScalarFloat: The KL-divergence between our variational
-                approximation and the GP prior.
-        """
-        # Unpack variational parameters
-        variational_mean = self.variational_mean.value
-        variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs.value
-
-        # Unpack mean function and kernel
-        mean_function = self.posterior.prior.mean_function
-        kernel = self.posterior.prior.kernel
-
-        inducing_mean = mean_function(inducing_inputs)
-        Kzz = kernel.gram(inducing_inputs)
-        Kzz = psd(Dense(add_jitter(Kzz.to_dense(), self.jitter)))
-
-        variational_sqrt_triangular = Triangular(variational_sqrt)
-        variational_covariance = (
-            variational_sqrt_triangular @ variational_sqrt_triangular.T
-        )
-
-
-        q_inducing = GaussianDistribution(
-            loc=jnp.atleast_1d(variational_mean.squeeze()), scale=variational_covariance
-        )
-        p_inducing = GaussianDistribution(
-            loc=jnp.atleast_1d(inducing_mean.squeeze()), scale=Kzz
-        )
-
-        return q_inducing.kl_divergence(p_inducing)
-    
-    def eval_S(self, kernel):
-        eigenvalues = kernel.eigenvalues
-        kappa = kernel.lengthscale
-        nu = kernel.smoothness
-        sigma_f = kernel.variance
-        num_vertex = kernel.num_vertex
-
-        S = jnp.pow(eigenvalues + 2*nu/kappa/kappa, -nu)
-        S = jnp.multiply(S, num_vertex/jnp.sum(S))
-        S = jnp.multiply(S, sigma_f)
-
-        return S.squeeze()
-
-    def predict(self, test_inputs: Float[Array, "N D"], full_cov: bool = False) -> GaussianDistribution:
-        r"""Compute the predictive distribution of the GP at the test inputs t.
-
-        This is the integral $q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u$, which
-        can be computed in closed form as:
-        ```math
-            \mathcal{N}\left(f(t); \mu t + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} (\mu - \mu z),  \mathbf{K}_{tt} - \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt} + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} S \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt}\right).
-        ```
-
-        Args:
-            test_inputs (Float[Array, "N D"]): The test inputs at which we wish to
-                make a prediction.
-
-        Returns:
-            GaussianDistribution: The predictive distribution of the low-rank GP at
-                the test inputs.
-        """
-
-        # Unpack variational parameters
-        variational_mean = self.variational_mean.value # [M, P]
-        variational_sqrt = self.variational_root_covariance.value # [M, P]
-        kernel = self.posterior.prior.kernel
-        X_id = test_inputs[:, 0].astype(jnp.int64)
-        
-        S = self.eval_S(kernel)
-        U = jnp.take(kernel.eigenvectors, X_id) * S[None, :]
-        mean = jnp.einsum('ij,jl->il', U, variational_mean)
-        
-        if variational_sqrt.ndim == 3:
-            q_cov = jnp.einsum("ijn,kjn->ijk", variational_sqrt, variational_sqrt)
-        if variational_sqrt.ndim == 2:
-            q_cov = jnp.einsum("in,in->in", variational_sqrt, variational_sqrt)
-
-        if full_cov:
-            if variational_sqrt.ndim == 3:
-                covariance = jnp.einsum('ij,njk,lk->nil', U, q_cov, U)
-            if variational_sqrt.ndim == 2:
-                covariance = jnp.einsum('ij, jn, kj->nik', U, q_cov, U)
-        else:
-            if variational_sqrt.ndim == 3:
-                covariance = jnp.einsum('ij,njk,ik->in', U, q_cov, U)
-            if variational_sqrt.ndim == 2:
-                covariance = jnp.einsum('ij, jn,ij->in', U, q_cov, U)
-        
-        prior_mean = self.posterior.prior.mean_function(test_inputs)
-        mean += prior_mean
-        
-        if hasattr(covariance, "to_dense"):
-            covariance = covariance.to_dense()
-
-        covariance += self.jitter * jnp.eye(jnp.shape(covariance)[0], dtype=covariance.dtype)
-        covariance = Dense(covariance)
-
-        return GaussianDistribution(
-            loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
-        )
 
 class WhitenedVariationalGaussian(VariationalGaussian[L]):
     r"""The whitened variational Gaussian family of probability distributions.
