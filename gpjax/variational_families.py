@@ -148,7 +148,8 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     ):
         super().__init__(posterior, inducing_inputs, jitter)
 
-        self.inducing_inputs = self.inducing_inputs.value.astype(jnp.int64)
+        if isinstance(self.posterior.prior.kernel, GraphKernel):
+            self.inducing_inputs = self.inducing_inputs.value.astype(jnp.int64)
 
         if variational_mean is None:
             variational_mean = jnp.zeros((self.num_inducing, 1))
@@ -182,7 +183,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack variational parameters
         variational_mean = self.variational_mean.value
         variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs
+        if isinstance(self.posterior.prior.kernel, GraphKernel):
+            inducing_inputs = self.inducing_inputs
+        else:
+            inducing_inputs = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -226,7 +230,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack variational parameters
         variational_mean = self.variational_mean.value
         variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs
+        if isinstance(self.posterior.prior.kernel, GraphKernel):
+            inducing_inputs = self.inducing_inputs
+        else:
+            inducing_inputs = self.inducing_inputs.value
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
