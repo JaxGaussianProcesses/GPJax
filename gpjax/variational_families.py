@@ -244,12 +244,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         Ktt = kernel.gram(test_points)
         Kzt = kernel.cross_covariance(inducing_inputs, test_points)
         test_mean = mean_function(test_points)
-        
-
-        Ktt = Ktt.to_dense() if hasattr(Ktt, "to_dense") else Ktt
-        Kzt = Kzt.to_dense() if hasattr(Kzt, "to_dense") else Kzt
 
         if isinstance(kernel, GraphKernel):
+            Ktt = Ktt.to_dense() if hasattr(Ktt, "to_dense") else Ktt
+            Kzt = Kzt.to_dense() if hasattr(Kzt, "to_dense") else Kzt
             Ktt = ensure_2d(Ktt)
             Kzt = ensure_2d(Kzt)
 
