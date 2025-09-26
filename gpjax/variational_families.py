@@ -128,6 +128,15 @@ class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
         return self.inducing_inputs.value.shape[0]
 
 
+def ensure_2d(mat):
+    mat = jnp.asarray(mat)
+    if mat.ndim == 0:
+        return mat[None, None]
+    if mat.ndim == 1:
+        return mat[:, None]
+    return mat
+
+
 class VariationalGaussian(AbstractVariationalGaussian[L]):
     r"""The variational Gaussian family of probability distributions.
 
@@ -153,7 +162,6 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
 
         if variational_mean is None:
             variational_mean = jnp.zeros((self.num_inducing, 1))
-
 
         if variational_root_covariance is None:
             variational_root_covariance = jnp.eye(self.num_inducing)
@@ -191,7 +199,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
         kernel = self.posterior.prior.kernel
-        
+
         inducing_mean = mean_function(inducing_inputs)
         Kzz = kernel.gram(inducing_inputs)
         Kzz = psd(Dense(add_jitter(Kzz.to_dense(), self.jitter)))
@@ -270,8 +278,6 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # μt + Ktz Kzz⁻¹ (μ - μz)
         mean = test_mean + jnp.matmul(Kzz_inv_Kzt.T, variational_mean - inducing_mean)
 
-        
-
         # Ktt - Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
         covariance = (
             Ktt
@@ -282,26 +288,17 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         if hasattr(covariance, "to_dense"):
             covariance = covariance.to_dense()
 
-
         covariance = add_jitter(covariance, self.jitter)
         covariance = Dense(covariance)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
-    
+
     @property
     def num_inducing(self) -> int:
         """The number of inducing inputs."""
         return self.inducing_inputs.shape[0]
-
-def ensure_2d(mat):
-    mat = jnp.asarray(mat)
-    if mat.ndim == 0:
-        return mat[None, None]        # scalar -> (1,1)
-    if mat.ndim == 1:
-        return mat[:, None]           # vector -> column (N,1)
-    return mat
 
 
 class WhitenedVariationalGaussian(VariationalGaussian[L]):
