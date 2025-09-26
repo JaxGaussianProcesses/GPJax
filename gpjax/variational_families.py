@@ -148,8 +148,11 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     ):
         super().__init__(posterior, inducing_inputs, jitter)
 
+        self.inducing_inputs = self.inducing_inputs.value.astype(jnp.int64)
+
         if variational_mean is None:
             variational_mean = jnp.zeros((self.num_inducing, 1))
+
 
         if variational_root_covariance is None:
             variational_root_covariance = jnp.eye(self.num_inducing)
@@ -179,12 +182,12 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack variational parameters
         variational_mean = self.variational_mean.value
         variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs.value
+        inducing_inputs = self.inducing_inputs
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
         kernel = self.posterior.prior.kernel
-
+        
         inducing_mean = mean_function(inducing_inputs)
         Kzz = kernel.gram(inducing_inputs)
         Kzz = psd(Dense(add_jitter(Kzz.to_dense(), self.jitter)))
@@ -223,7 +226,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack variational parameters
         variational_mean = self.variational_mean.value
         variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs.value
+        inducing_inputs = self.inducing_inputs
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -241,10 +244,14 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         Ktt = kernel.gram(test_points)
         Kzt = kernel.cross_covariance(inducing_inputs, test_points)
         test_mean = mean_function(test_points)
+        
+
+        Ktt = Ktt.to_dense() if hasattr(Ktt, "to_dense") else Ktt
+        Kzt = Kzt.to_dense() if hasattr(Kzt, "to_dense") else Kzt
 
         if isinstance(kernel, GraphKernel):
-            Ktt = self.ensure_2d(Ktt)
-            Kzt = self.ensure_2d(Kzt)
+            Ktt = ensure_2d(Ktt)
+            Kzt = ensure_2d(Kzt)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = solve(Lz, Kzt)
@@ -258,28 +265,38 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # μt + Ktz Kzz⁻¹ (μ - μz)
         mean = test_mean + jnp.matmul(Kzz_inv_Kzt.T, variational_mean - inducing_mean)
 
+        
+
         # Ktt - Ktz Kzz⁻¹ Kzt  +  Ktz Kzz⁻¹ S Kzz⁻¹ Kzt  [recall S = sqrt sqrtᵀ]
         covariance = (
             Ktt
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
+
         if hasattr(covariance, "to_dense"):
             covariance = covariance.to_dense()
+
+
         covariance = add_jitter(covariance, self.jitter)
         covariance = Dense(covariance)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
+    
+    @property
+    def num_inducing(self) -> int:
+        """The number of inducing inputs."""
+        return self.inducing_inputs.shape[0]
 
-    def ensure_2d(self, mat):
-        mat = jnp.asarray(mat)
-        if mat.ndim == 0:
-            return mat[None, None]        # scalar -> (1,1)
-        if mat.ndim == 1:
-            return mat[:, None]           # vector -> column (N,1)
-        return mat
+def ensure_2d(mat):
+    mat = jnp.asarray(mat)
+    if mat.ndim == 0:
+        return mat[None, None]        # scalar -> (1,1)
+    if mat.ndim == 1:
+        return mat[:, None]           # vector -> column (N,1)
+    return mat
 
 
 class WhitenedVariationalGaussian(VariationalGaussian[L]):
