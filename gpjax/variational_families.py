@@ -27,8 +27,8 @@ from gpjax.gps import (
     AbstractPosterior,
     AbstractPrior,
 )
-from gpjax.kernels.base import AbstractKernel
 from gpjax.kernels import GraphKernel
+from gpjax.kernels.base import AbstractKernel
 from gpjax.likelihoods import (
     Gaussian,
     NonGaussian,
