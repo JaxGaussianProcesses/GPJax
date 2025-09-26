@@ -298,7 +298,10 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     @property
     def num_inducing(self) -> int:
         """The number of inducing inputs."""
-        return self.inducing_inputs.shape[0]
+        if isinstance(self.posterior.prior.kernel, GraphKernel):
+            return self.inducing_inputs.shape[0]
+        else:
+            return self.inducing_inputs.value.shape[0]
 
 
 class WhitenedVariationalGaussian(VariationalGaussian[L]):
