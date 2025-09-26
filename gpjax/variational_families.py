@@ -846,7 +846,6 @@ __all__ = [
     "AbstractVariationalFamily",
     "AbstractVariationalGaussian",
     "VariationalGaussian",
-    "GraphVariationalGaussian",
     "WhitenedVariationalGaussian",
     "NaturalVariationalGaussian",
     "ExpectationVariationalGaussian",
