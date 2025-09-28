@@ -35,7 +35,7 @@ class Matern12(StationaryKernel):
     lengthscale parameter $\ell$ and variance $\sigma^2$.
 
     $$
-    k(x, y) = \sigma^2\exp\Bigg(-\frac{\lvert x-y \rvert}{2\ell^2}\Bigg)
+    k(x, y) = \sigma^2\exp\Bigg(-\frac{\lvert x-y \rvert}{2\ell}\Bigg)
     $$
     """
 
