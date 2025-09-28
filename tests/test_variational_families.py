@@ -25,6 +25,7 @@ from jaxtyping import (
     Array,
     Float,
 )
+import networkx as nx
 import numpy as np
 import numpyro.distributions as npd
 from numpyro.distributions import Distribution as NumpyroDistribution
@@ -104,7 +105,6 @@ def diag_matrix_val(
     "variational_family",
     [
         VariationalGaussian,
-        GraphVariationalGaussian,
         WhitenedVariationalGaussian,
         NaturalVariationalGaussian,
         ExpectationVariationalGaussian,
@@ -122,9 +122,6 @@ def test_variational_gaussians(
     likelihood = gpx.likelihoods.Gaussian(123)
     inducing_inputs = jnp.linspace(-5.0, 5.0, n_inducing).reshape(-1, 1)
 
-    if issubclass(variational_family, GraphVariationalGaussian):
-        inducing_inputs = jnp.array(np.random.randint(low=1, high=100, size=(15, 1)))
-
     test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
 
     posterior = prior * likelihood
@@ -135,14 +132,6 @@ def test_variational_gaussians(
     assert isinstance(q, AbstractVariationalFamily)
 
     if isinstance(q, VariationalGaussian):
-        assert q.variational_mean.value.shape == vector_shape(n_inducing)
-        assert q.variational_root_covariance.value.shape == matrix_shape(n_inducing)
-        assert (q.variational_mean.value == vector_val(0.0)(n_inducing)).all()
-        assert (
-            q.variational_root_covariance.value == diag_matrix_val(1.0)(n_inducing)
-        ).all()
-
-    if isinstance(q, GraphVariationalGaussian):
         assert q.variational_mean.value.shape == vector_shape(n_inducing)
         assert q.variational_root_covariance.value.shape == matrix_shape(n_inducing)
         assert (q.variational_mean.value == vector_val(0.0)(n_inducing)).all()
@@ -170,6 +159,64 @@ def test_variational_gaussians(
         assert (q.expectation_vector.value == vector_val(0.0)(n_inducing)).all()
         assert (q.expectation_matrix.value == diag_matrix_val(1.0)(n_inducing)).all()
 
+    # Test KL
+    kl = q.prior_kl()
+    assert isinstance(kl, jnp.ndarray)
+    assert kl.shape == ()
+    assert kl >= 0.0
+
+    # Test predictions
+    predictive_dist = q(test_inputs)
+    assert isinstance(predictive_dist, NumpyroDistribution)
+
+    mu = predictive_dist.mean
+    sigma = predictive_dist.covariance()
+
+    assert isinstance(mu, jnp.ndarray)
+    assert isinstance(sigma, jnp.ndarray)
+    assert mu.shape == (n_test,)
+    assert sigma.shape == (n_test, n_test)
+
+
+@pytest.mark.parametrize("n_test", [1, 10])
+@pytest.mark.parametrize("n_inducing", [1, 10, 20])
+@pytest.mark.parametrize(
+    "variational_family",
+    [
+        GraphVariationalGaussian,
+    ],
+)
+def test_graph_variational_gaussian(
+    n_test: int,
+    n_inducing: int,
+    variational_family: AbstractVariationalFamily,
+) -> None:
+    G = nx.barbell_graph(100, 0)
+    L = nx.laplacian_matrix(G).toarray()
+    # Initialise variational family:
+    kernel = gpx.kernels.GraphKernel(
+        laplacian=L,
+        lengthscale=2.3,
+        variance=3.2,
+        smoothness=6.1,
+    )
+    meanf = gpx.mean_functions.Constant()
+    prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
+    num_nodes = G.number_of_nodes()  # 200
+    x = jnp.arange(num_nodes).reshape(-1, 1).astype(jnp.int64)
+    np_y = np.array([0] * (num_nodes // 2) + [1] * (num_nodes // 2))
+    np.random.shuffle(np_y)
+    y = jnp.array(np_y).reshape(-1, 1).astype(jnp.float64)
+    inducing_inputs = jnp.array(
+        np.random.randint(low=1, high=100, size=(15, 1))
+    ).astype(jnp.int64)
+
+    D = gpx.Dataset(X=x, y=y)
+    likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
+    test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
+
+    posterior = prior * likelihood
+    q = variational_family(posterior=posterior, inducing_inputs=inducing_inputs)
     # Test KL
     kl = q.prior_kl()
     assert isinstance(kl, jnp.ndarray)
