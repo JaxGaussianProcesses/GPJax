@@ -101,7 +101,7 @@ class GraphKernel(StationaryKernel):
     def __call__(  # TODO not consistent with general kernel interface
         self,
         x: Int[Array, "N 1"],
-        y: Int[Array, "N 1"],
+        y: Int[Array, "M 1"],
         *,
         S,
         **kwargs,
