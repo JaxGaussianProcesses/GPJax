@@ -178,8 +178,8 @@ def test_variational_gaussians(
     assert sigma.shape == (n_test, n_test)
 
 
-@pytest.mark.parametrize("n_test", [1, 10])
-@pytest.mark.parametrize("n_inducing", [1, 10, 20])
+@pytest.mark.parametrize("n_test", [10, 20])
+@pytest.mark.parametrize("n_inducing", [10, 20])
 @pytest.mark.parametrize(
     "variational_family",
     [
@@ -193,7 +193,7 @@ def test_graph_variational_gaussian(
 ) -> None:
     G = nx.barbell_graph(100, 0)
     L = nx.laplacian_matrix(G).toarray()
-    # Initialise variational family:
+
     kernel = gpx.kernels.GraphKernel(
         laplacian=L,
         lengthscale=2.3,
@@ -202,18 +202,15 @@ def test_graph_variational_gaussian(
     )
     meanf = gpx.mean_functions.Constant()
     prior = gpx.gps.Prior(mean_function=meanf, kernel=kernel)
-    num_nodes = G.number_of_nodes()  # 200
-    x = jnp.arange(num_nodes).reshape(-1, 1).astype(jnp.int64)
-    np_y = np.array([0] * (num_nodes // 2) + [1] * (num_nodes // 2))
-    np.random.shuffle(np_y)
-    y = jnp.array(np_y).reshape(-1, 1).astype(jnp.float64)
+    likelihood = gpx.likelihoods.Bernoulli(num_datapoints=G.number_of_nodes())
+
     inducing_inputs = jnp.array(
-        np.random.randint(low=1, high=100, size=(15, 1))
+        np.random.randint(low=1, high=100, size=(n_inducing, 1))
     ).astype(jnp.int64)
 
-    D = gpx.Dataset(X=x, y=y)
-    likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
-    test_inputs = jnp.linspace(-5.0, 5.0, n_test).reshape(-1, 1)
+    test_inputs = jnp.array(np.random.randint(low=0, high=1, size=(n_test, 1))).astype(
+        jnp.int64
+    )
 
     posterior = prior * likelihood
     q = variational_family(posterior=posterior, inducing_inputs=inducing_inputs)

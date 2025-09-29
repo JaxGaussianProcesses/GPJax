@@ -111,6 +111,7 @@ class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
         self,
         posterior: AbstractPosterior[P, L],
         inducing_inputs: tp.Union[
+            Int[Array, "N D"],
             Float[Array, "N D"],
             Real,
         ],
@@ -143,7 +144,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     def __init__(
         self,
         posterior: AbstractPosterior[P, L],
-        inducing_inputs: Float[Array, "N D"],
+        inducing_inputs: tp.Union[Int[Array, "N D"], Float[Array, "N D"]],
         variational_mean: tp.Union[Float[Array, "N 1"], None] = None,
         variational_root_covariance: tp.Union[Float[Array, "N N"], None] = None,
         jitter: ScalarFloat = 1e-6,
@@ -211,7 +212,9 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
 
         return q_inducing.kl_divergence(p_inducing)
 
-    def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
+    def predict(
+        self, test_inputs: tp.Union[Int[Array, "N D"], Float[Array, "N D"]]
+    ) -> GaussianDistribution:
         r"""Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral $q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u$, which
