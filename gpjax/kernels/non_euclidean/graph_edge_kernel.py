@@ -74,7 +74,7 @@ class GraphEdgeKernel(AbstractKernel):
             Kernel
         """
 
-        print(type(X))
+        print(X)
 
         X2 = X if y is None else y
         cov = self.base_kernel.gram(self.dense_feature_mat).to_dense()
