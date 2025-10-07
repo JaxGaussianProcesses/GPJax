@@ -16,9 +16,9 @@
 from abc import abstractmethod
 
 import beartype.typing as tp
+from flax import nnx
 import jax.numpy as jnp
 import jax.random as jr
-from flax import nnx
 from jaxtyping import (
     Float,
     Num,
