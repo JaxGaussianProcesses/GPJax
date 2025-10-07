@@ -1,4 +1,8 @@
 # %%
+%load_ext autoreload
+%autoreload 2
+
+# %%
 import jax.numpy as jnp
 import gpjax
 from gpjax.parameters import (
@@ -45,31 +49,32 @@ node_feat_matrix = nx.attr_matrix(G)
 x = node_feat_matrix[0]
 
 # %%
-np_y = np.array([0] * 20 + [1] * (20))
+num_edges = len(G.edges)
+num_edges
+
+# %%
+np_y = np.array([0] * 175 + [1] * (176))
 np.random.shuffle(np_y)
 y = jnp.array(np_y).reshape(-1, 1).astype(jnp.float64)
 
 # %%
-D = gpx.Dataset(X=x, y=y.astype(jnp.float64))
+edge_indices = jnp.array(G.edges)
+
+# %%
+D = gpx.Dataset(X=edge_indices, y=y.astype(jnp.float64))
 
 # %%
 kernel = gpx.kernels.RBF()
 
 # %%
 graph_kernel = GraphEdgeKernel(
-    feature_mat=D.X,
+    feature_mat=x,
     base_kernel=kernel,
     # laplacian=L,
     lengthscale=2.3,
     variance=3.2,
     smoothness=6.1,
 )
-
-# %%
-edge_indices = jnp.array(G.edges)
-
-# %%
-kernel(D.X, D.y)
 
 # %%
 meanf = gpx.mean_functions.Constant()
@@ -80,7 +85,7 @@ likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
 posterior = prior * likelihood
 
 # %%
-D = gpx.Dataset(X=edge_indices, y=y.astype(jnp.float64))
+sth = graph_kernel(edge_indices)
 
 # %%
 optimiser = ox.adam(learning_rate=0.01)
@@ -94,3 +99,8 @@ opt_posterior, history = gpx.fit(
     key=key,
     trainable=Parameter,  # train all parameters (default behavior)
 )
+
+# %%
+
+
+

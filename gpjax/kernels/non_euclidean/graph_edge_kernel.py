@@ -3,12 +3,6 @@ import jax.numpy as jnp
 from jaxtyping import (
     Float,
     Int,
-    Num,
-)
-
-from gpjax.kernels.computations import (
-    AbstractKernelComputation,
-    EigenKernelComputation,
 )
 
 from gpjax.kernels.base import AbstractKernel
@@ -19,13 +13,12 @@ from gpjax.parameters import (
 from gpjax.typing import (
     Array,
     ScalarFloat,
-    ScalarInt,
 )
 
 
 # Stationary kernels are a class of kernels that are invariant to translations in the input space.
 class GraphEdgeKernel(AbstractKernel):
-    name: str = "Graph Matérn"
+    name: str = "Edge Kernel"
 
     def __init__(
         self,
@@ -36,7 +29,6 @@ class GraphEdgeKernel(AbstractKernel):
         variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         smoothness: ScalarFloat = 1.0,
         n_dims: tp.Union[int, None] = None,
-        compute_engine: AbstractKernelComputation = EigenKernelComputation(),
     ):
         """Initializes the kernel.
 
@@ -62,7 +54,7 @@ class GraphEdgeKernel(AbstractKernel):
         self.base_kernel = base_kernel
         self.dense_feature_mat = feature_mat
 
-        super().__init__(active_dims, n_dims, compute_engine)
+        super().__init__(active_dims, n_dims)
 
     def __call__(  # TODO not consistent with general kernel interface
         self,
@@ -81,6 +73,8 @@ class GraphEdgeKernel(AbstractKernel):
         :return:
             Kernel
         """
+
+        print(type(X))
 
         X2 = X if y is None else y
         cov = self.base_kernel.gram(self.dense_feature_mat).to_dense()
