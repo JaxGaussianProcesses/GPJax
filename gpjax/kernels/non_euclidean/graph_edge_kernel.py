@@ -1,7 +1,6 @@
 import beartype.typing as tp
 import jax.numpy as jnp
 from jaxtyping import (
-    Float,
     Int,
 )
 
@@ -18,22 +17,27 @@ from gpjax.typing import (
 
 # Stationary kernels are a class of kernels that are invariant to translations in the input space.
 class GraphEdgeKernel(AbstractKernel):
-    name: str = "Edge Kernel"
+    r"""The Edge graph kernel defined on the edge set of a graph.
+
+    Directed Graphs: K ((i, j), (i′, j′)) = 〈xi ⊗ xj, xi′ ⊗ xj′ 〉
+    Undirected Graphs: K ((i, j), (i′, j′)) = 〈xi ⊗ xj, xi′ ⊗ xj′ 〉 + 〈xi ⊗ xj, xj′ ⊗ xi′ 〉
+
+    """
+
+    name: str = "Graph Matérn"
 
     def __init__(
         self,
         base_kernel,
         feature_mat,
+        directed = False,
         active_dims: tp.Union[list[int], slice, None] = None,
-        lengthscale: tp.Union[ScalarFloat, Float[Array, " D"], Parameter] = 1.0,
-        variance: tp.Union[ScalarFloat, Parameter] = 1.0,
         smoothness: ScalarFloat = 1.0,
         n_dims: tp.Union[int, None] = None,
     ):
         """Initializes the kernel.
 
         Args:
-            laplacian: the Laplacian matrix of the graph.
             active_dims: The indices of the input dimensions that the kernel operates on.
             lengthscale: the lengthscale(s) of the kernel ℓ. If a scalar or an array of
                 length 1, the kernel is isotropic, meaning that the same lengthscale is
@@ -53,6 +57,7 @@ class GraphEdgeKernel(AbstractKernel):
 
         self.base_kernel = base_kernel
         self.dense_feature_mat = feature_mat
+        self.directed = directed
 
         super().__init__(active_dims, n_dims)
 
@@ -74,15 +79,14 @@ class GraphEdgeKernel(AbstractKernel):
             Kernel
         """
 
-        print(X)
-
         X2 = X if y is None else y
         cov = self.base_kernel.gram(self.dense_feature_mat).to_dense()
 
         cov_edges = (jnp.take(jnp.take(cov, X[:, 0], axis=0), X2[:, 0], axis=1)
                      * jnp.take(jnp.take(cov, X[:, 1], axis=0), X2[:, 1], axis=1))
 
-        cov_edges += (jnp.take(jnp.take(cov, X[:, 0], axis=0), X2[:, 1], axis=1)
-                     * jnp.take(jnp.take(cov, X[:, 1], axis=0), X2[:, 0], axis=1))
+        if not self.directed:
+            cov_edges += (jnp.take(jnp.take(cov, X[:, 0], axis=0), X2[:, 1], axis=1)
+                        * jnp.take(jnp.take(cov, X[:, 1], axis=0), X2[:, 0], axis=1))
 
         return cov_edges.T.squeeze()
