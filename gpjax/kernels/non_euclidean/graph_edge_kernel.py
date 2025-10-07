@@ -10,7 +10,7 @@ from gpjax.kernels.computations import (
     AbstractKernelComputation,
     EigenKernelComputation,
 )
-from gpjax.kernels.non_euclidean.utils import jax_gather_nd
+
 from gpjax.kernels.base import AbstractKernel
 from gpjax.parameters import (
     Parameter,
@@ -21,7 +21,6 @@ from gpjax.typing import (
     ScalarFloat,
     ScalarInt,
 )
-from jax import lax
 
 
 # Stationary kernels are a class of kernels that are invariant to translations in the input space.
@@ -68,8 +67,7 @@ class GraphEdgeKernel(AbstractKernel):
     def __call__(  # TODO not consistent with general kernel interface
         self,
         X: Int[Array, "N 2"],
-        y: Int[Array, "N 1"],
-        X2: Int[Array, "N 2"] = None,
+        y: Int[Array, "N 2"] = None,
         *,
         S=None,
         **kwargs,
@@ -84,8 +82,7 @@ class GraphEdgeKernel(AbstractKernel):
             Kernel
         """
 
-        X2 = X if X2 is None else X2
-        print("Hello")
+        X2 = X if y is None else y
         cov = self.base_kernel.gram(self.dense_feature_mat).to_dense()
 
         cov_edges = (jnp.take(jnp.take(cov, X[:, 0], axis=0), X2[:, 0], axis=1)
@@ -94,4 +91,4 @@ class GraphEdgeKernel(AbstractKernel):
         cov_edges += (jnp.take(jnp.take(cov, X[:, 0], axis=0), X2[:, 1], axis=1)
                      * jnp.take(jnp.take(cov, X[:, 1], axis=0), X2[:, 0], axis=1))
 
-        return cov_edges.squeeze()
+        return cov_edges.T.squeeze()
