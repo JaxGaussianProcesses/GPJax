@@ -20,7 +20,7 @@
 #
 # This notebook demonstrates how link prediction model can be constructed on the vertices
 # of a graph using a Gaussian process kernel like RBF which helps to learn edge wise covariances on the edges
-# with an Edge kernel presented in <strong data-cite="(Yu and Chu, 2008)"></strong>.
+# with an Edge kernel presented in <strong data-cite="NIPS2007_d045c59a"></strong>.
 # For a general discussion of the kernels supported within GPJax, see the
 # [kernels notebook](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels).
 # %%
