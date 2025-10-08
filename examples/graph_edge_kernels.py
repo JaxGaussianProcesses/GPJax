@@ -1,10 +1,6 @@
 # %%
-%load_ext autoreload
-%autoreload 2
-
-# %%
 import jax.numpy as jnp
-import gpjax
+import jax
 from gpjax.parameters import (
     Parameter,
 )
@@ -13,12 +9,14 @@ import networkx as nx
 import gpjax as gpx
 import jax.random as jr
 
-from gpjax.kernels.non_euclidean.graph_edge_kernel import GraphEdgeKernel
+from gpjax.kernels.non_euclidean.graph_edge import GraphEdgeKernel
 from sklearn.model_selection import train_test_split
 
 import random
 import numpy as np
 import optax as ox
+
+from sklearn.metrics import roc_auc_score, accuracy_score, f1_score, roc_curve
 
 # %%
 key = jr.key(42)
@@ -43,14 +41,7 @@ attrib_matrix = nx.attr_matrix(G)
 L = nx.laplacian_matrix(G).toarray()
 
 # %%
-node_feat_matrix = nx.attr_matrix(G)
-
-# %%
-x = node_feat_matrix[0]
-
-# %%
-num_edges = len(G.edges)
-num_edges
+x = np.random.uniform(low=0.5, high=13.3, size=(40, 5))
 
 # %%
 np_y = np.array([0] * 175 + [1] * (176))
@@ -59,6 +50,9 @@ y = jnp.array(np_y).reshape(-1, 1).astype(jnp.float64)
 
 # %%
 edge_indices = jnp.array(G.edges)
+
+# %%
+edge_indices.shape
 
 # %%
 D = gpx.Dataset(X=edge_indices, y=y.astype(jnp.float64))
@@ -70,10 +64,6 @@ kernel = gpx.kernels.RBF()
 graph_kernel = GraphEdgeKernel(
     feature_mat=x,
     base_kernel=kernel,
-    # laplacian=L,
-    lengthscale=2.3,
-    variance=3.2,
-    smoothness=6.1,
 )
 
 # %%
@@ -85,13 +75,15 @@ likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
 posterior = prior * likelihood
 
 # %%
-sth = graph_kernel(edge_indices)
+x = graph_kernel.gram(edge_indices).to_dense()
+
+# %%
+x.shape
 
 # %%
 optimiser = ox.adam(learning_rate=0.01)
 opt_posterior, history = gpx.fit(
     model=posterior,
-    # we use the negative lpd as we are minimising
     objective=lambda p, d: -gpx.objectives.log_posterior_density(p, d),
     train_data=D,
     optim=ox.adamw(learning_rate=0.01),
@@ -99,6 +91,19 @@ opt_posterior, history = gpx.fit(
     key=key,
     trainable=Parameter,  # train all parameters (default behavior)
 )
+
+# %%
+map_latent_dist = opt_posterior.predict(D.X, train_data=D)
+
+# %%
+predictive_dist = opt_posterior.likelihood(map_latent_dist)
+
+# %%
+predictive_mean = predictive_dist.mean
+predictive_std = jnp.sqrt(predictive_dist.variance)
+
+# %%
+predictive_dist.mean
 
 # %%
 
