@@ -14,8 +14,10 @@
 # ==============================================================================
 
 import beartype.typing as tp
-from jax import vmap
-from jaxtyping import Float, Num
+from jaxtyping import (
+    Float,
+    Int,
+)
 
 import gpjax  # noqa: F401
 from gpjax.kernels.computations.base import AbstractKernelComputation
@@ -29,11 +31,8 @@ class GraphEdgeKernelComputation(AbstractKernelComputation):
     a dense gram matrix structure.
     """
 
-    def _cross_covariance(
-        self, kernel: K, x: Num[Array, "N D"], y: Float[Array, "M D"]
+    def cross_covariance(
+        self, kernel: K, x: Int[Array, "N D"], y: Int[Array, "M D"]
     ) -> Float[Array, "N M"]:
-
-        sender, reciever = x[:, 0].reshape(-1, 1), x[:, 1].reshape(-1, 1)
-        cross_cov = vmap(lambda s, r: vmap(lambda y: kernel(s, r, y = y))(y))(sender, reciever)
-
+        cross_cov = kernel(x, y)
         return cross_cov

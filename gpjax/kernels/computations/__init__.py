@@ -30,5 +30,5 @@ __all__ = [
     "DenseKernelComputation",
     "DiagonalKernelComputation",
     "EigenKernelComputation",
-    "GraphEdgeKernelComputation"
+    "GraphEdgeKernelComputation",
 ]
