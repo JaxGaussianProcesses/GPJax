@@ -13,8 +13,13 @@
 from jax import config
 import jax.numpy as jnp
 import networkx as nx
+import numpy as np
 
-from gpjax.kernels.non_euclidean import GraphKernel
+from gpjax.kernels.non_euclidean import (
+    GraphEdgeKernel,
+    GraphKernel,
+)
+from gpjax.kernels.stationary import RBF
 from gpjax.linalg.operators import Identity
 
 # # Enable Float64 for more stable matrix inversions.
@@ -43,6 +48,32 @@ def test_graph_kernel():
     # Compute gram matrix
     Kxx = kern.gram(x)
     assert Kxx.shape == (n_verticies, n_verticies)
+
+    # Check positive definiteness
+    Kxx += Identity(Kxx.shape[0]) * 1e-6
+    eigen_values = jnp.linalg.eigvalsh(Kxx.to_dense())
+    assert all(eigen_values > 0)
+
+
+def test_graph_edge_kernel():
+    # Create a random graph, G, and verice labels, x,
+    n_verticies = 20
+    n_edges = 40
+    G = nx.gnm_random_graph(n_verticies, n_edges, seed=123)
+    edge_indices = jnp.array(G.edges).astype(jnp.int64)
+
+    # Create graph kernel
+    kern = GraphEdgeKernel(
+        base_kernel=RBF(),
+        feature_mat=jnp.array(
+            np.random.uniform(low=0.5, high=13.3, size=(n_verticies, 5))
+        ),
+    )
+    assert isinstance(kern, GraphEdgeKernel)
+
+    # Compute gram matrix
+    Kxx = kern.gram(edge_indices)
+    assert Kxx.shape == (n_edges, n_edges)
 
     # Check positive definiteness
     Kxx += Identity(Kxx.shape[0]) * 1e-6
