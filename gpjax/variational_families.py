@@ -286,6 +286,17 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
 
 
 class GraphVariationalGaussian(VariationalGaussian[L]):
+    r"""A variational Gaussian defined over graph-structured inducing inputs.
+
+    This subclass adapts the :class:`VariationalGaussian` family to the
+    case where the inducing inputs are discrete graph node indices rather
+    than continuous spatial coordinates.
+
+    The main differences are:
+      * Inducing inputs are integer node IDs.
+      * Kernel matrices are ensured to be dense and 2D.
+    """
+
     def __init__(
         self,
         posterior: AbstractPosterior[P, L],
@@ -869,6 +880,7 @@ __all__ = [
     "AbstractVariationalFamily",
     "AbstractVariationalGaussian",
     "VariationalGaussian",
+    "GraphVariationalGaussian",
     "WhitenedVariationalGaussian",
     "NaturalVariationalGaussian",
     "ExpectationVariationalGaussian",
