@@ -14,7 +14,6 @@ authors = [{ name = "Thomas Pinder", email = "tompinder@live.co.uk" }]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -194,7 +193,7 @@ skip_covered = true
 
 [tool.black] # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
 line-length = 88
-target-version = ["py310"]
+target-version = ["py311"]
 
 [tool.pytest.ini_options] # https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
 filterwarnings = ["error", "ignore::DeprecationWarning"]
@@ -207,7 +206,7 @@ cache-dir = "~/.cache/ruff"
 exclude = ["docs/", "examples/"]
 line-length = 88
 src = ["gpjax", "tests"]
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 dummy-variable-rgx = "^_$"

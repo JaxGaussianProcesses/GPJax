@@ -50,7 +50,7 @@ hardware acceleration support as detailed in the
     We advise you create virtual environment before installing:
 
     ```bash
-    conda create -n gpjax_experimental python=3.10.0
+    conda create -n gpjax_experimental python=3.11.0
     conda activate gpjax_experimental
     ```
 
