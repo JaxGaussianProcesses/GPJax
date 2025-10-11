@@ -7,7 +7,7 @@ name = "gpjax"
 dynamic = ["version"]
 description = 'Gaussian processes in JAX.'
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 keywords = ["gaussian-processes jax machine-learning bayesian"]
 authors = [{ name = "Thomas Pinder", email = "tompinder@live.co.uk" }]
@@ -29,7 +29,7 @@ dependencies = [
   "jaxtyping>0.2.10",
   "tqdm>4.66.2",
   "beartype>0.16.1",
-  "flax>=0.10.0",
+  "flax>=0.12.0",
   "numpy>=2.0.0",
 ]
 

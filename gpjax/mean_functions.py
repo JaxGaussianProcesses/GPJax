@@ -176,7 +176,7 @@ class CombinationMeanFunction(AbstractMeanFunction):
         super().__init__(**kwargs)
 
         # Add means to a list, flattening out instances of this class therein, as in GPFlow kernels.
-        items_list: list[AbstractMeanFunction] = []
+        items_list: list[AbstractMeanFunction] = nnx.List([])
 
         for item in means:
             if not isinstance(item, AbstractMeanFunction):
