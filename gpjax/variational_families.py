@@ -314,19 +314,12 @@ class GraphVariationalGaussian(VariationalGaussian[L]):
         )
         self.inducing_inputs = self.inducing_inputs.value.astype(jnp.int64)
 
-    def _ensure_2d(self, mat):
-        mat = jnp.asarray(mat)
-        if mat.ndim == 0:
-            return mat[None, None]
-        if mat.ndim == 1:
-            return mat[:, None]
-        return mat
-
     def _fmt_Kzt_Ktt(self, Kzt, Ktt):
         Ktt = Ktt.to_dense() if hasattr(Ktt, "to_dense") else Ktt
         Kzt = Kzt.to_dense() if hasattr(Kzt, "to_dense") else Kzt
-        Ktt = self._ensure_2d(Ktt)
-        Kzt = self._ensure_2d(Kzt)
+        Ktt = jnp.atleast_2d(Ktt)
+        if Kzt.ndim != 2:
+            Kzt = jnp.transpose(jnp.atleast_2d(Kzt))
         return Kzt, Ktt
 
     def _fmt_inducing_inputs(self):
