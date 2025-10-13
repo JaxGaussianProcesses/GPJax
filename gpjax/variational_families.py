@@ -318,8 +318,9 @@ class GraphVariationalGaussian(VariationalGaussian[L]):
         Ktt = Ktt.to_dense() if hasattr(Ktt, "to_dense") else Ktt
         Kzt = Kzt.to_dense() if hasattr(Kzt, "to_dense") else Kzt
         Ktt = jnp.atleast_2d(Ktt)
-        if Kzt.ndim != 2:
-            Kzt = jnp.transpose(jnp.atleast_2d(Kzt))
+        Kzt = (
+            jnp.transpose(jnp.atleast_2d(Kzt)) if Kzt.ndim < 2 else jnp.atleast_2d(Kzt)
+        )
         return Kzt, Ktt
 
     def _fmt_inducing_inputs(self):
