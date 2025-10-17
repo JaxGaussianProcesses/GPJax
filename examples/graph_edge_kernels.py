@@ -1,28 +1,6 @@
-# -*- coding: utf-8 -*-
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.17.3
-#   kernelspec:
-#     display_name: gpjax
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
-# # Graph Edge Kernels
-#
-# This notebook demonstrates how link prediction model can be constructed on the vertices
-# of a graph using a Gaussian process kernel like RBF which helps to learn edge wise covariances on the edges
-# with an Edge kernel presented in <strong data-cite="NIPS2007_d045c59a"></strong>.
-# For a general discussion of the kernels supported within GPJax, see the
-# [kernels notebook](https://docs.jaxgaussianprocesses.com/_examples/constructing_new_kernels).
+# # Graph Edge Kernels — medium random graph (~2000 edges)
+
 # %%
 import random
 
@@ -38,128 +16,127 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
+from sklearn.model_selection import train_test_split
 
 import gpjax as gpx
 from gpjax.kernels.non_euclidean.graph_edge import GraphEdgeKernel
-from gpjax.parameters import (
-    Parameter,
-)
+from gpjax.parameters import Parameter
 
 # %% [markdown]
-# ## Graph construction
-#
-# Our graph $\mathcal{G}=\lbrace V, E \rbrace$ comprises a set of vertices
-# $V = \lbrace v_1, v_2, \ldots, v_n\rbrace$ and edges
-# $E=\lbrace (v_i, v_j)\in V \ : \ i \neq j\rbrace$. In particular, we will consider
-# a [barbell graph](https://en.wikipedia.org/wiki/Barbell_graph) that is an undirected
-# graph containing two clusters of vertices with a single shared edge between the
-# two clusters.
-#
-# Contrary to the typical barbell graph, we'll randomly remove a subset of 30 edges
-# within each of the two clusters. Given the 40 vertices within the graph, this results
-# in 351 edges as shown below.
-
+# ## Configuration
 # %%
+SEED = 123
+np.random.seed(SEED)
+random.seed(SEED)
 key = jr.key(42)
 
-vertex_per_side = 20
-n_edges_to_remove = 30
-p = 0.8
-
-G = nx.barbell_graph(vertex_per_side, 0)
-
-random.seed(123)
-[G.remove_edge(*i) for i in random.sample(list(G.edges), n_edges_to_remove)]
-
-pos = nx.spring_layout(G, seed=123)  # positions for all nodes
-
-nx.draw(G, pos, node_size=100, edge_color="black", with_labels=False)
-
-# ## Simulating a signal on the graph
-#
-# We begin by simulating a signal on the graph's vertices which will help on edge Gaussian Process.
-# For this example its all random feature matrix which goes into the base kernel (RBF in this case),
-# a binary indication of edge presence or absense also randomly drawn.
+# %% [markdown]
+# ## Construct medium-sized random graph (~2000 edges)
 # %%
-node_feature_matrix = np.random.uniform(low=0.5, high=13.3, size=(40, 5))
+n_nodes = 150
+target_edges = 3000
+p_edge = target_edges / (n_nodes * (n_nodes - 1) / 2)
+G = nx.erdos_renyi_graph(n_nodes, p_edge, seed=SEED)
 
-# %%
-np_y = np.array([0] * 175 + [1] * (176))
-np.random.shuffle(np_y)
-y = jnp.array(np_y).reshape(-1, 1).astype(jnp.float64)
+while G.number_of_edges() > target_edges:
+    u, v = random.choice(list(G.edges()))
+    G.remove_edge(u, v)
 
+print(f"Graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges")
 # %%
-edge_indices = jnp.array(G.edges).astype(jnp.int64)
-
-# %%
-D = gpx.Dataset(X=edge_indices, y=y.astype(jnp.float64))
+pos = nx.spring_layout(G, seed=SEED)
+plt.figure(figsize=(6, 5))
+nx.draw(G, pos, node_size=40, edge_color="black", with_labels=False)
+plt.title(
+    f"Random graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges"
+)
+plt.show()
 
 # %% [markdown]
-#
-# ## Constructing a edge graph Gaussian process
-#
-# With our dataset created, we proceed to define our posterior Gaussian process and
-# optimise the model's hyperparameters.
-# Whilst our underlying space is the graph's vertex set and is therefore
-# non-Euclidean, our likelihood is still Gaussian and the model is non-conjugate.
-# We simply perform gradient descent on the GP's marginal
-# log-likelihood term as in the
-# [classification notebook](https://docs.jaxgaussianprocesses.com/_examples/classification/).
-
+# ## Node features
 # %%
-kernel = gpx.kernels.RBF()
+node_feature_dim = 20
+node_feature_matrix = np.random.uniform(
+    low=0.5, high=13.3, size=(n_nodes, node_feature_dim)
+).astype(np.float64)
 
+# %% [markdown]
+# ## Prepare edges and labels
 # %%
-graph_kernel = GraphEdgeKernel(
-    feature_mat=node_feature_matrix,
-    base_kernel=kernel,
+edge_list = jnp.array(G.edges).astype(jnp.int64)
+num_edges = edge_list.shape[0]
+pos_frac = 0.5
+n_pos = int(pos_frac * num_edges)
+labels = np.array([1] * n_pos + [0] * (num_edges - n_pos), dtype=np.float64)
+np.random.shuffle(labels)
+labels_jnp = jnp.array(labels).reshape(-1, 1).astype(jnp.float64)
+# %% [markdown]
+# ## Train / Test split
+# %%
+edge_idx = np.arange(num_edges)
+train_idx, test_idx = train_test_split(
+    edge_idx, test_size=0.2, random_state=SEED, stratify=labels
 )
 
+edge_train = edge_list[train_idx]
+edge_test = edge_list[test_idx]
+y_train = labels_jnp[train_idx]
+y_test = labels_jnp[test_idx]
+
+print(f"Training edges: {len(train_idx)}, Test edges: {len(test_idx)}")
+
+# %% [markdown]
+# ## Model definition
 # %%
+base_kernel = gpx.kernels.RBF()
+graph_kernel = GraphEdgeKernel(feature_mat=node_feature_matrix, base_kernel=base_kernel)
 meanf = gpx.mean_functions.Constant()
 prior = gpx.gps.Prior(mean_function=meanf, kernel=graph_kernel)
-likelihood = gpx.likelihoods.Bernoulli(num_datapoints=D.n)
-
-# %%
+likelihood = gpx.likelihoods.Bernoulli(num_datapoints=len(train_idx))
 posterior = prior * likelihood
 
+# %% [markdown]
+# ## Train model
 # %%
-optimiser = ox.adam(learning_rate=0.01)
+D_train = gpx.Dataset(X=jnp.array(edge_train), y=y_train)
+D_test = gpx.Dataset(X=jnp.array(edge_test), y=y_test)
+
+optimiser = ox.adamw(learning_rate=0.1)
+num_iters = 2000
+
 opt_posterior, history = gpx.fit(
     model=posterior,
     objective=lambda p, d: -gpx.objectives.log_posterior_density(p, d),
-    train_data=D,
-    optim=ox.adamw(learning_rate=0.01),
-    num_iters=1000,
+    train_data=D_train,
+    optim=optimiser,
+    num_iters=num_iters,
     key=key,
-    trainable=Parameter,  # train all parameters (default behavior)
+    trainable=Parameter,
 )
+
 # %% [markdown]
-#
-# ## Making predictions
-#
-# Having optimised our hyperparameters, we can now make predictions on the graph.
-# Though we haven't defined a training and testing dataset here, we'll simply query
-# the predictive posterior for the full graph to compare the ROC-AUC, F1, accuracy scores.
+# ## Predictions on test edges
 # %%
-initial_dist = likelihood(posterior(edge_indices, D))
-predictive_dist = opt_posterior.likelihood(opt_posterior(edge_indices, D))
+pred_dist = opt_posterior.likelihood(opt_posterior(edge_test, D_train))
+pred_mean = pred_dist.mean
 
-# %%
-predictive_mean = predictive_dist.mean
-predictive_std = jnp.sqrt(predictive_dist.variance)
+y_prob_np = np.array(pred_mean)
+y_test_np = np.array(y_test)
 
-# %%
-y_prob = predictive_mean
-auc = roc_auc_score(y, y_prob)
-accu = accuracy_score(y, jnp.where(y_prob > 0.5, 1, 0))
-f1 = f1_score(y, jnp.where(y_prob > 0.5, 1, 0))
-print(f"ROC AUC:, {auc} || Accuracy: {accu} || F1: {f1}")
+pred_labels = jnp.where(y_prob_np > 0.5, 1, 0)
+auc = roc_auc_score(y_test_np, y_prob_np)
+acc = accuracy_score(y_test_np, pred_labels)
+f1 = f1_score(y_test_np, pred_labels)
+print(f"Test ROC-AUC: {auc:.4f}, Accuracy: {acc:.4f}, F1: {f1:.4f}")
 
+# %% [markdown]
+# ## Plot ROC curve
 # %%
-fpr, tpr, thresholds = roc_curve(y, y_prob)
-
-# %%
+fpr, tpr, _ = roc_curve(y_test_np, y_prob_np)
+plt.figure(figsize=(5, 4))
 plt.plot(fpr, tpr)
 plt.xlabel("False Positive Rate")
 plt.ylabel("True Positive Rate")
+plt.title("ROC Curve on Test Edges")
+plt.grid(True)
+plt.show()
