@@ -24,6 +24,7 @@ nav:
     - Barycentres: _examples/barycentres.md
     - Deep kernel learning: _examples/deep_kernels.md
     - Graph kernels: _examples/graph_kernels.md
+    - Graph Edge kernels: _examples/graph_edge_kernels.md
     - Sparse GPs: _examples/collapsed_vi.md
     - Stochastic sparse GPs: _examples/uncollapsed_vi.md
     - Multi-output GPs for Ocean Modelling: _examples/oceanmodelling.md
