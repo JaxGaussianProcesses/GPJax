@@ -2591,6 +2591,57 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphVariationalGaussian
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GraphVariationalGaussian">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian.num_inducing" class="md-nav__link">
+    <span class="md-ellipsis">
+      num_inducing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian.predict" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian.prior_kl" class="md-nav__link">
+    <span class="md-ellipsis">
+      prior_kl
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gpjax.variational_families.WhitenedVariationalGaussian" class="md-nav__link">
     <span class="md-ellipsis">
       WhitenedVariationalGaussian
@@ -2949,6 +3000,57 @@
   <a href="#gpjax.variational_families.VariationalGaussian.predict" class="md-nav__link">
     <span class="md-ellipsis">
       predict
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphVariationalGaussian
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GraphVariationalGaussian">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian.num_inducing" class="md-nav__link">
+    <span class="md-ellipsis">
+      num_inducing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian.predict" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpjax.variational_families.GraphVariationalGaussian.prior_kl" class="md-nav__link">
+    <span class="md-ellipsis">
+      prior_kl
     </span>
   </a>
   
@@ -3801,6 +3903,273 @@ make a prediction.</p>
           <div class="doc-md-description">
             <p>The predictive distribution of the low-rank GP at
 the test inputs.</p>
+          </div>
+        </li>
+    </ul>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="gpjax.variational_families.GraphVariationalGaussian" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">GraphVariationalGaussian</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">GraphVariationalGaussian</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">posterior</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">inducing_inputs</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">variational_mean</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variational_root_covariance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">jitter</span><span class="o">=</span><span class="mf">1e-06</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="gpjax.variational_families.VariationalGaussian" href="#gpjax.variational_families.VariationalGaussian">VariationalGaussian</a>[<span title="gpjax.variational_families.L">L</span>]</code></p>
+
+
+        <p>A variational Gaussian defined over graph-structured inducing inputs.</p>
+<p>This subclass adapts the :class:<code>VariationalGaussian</code> family to the
+case where the inducing inputs are discrete graph node indices rather
+than continuous spatial coordinates.</p>
+
+
+<details class="the-main-differences-are" open>
+  <summary>The main differences are</summary>
+  <ul>
+<li>Inducing inputs are integer node IDs.</li>
+<li>Kernel matrices are ensured to be dense and 2D.</li>
+</ul>
+</details>
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="gpjax.variational_families.GraphVariationalGaussian.num_inducing" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">num_inducing</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">num_inducing</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The number of inducing inputs.</p>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.variational_families.GraphVariationalGaussian.__call__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__call__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="nf">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Evaluate the variational family's density.</p>
+<p>For a given set of parameters, compute the latent function's prediction
+under the variational approximation.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>*args</code></b>
+              (<code><span title="Any">Any</span></code>, default:
+                  <code>()</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Arguments of the variational family's <code>predict</code> method.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>**kwargs</code></b>
+              (<code><span title="Any">Any</span></code>, default:
+                  <code>{}</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Keyword arguments of the variational family's <code>predict</code>
+method.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<b><code>GaussianDistribution</code></b> (              <code><a class="autorefs autorefs-internal" title="gpjax.distributions.GaussianDistribution" href="../distributions/#gpjax.distributions.GaussianDistribution">GaussianDistribution</a></code>
+)          –
+          <div class="doc-md-description">
+            <p>The output of the variational family's <code>predict</code> method.</p>
+          </div>
+        </li>
+    </ul>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.variational_families.GraphVariationalGaussian.predict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">predict</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">predict</span><span class="p">(</span><span class="n">test_inputs</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Compute the predictive distribution of the GP at the test inputs t.</p>
+<p>This is the integral <span class="arithmatex">\(q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u\)</span>, which
+can be computed in closed form as:
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="script">N</mi><mrow><mo fence="true">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo separator="true">;</mo><mi>μ</mi><mi>t</mi><mo>+</mo><msub><mi mathvariant="bold">K</mi><mrow><mi>t</mi><mi>z</mi></mrow></msub><msubsup><mi mathvariant="bold">K</mi><mrow><mi>z</mi><mi>z</mi></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mo stretchy="false">(</mo><mi>μ</mi><mo>−</mo><mi>μ</mi><mi>z</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msub><mi mathvariant="bold">K</mi><mrow><mi>t</mi><mi>t</mi></mrow></msub><mo>−</mo><msub><mi mathvariant="bold">K</mi><mrow><mi>t</mi><mi>z</mi></mrow></msub><msubsup><mi mathvariant="bold">K</mi><mrow><mi>z</mi><mi>z</mi></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi mathvariant="bold">K</mi><mrow><mi>z</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi mathvariant="bold">K</mi><mrow><mi>t</mi><mi>z</mi></mrow></msub><msubsup><mi mathvariant="bold">K</mi><mrow><mi>z</mi><mi>z</mi></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mi>S</mi><msubsup><mi mathvariant="bold">K</mi><mrow><mi>z</mi><mi>z</mi></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi mathvariant="bold">K</mi><mrow><mi>z</mi><mi>t</mi></mrow></msub><mo fence="true">)</mo></mrow><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">
+    \mathcal{N}\left(f(t); \mu t + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} (\mu - \mu z),  \mathbf{K}_{tt} - \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt} + \mathbf{K}_{tz} \mathbf{K}_{zz}^{-1} S \mathbf{K}_{zz}^{-1} \mathbf{K}_{zt}\right).
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2141em;vertical-align:-0.35em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">zz</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">μ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">tt</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">zz</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">zz</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">zz</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">.</span></span></span></span></span></p></p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>test_inputs</code></b>
+              (<code><span title="jaxtyping.Float">Float</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N D&#39;]</code>)
+          –
+          <div class="doc-md-description">
+            <p>The test inputs at which we wish to
+make a prediction.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<b><code>GaussianDistribution</code></b> (              <code><a class="autorefs autorefs-internal" title="gpjax.distributions.GaussianDistribution" href="../distributions/#gpjax.distributions.GaussianDistribution">GaussianDistribution</a></code>
+)          –
+          <div class="doc-md-description">
+            <p>The predictive distribution of the low-rank GP at
+the test inputs.</p>
+          </div>
+        </li>
+    </ul>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="gpjax.variational_families.GraphVariationalGaussian.prior_kl" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">prior_kl</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">prior_kl</span><span class="p">()</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+  integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+  crossorigin="anonymous" />
+
+<style type="text/css">
+    .katex img {
+      object-fit: fill;
+      padding: unset;
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: inherit;
+    }
+</style>
+<p>Compute the prior KL divergence.</p>
+<p>Compute the KL-divergence between our variational approximation and the
+Gaussian process prior.</p>
+<p>For this variational family, we have
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi mathvariant="normal">KL</mi><mo>⁡</mo><mo stretchy="false">[</mo><mi>q</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>∣</mo><mo>∣</mo><mi>p</mi><mo stretchy="false">(</mo><mo>⋅</mo><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">KL</mi><mo>⁡</mo><mo stretchy="false">[</mo><mi>q</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>∣</mo><mo>∣</mo><mi>p</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">KL</mi><mo>⁡</mo><mo stretchy="false">[</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mi>μ</mi><mo separator="true">,</mo><mi>S</mi><mo stretchy="false">)</mo><mo>∣</mo><mo>∣</mo><mi>N</mi><mo stretchy="false">(</mo><mi>μ</mi><mi>z</mi><mo separator="true">,</mo><msub><mi mathvariant="bold">K</mi><mrow><mi>z</mi><mi>z</mi></mrow></msub><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mo separator="true">,</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{align}
+\operatorname{KL}[q(f(\cdot))\mid\mid p(\cdot)] &amp; = \operatorname{KL}[q(u)\mid\mid p(u)]\\
+&amp; = \operatorname{KL}[ \mathcal{N}(\mu, S) \mid\mid N(\mu z, \mathbf{K}_{zz}) ],
+\end{align}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.75em;"><span style="top:-3.91em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mord mathrm">KL</span></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">)]</span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.75em;"><span style="top:-3.91em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mop"><span class="mord mathrm">KL</span></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mclose">)]</span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mop"><span class="mord mathrm">KL</span></span><span class="mopen">[</span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord mathnormal">μ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mopen">(</span><span class="mord mathnormal">μ</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">zz</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)]</span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.75em;"><span style="top:-3.75em;"><span class="pstrut" style="height:2.84em;"></span><span class="eqn-num"></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:2.84em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span></span></span></span></p>
+where <span class="arithmatex">\(u = f(z)\)</span> and <span class="arithmatex">\(z\)</span> are the inducing inputs.</p>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<b><code>ScalarFloat</code></b> (              <code><span title="gpjax.typing.ScalarFloat">ScalarFloat</span></code>
+)          –
+          <div class="doc-md-description">
+            <p>The KL-divergence between our variational
+approximation and the GP prior.</p>
           </div>
         </li>
     </ul>
