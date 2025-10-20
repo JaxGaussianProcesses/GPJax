@@ -19,7 +19,10 @@ import beartype.typing as tp
 from flax import nnx
 import jax.numpy as jnp
 import jax.scipy as jsp
-from jaxtyping import Float
+from jaxtyping import (
+    Float,
+    Int,
+)
 
 from gpjax.dataset import Dataset
 from gpjax.distributions import GaussianDistribution
@@ -108,6 +111,7 @@ class AbstractVariationalGaussian(AbstractVariationalFamily[L]):
         self,
         posterior: AbstractPosterior[P, L],
         inducing_inputs: tp.Union[
+            Int[Array, "N D"],
             Float[Array, "N D"],
             Real,
         ],
@@ -140,7 +144,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
     def __init__(
         self,
         posterior: AbstractPosterior[P, L],
-        inducing_inputs: Float[Array, "N D"],
+        inducing_inputs: tp.Union[Int[Array, "N D"], Float[Array, "N D"]],
         variational_mean: tp.Union[Float[Array, "N 1"], None] = None,
         variational_root_covariance: tp.Union[Float[Array, "N N"], None] = None,
         jitter: ScalarFloat = 1e-6,
@@ -155,6 +159,12 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
 
         self.variational_mean = Real(variational_mean)
         self.variational_root_covariance = LowerTriangular(variational_root_covariance)
+
+    def _fmt_Kzt_Ktt(self, Kzt, Ktt):
+        return Kzt, Ktt
+
+    def _fmt_inducing_inputs(self):
+        return self.inducing_inputs.value
 
     def prior_kl(self) -> ScalarFloat:
         r"""Compute the prior KL divergence.
@@ -178,7 +188,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack variational parameters
         variational_mean = self.variational_mean.value
         variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs.value
+        inducing_inputs = self._fmt_inducing_inputs()
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -202,7 +212,9 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
 
         return q_inducing.kl_divergence(p_inducing)
 
-    def predict(self, test_inputs: Float[Array, "N D"]) -> GaussianDistribution:
+    def predict(
+        self, test_inputs: tp.Union[Int[Array, "N D"], Float[Array, "N D"]]
+    ) -> GaussianDistribution:
         r"""Compute the predictive distribution of the GP at the test inputs t.
 
         This is the integral $q(f(t)) = \int p(f(t)\mid u) q(u) \mathrm{d}u$, which
@@ -222,7 +234,7 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         # Unpack variational parameters
         variational_mean = self.variational_mean.value
         variational_sqrt = self.variational_root_covariance.value
-        inducing_inputs = self.inducing_inputs.value
+        inducing_inputs = self._fmt_inducing_inputs()
 
         # Unpack mean function and kernel
         mean_function = self.posterior.prior.mean_function
@@ -240,6 +252,8 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
         Ktt = kernel.gram(test_points)
         Kzt = kernel.cross_covariance(inducing_inputs, test_points)
         test_mean = mean_function(test_points)
+
+        Kzt, Ktt = self._fmt_Kzt_Ktt(Kzt, Ktt)
 
         # Lz⁻¹ Kzt
         Lz_inv_Kzt = solve(Lz, Kzt)
@@ -259,14 +273,63 @@ class VariationalGaussian(AbstractVariationalGaussian[L]):
             - jnp.matmul(Lz_inv_Kzt.T, Lz_inv_Kzt)
             + jnp.matmul(Ktz_Kzz_inv_sqrt, Ktz_Kzz_inv_sqrt.T)
         )
+
         if hasattr(covariance, "to_dense"):
             covariance = covariance.to_dense()
+
         covariance = add_jitter(covariance, self.jitter)
         covariance = Dense(covariance)
 
         return GaussianDistribution(
             loc=jnp.atleast_1d(mean.squeeze()), scale=covariance
         )
+
+
+class GraphVariationalGaussian(VariationalGaussian[L]):
+    r"""A variational Gaussian defined over graph-structured inducing inputs.
+
+    This subclass adapts the :class:`VariationalGaussian` family to the
+    case where the inducing inputs are discrete graph node indices rather
+    than continuous spatial coordinates.
+
+    The main differences are:
+      * Inducing inputs are integer node IDs.
+      * Kernel matrices are ensured to be dense and 2D.
+    """
+
+    def __init__(
+        self,
+        posterior: AbstractPosterior[P, L],
+        inducing_inputs: Int[Array, "N D"],
+        variational_mean: tp.Union[Float[Array, "N 1"], None] = None,
+        variational_root_covariance: tp.Union[Float[Array, "N N"], None] = None,
+        jitter: ScalarFloat = 1e-6,
+    ):
+        super().__init__(
+            posterior,
+            inducing_inputs,
+            variational_mean,
+            variational_root_covariance,
+            jitter,
+        )
+        self.inducing_inputs = self.inducing_inputs.value.astype(jnp.int64)
+
+    def _fmt_Kzt_Ktt(self, Kzt, Ktt):
+        Ktt = Ktt.to_dense() if hasattr(Ktt, "to_dense") else Ktt
+        Kzt = Kzt.to_dense() if hasattr(Kzt, "to_dense") else Kzt
+        Ktt = jnp.atleast_2d(Ktt)
+        Kzt = (
+            jnp.transpose(jnp.atleast_2d(Kzt)) if Kzt.ndim < 2 else jnp.atleast_2d(Kzt)
+        )
+        return Kzt, Ktt
+
+    def _fmt_inducing_inputs(self):
+        return self.inducing_inputs
+
+    @property
+    def num_inducing(self) -> int:
+        """The number of inducing inputs."""
+        return self.inducing_inputs.shape[0]
 
 
 class WhitenedVariationalGaussian(VariationalGaussian[L]):
@@ -811,6 +874,7 @@ __all__ = [
     "AbstractVariationalFamily",
     "AbstractVariationalGaussian",
     "VariationalGaussian",
+    "GraphVariationalGaussian",
     "WhitenedVariationalGaussian",
     "NaturalVariationalGaussian",
     "ExpectationVariationalGaussian",
