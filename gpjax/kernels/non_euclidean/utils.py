@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+import jax.numpy as jnp
 from jaxtyping import (
     Float,
     Int,
@@ -41,3 +42,26 @@ def jax_gather_nd(
     """
     tuple_indices = tuple(indices[..., i] for i in range(indices.shape[-1]))
     return params[tuple_indices]
+
+
+def calculate_S(kernel):
+    r"""Returns the rescaled heat semigroup, S
+
+    Args:
+        kernel: instance of the graph kernel
+
+    Returns:
+        S
+    """
+    S = jnp.power(
+        kernel.eigenvalues
+        + 2
+        * kernel.smoothness.value
+        / kernel.lengthscale.value
+        / kernel.lengthscale.value,
+        -kernel.smoothness.value,
+    )
+    S = jnp.multiply(S, kernel.num_vertex / jnp.sum(S))
+    # Scale the transform eigenvalues by the kernel variance
+    S = jnp.multiply(S, kernel.variance.value)
+    return S
