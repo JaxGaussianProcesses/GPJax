@@ -40,7 +40,7 @@ jobs:
 
       # Install katex for math support
       - name: Install NPM
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 16
       - name: Install KaTeX
@@ -49,7 +49,7 @@ jobs:
 
       # Install uv
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           version: "latest"
 

@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/first-interaction@v3.0.0
+      - uses: actions/first-interaction@v3.1.0
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-message: >+
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_message: >+
             Thank you for opening your first PR into GPJax!
 
 

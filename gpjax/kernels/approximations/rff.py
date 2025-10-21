@@ -1,6 +1,7 @@
 """Compute Random Fourier Feature (RFF) kernel approximations."""
 
 import beartype.typing as tp
+from flax import nnx
 import jax.random as jr
 from jaxtyping import Float
 
@@ -54,7 +55,7 @@ class RFF(AbstractKernel):
         self._check_valid_base_kernel(base_kernel)
         self.base_kernel = base_kernel
         self.num_basis_fns = num_basis_fns
-        self.frequencies = frequencies
+        self.frequencies = nnx.data(frequencies)
         self.compute_engine = compute_engine
 
         if self.frequencies is None:

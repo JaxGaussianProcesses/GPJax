@@ -127,7 +127,7 @@ def _check_lengthscale_dims_compat(
     """
 
     if isinstance(lengthscale, nnx.Variable):
-        return _check_lengthscale_dims_compat_old(lengthscale.value, n_dims)
+        return _check_lengthscale_dims_compat(lengthscale.value, n_dims)
 
     lengthscale = jnp.asarray(lengthscale)
     ls_shape = jnp.shape(lengthscale)
@@ -144,35 +144,6 @@ def _check_lengthscale_dims_compat(
                 f"but the number of input dimensions is {n_dims}."
             )
         return n_dims
-
-
-def _check_lengthscale_dims_compat_old(
-    lengthscale: tp.Union[LengthscaleCompatible, nnx.Variable[Lengthscale]],
-    n_dims: tp.Union[int, None],
-):
-    r"""Check that the lengthscale is compatible with n_dims.
-
-    If possible, infer the number of input dimensions from the lengthscale.
-    """
-
-    if isinstance(lengthscale, nnx.Variable):
-        return _check_lengthscale_dims_compat_old(lengthscale.value, n_dims)
-
-    lengthscale = jnp.asarray(lengthscale)
-    ls_shape = jnp.shape(lengthscale)
-
-    if ls_shape == ():
-        return lengthscale, n_dims
-    elif ls_shape != () and n_dims is None:
-        return lengthscale, ls_shape[0]
-    elif ls_shape != () and n_dims is not None:
-        if ls_shape != (n_dims,):
-            raise ValueError(
-                "Expected `lengthscale` to be compatible with the number "
-                f"of input dimensions. Got `lengthscale` with shape {ls_shape}, "
-                f"but the number of input dimensions is {n_dims}."
-            )
-        return lengthscale, n_dims
 
 
 def _check_lengthscale(lengthscale: tp.Any):

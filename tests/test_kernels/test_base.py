@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+from flax import nnx
 from jax import config
 import jax.numpy as jnp
 from jaxtyping import (
@@ -113,11 +114,11 @@ def test_combination_kernel(
     combination_kernel = combination_type(kernels=kernels)
 
     # Check params are a list of dictionaries
-    assert combination_kernel.kernels == kernels
+    assert combination_kernel.kernels == nnx.List(kernels)
 
     # Check combination kernel set
     assert len(combination_kernel.kernels) == n_kerns
-    assert isinstance(combination_kernel.kernels, list)
+    assert isinstance(combination_kernel.kernels, nnx.List)
     assert isinstance(combination_kernel.kernels[0], AbstractKernel)
 
     # Compute gram matrix

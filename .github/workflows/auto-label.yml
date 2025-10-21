@@ -1,7 +1,7 @@
 name: "Automatic Labeling"
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
   issues:
     types: [opened, reopened]
@@ -13,7 +13,7 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -32,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           xs_label: 'size/xs'
           xs_max_size: '10'
-          s_label: 'size/s' 
+          s_label: 'size/s'
           s_max_size: '100'
           m_label: 'size/m'
           m_max_size: '500'
@@ -51,62 +51,62 @@ jobs:
             const title = context.payload.issue.title.toLowerCase();
             const body = context.payload.issue.body?.toLowerCase() || '';
             const text = title + ' ' + body;
-            
+
             const labels = [];
-            
+
             // GPU/Hardware related
-            if (text.includes('gpu') || text.includes('cuda') || text.includes('device') || 
+            if (text.includes('gpu') || text.includes('cuda') || text.includes('device') ||
                 text.includes('memory') || text.includes('jax.device')) {
               labels.push('gpu-support');
             }
-            
+
             // Performance related
             if (text.includes('slow') || text.includes('performance') || text.includes('speed') ||
                 text.includes('memory usage') || text.includes('regression') || text.includes('benchmark')) {
               labels.push('performance');
             }
-            
+
             // Numerical stability
             if (text.includes('numerical') || text.includes('instability') || text.includes('nan') ||
                 text.includes('inf') || text.includes('convergence') || text.includes('precision')) {
               labels.push('numerical-stability');
             }
-            
+
             // JAX compatibility
-            if (text.includes('jax') || text.includes('jit') || text.includes('vmap') || 
+            if (text.includes('jax') || text.includes('jit') || text.includes('vmap') ||
                 text.includes('pmap') || text.includes('xla')) {
               labels.push('jax-compatibility');
             }
-            
+
             // Component detection
             if (text.includes('kernel') || text.includes('rbf') || text.includes('matern')) {
               labels.push('kernels');
             }
-            
+
             if (text.includes('gaussian process') || text.includes(' gp ') || text.includes('posterior') ||
                 text.includes('prior') || text.includes('inference')) {
               labels.push('gps');
             }
-            
+
             if (text.includes('variational') || text.includes('elbo') || text.includes('svgp')) {
               labels.push('variational');
             }
-            
+
             if (text.includes('likelihood') || text.includes('bernoulli') || text.includes('poisson')) {
               labels.push('likelihoods');
             }
-            
+
             if (text.includes('optimization') || text.includes('optimizer') || text.includes('fit') ||
                 text.includes('scipy') || text.includes('optax')) {
               labels.push('optimization');
             }
-            
+
             // Documentation related
             if (text.includes('documentation') || text.includes('docs') || text.includes('example') ||
                 text.includes('tutorial') || text.includes('docstring')) {
               labels.push('documentation');
             }
-            
+
             // Bug vs Feature detection
             if (text.includes('bug') || text.includes('error') || text.includes('fail') ||
                 text.includes('broken') || text.includes('issue') || text.includes('problem')) {
@@ -115,7 +115,7 @@ jobs:
                       text.includes('implement') || text.includes('support') || text.includes('new')) {
               labels.push('enhancement');
             }
-            
+
             // Difficulty assessment
             if (text.includes('good first issue') || text.includes('beginner') || text.includes('easy')) {
               labels.push('good first issue');
@@ -124,14 +124,14 @@ jobs:
             } else if (text.includes('complex') || text.includes('advanced') || text.includes('expert')) {
               labels.push('expert-level');
             }
-            
+
             // Priority detection
             if (text.includes('urgent') || text.includes('critical') || text.includes('blocking')) {
               labels.push('priority/high');
             } else if (text.includes('nice to have') || text.includes('low priority')) {
               labels.push('priority/low');
             }
-            
+
             // Apply labels
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
@@ -150,51 +150,51 @@ jobs:
             const title = context.payload.pull_request.title.toLowerCase();
             const body = context.payload.pull_request.body?.toLowerCase() || '';
             const text = title + ' ' + body;
-            
+
             const labels = [];
-            
+
             // Breaking changes
             if (text.includes('breaking') || text.includes('breaking change') ||
                 title.includes('!:') || body.includes('breaking change')) {
               labels.push('breaking-change');
             }
-            
+
             // Dependencies
             if (title.includes('deps') || title.includes('dependenc') || title.includes('bump') ||
                 text.includes('requirements') || text.includes('pyproject.toml')) {
               labels.push('dependencies');
             }
-            
-            // CI/Infrastructure  
+
+            // CI/Infrastructure
             if (text.includes('github actions') || text.includes('workflow') || text.includes('.yml') ||
                 text.includes('ci') || text.includes('pipeline')) {
               labels.push('ci');
             }
-            
+
             // Performance improvements
             if (text.includes('performance') || text.includes('optimization') || text.includes('faster') ||
                 text.includes('efficient') || text.includes('benchmark')) {
               labels.push('performance');
             }
-            
+
             // Documentation
             if (text.includes('docs') || text.includes('readme') || text.includes('docstring') ||
                 text.includes('example') || text.includes('.md') || text.includes('tutorial')) {
               labels.push('documentation');
             }
-            
+
             // Tests
             if (text.includes('test') || text.includes('pytest') || text.includes('coverage') ||
                 title.startsWith('test:') || text.includes('testing')) {
               labels.push('tests');
             }
-            
+
             // Security
             if (text.includes('security') || text.includes('vulnerability') || text.includes('cve') ||
                 text.includes('safety') || text.includes('bandit')) {
               labels.push('security');
             }
-            
+
             // Apply labels
             if (labels.length > 0) {
               await github.rest.issues.addLabels({

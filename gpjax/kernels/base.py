@@ -253,7 +253,7 @@ class CombinationKernel(AbstractKernel):
         compute_engine: AbstractKernelComputation = DenseKernelComputation(),
     ):
         # Add kernels to a list, flattening out instances of this class therein, as in GPFlow kernels.
-        kernels_list: list[AbstractKernel] = []
+        kernels_list: list[AbstractKernel] = nnx.List([])
         for kernel in kernels:
             if not isinstance(kernel, AbstractKernel):
                 raise TypeError("can only combine Kernel instances")  # pragma: no cover
