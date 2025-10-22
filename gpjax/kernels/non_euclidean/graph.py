@@ -26,6 +26,7 @@ from gpjax.kernels.computations import (
     EigenKernelComputation,
 )
 from gpjax.kernels.non_euclidean.utils import (
+    calculate_heat_semigroup,
     jax_gather_nd,
 )
 from gpjax.kernels.stationary.base import StationaryKernel
@@ -110,26 +111,3 @@ class GraphKernel(StationaryKernel):
             jax_gather_nd(self.eigenvectors, y)
         )  # shape (n,n)
         return Kxx.squeeze()
-
-
-def calculate_heat_semigroup(kernel: GraphKernel) -> Float[Array, "N M"]:
-    r"""Returns the rescaled heat semigroup, S
-
-    Args:
-        kernel: instance of the graph kernel
-
-    Returns:
-        S
-    """
-    S = jnp.power(
-        kernel.eigenvalues
-        + 2
-        * kernel.smoothness.value
-        / kernel.lengthscale.value
-        / kernel.lengthscale.value,
-        -kernel.smoothness.value,
-    )
-    S = jnp.multiply(S, kernel.num_vertex / jnp.sum(S))
-    # Scale the transform eigenvalues by the kernel variance
-    S = jnp.multiply(S, kernel.variance.value)
-    return S
