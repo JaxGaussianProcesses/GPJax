@@ -25,7 +25,10 @@ from gpjax.kernels.computations import (
     AbstractKernelComputation,
     EigenKernelComputation,
 )
-from gpjax.kernels.non_euclidean.utils import jax_gather_nd
+from gpjax.kernels.non_euclidean.utils import (
+    calculate_heat_semigroup,
+    jax_gather_nd,
+)
 from gpjax.kernels.stationary.base import StationaryKernel
 from gpjax.parameters import (
     Parameter,
@@ -98,14 +101,12 @@ class GraphKernel(StationaryKernel):
 
         super().__init__(active_dims, lengthscale, variance, n_dims, compute_engine)
 
-    def __call__(  # TODO not consistent with general kernel interface
+    def __call__(
         self,
         x: Int[Array, "N 1"],
         y: Int[Array, "M 1"],
-        *,
-        S,
-        **kwargs,
     ):
+        S = calculate_heat_semigroup(self)
         Kxx = (jax_gather_nd(self.eigenvectors, x) * S.squeeze()) @ jnp.transpose(
             jax_gather_nd(self.eigenvectors, y)
         )  # shape (n,n)
