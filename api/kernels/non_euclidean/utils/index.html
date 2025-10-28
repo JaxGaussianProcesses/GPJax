@@ -1757,6 +1757,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#gpjax.kernels.non_euclidean.utils.calculate_heat_semigroup" class="md-nav__link">
+    <span class="md-ellipsis">
+      calculate_heat_semigroup
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2532,6 +2541,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#gpjax.kernels.non_euclidean.utils.calculate_heat_semigroup" class="md-nav__link">
+    <span class="md-ellipsis">
+      calculate_heat_semigroup
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2626,6 +2644,50 @@ index <span class="arithmatex">\(i\)</span>.</p>
           –
           <div class="doc-md-description">
             <p>An arbitrary array with leading axes of length <span class="arithmatex">\(M\)</span>.</p>
+          </div>
+        </li>
+    </ul>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="gpjax.kernels.non_euclidean.utils.calculate_heat_semigroup" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">calculate_heat_semigroup</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">calculate_heat_semigroup</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returns the rescaled heat semigroup, S</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>kernel</code></b>
+              (<code><a class="autorefs autorefs-internal" title="gpjax.kernels.non_euclidean.graph.GraphKernel" href="../graph/#gpjax.kernels.non_euclidean.graph.GraphKernel">GraphKernel</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>instance of the graph kernel</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="jaxtyping.Float">Float</span>[<span title="gpjax.typing.Array">Array</span>, &#39;N M&#39;]</code>
+          –
+          <div class="doc-md-description">
+            <p>S</p>
           </div>
         </li>
     </ul>
