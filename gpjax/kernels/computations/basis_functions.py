@@ -6,9 +6,7 @@ from jaxtyping import Float
 import gpjax
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linalg import (
-    Dense,
     Diagonal,
-    psd,
 )
 from gpjax.typing import Array
 
@@ -27,9 +25,9 @@ class BasisFunctionComputation(AbstractKernelComputation):
         z2 = self.compute_features(kernel, y)
         return self.scaling(kernel) * jnp.matmul(z1, z2.T)
 
-    def _gram(self, kernel: K, inputs: Float[Array, "N D"]) -> Dense:
+    def _gram(self, kernel: K, inputs: Float[Array, "N D"]) -> Float[Array, "N N"]:
         z1 = self.compute_features(kernel, inputs)
-        return psd(Dense(self.scaling(kernel) * jnp.matmul(z1, z1.T)))
+        return self.scaling(kernel) * jnp.matmul(z1, z1.T)
 
     def diagonal(self, kernel: K, inputs: Float[Array, "N D"]) -> Diagonal:
         r"""For a given kernel, compute the elementwise diagonal of the
