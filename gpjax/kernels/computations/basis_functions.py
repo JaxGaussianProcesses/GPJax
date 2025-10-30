@@ -6,9 +6,7 @@ from jaxtyping import Float
 import gpjax
 from gpjax.kernels.computations.base import AbstractKernelComputation
 from gpjax.linalg import (
-    Dense,
     Diagonal,
-    psd,
 )
 from gpjax.typing import Array
 
